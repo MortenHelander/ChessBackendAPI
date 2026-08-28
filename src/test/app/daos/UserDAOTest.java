@@ -1,0 +1,149 @@
+package app.daos;
+
+import app.config.HibernateTestConfig;
+import app.entities.User;
+import app.exceptions.ApiException;
+import app.testutils.UserTestPopulator;
+import jakarta.persistence.EntityManagerFactory;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+
+import java.util.Map;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.not;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+public class UserDAOTest {
+
+
+        private final EntityManagerFactory emf = HibernateTestConfig.getEntityManagerFactory();
+
+        private UserDAO userDAO;
+        private Map<String, User> seeded;
+
+        @BeforeEach
+        void beforeEach(){
+            seeded = UserTestPopulator.populate(emf);
+            userDAO = new UserDAO(emf);
+        }
+
+        @AfterAll
+        void shutdown() {
+            emf.close();
+        }
+
+        @Test
+        void create() {
+            User user = new User("Simon", "Hansen", "simon@mail.dk", "simonsen", "simon123");
+
+            User created = userDAO.create(user);
+
+            assertThat(created.getId(), notNullValue());
+            User fetched = userDAO.getById(created.getId());
+            assertThat(fetched, samePropertyValuesAs(created));
+        }
+
+//        @Test
+//        void getById() {
+//            User seed = seeded.get("study1");
+//            User fetched = userDAO.getById(seed.getId());
+//            assertThat(fetched.getId(), is(seed.getId()));
+//            assertThat(fetched.getTitle(), is(seed.getTitle()));
+//        }
+//
+//        @Test
+//        void getAll() {
+//            List<User> all = userDAO.getAll();
+//            assertThat(all, hasSize(3));
+//            assertThat(all, containsInAnyOrder(seeded.get("study1"), seeded.get("study2"), seeded.get("study3")));
+//        }
+//
+//        @Test
+//        void update() {
+//            User seed = seeded.get("study2");
+//            LocalDate priorUpdatedAt = LocalDate.now().minusDays(2);
+//            User updated = User.builder()
+//                    .id(seed.getId())
+//                    .title("Updated Title")
+//                    .teacherId(seed.getTeacherId())
+//                    .studyDate(seed.getStudyDate())
+//                    .phase(seed.getPhase())
+//                    .createdAt(seed.getCreatedAt())
+//                    .updatedAt(priorUpdatedAt)
+//                    .deletedAt(seed.getDeletedAt())
+//                    .build();
+//
+//            User result = userDAO.update(updated);
+//
+//            assertThat(result.getId(), is(seed.getId()));
+//            assertThat(result.getTitle(), is("Updated Title"));
+//            assertThat(result.getUpdatedAt(), notNullValue());
+//            assertThat(result.getUpdatedAt(), is(LocalDate.now()));
+//            assertThat(result.getUpdatedAt(), not(priorUpdatedAt));
+//        }
+//
+//        @Test
+//        void delete() {
+//            User seed = seeded.get("study3");
+//
+//            boolean deleted = userDAO.delete(seed.getId());
+//
+//            assertThat(deleted, is(true));
+//            assertThrows(ApiException.class, () -> userDAO.getById(seed.getId()));
+//        }
+//
+//        @Test
+//        void create_withNullStudy_throwsApiException() {
+//            ApiException ex = assertThrows(ApiException.class, () -> userDAO.create(null));
+//            assertThat(ex.getCode(), is(400));
+//        }
+//
+//        @Test
+//        void getById_withNullId_throwsApiException() {
+//            ApiException ex = assertThrows(ApiException.class, () -> userDAO.getById(null));
+//            assertThat(ex.getCode(), is(400));
+//        }
+//
+//        @Test
+//        void getById_withMissingId_throwsApiException() {
+//            ApiException ex = assertThrows(ApiException.class, () -> userDAO.getById(999_999));
+//            assertThat(ex.getCode(), is(404));
+//        }
+//
+//        @Test
+//        void update_withNullStudy_throwsApiException() {
+//            ApiException ex = assertThrows(ApiException.class, () -> userDAO.update(null));
+//            assertThat(ex.getCode(), is(400));
+//        }
+//
+//        @Test
+//        void update_withMissingId_throwsApiException() {
+//            User missing = User.builder()
+//                    .id(999_999)
+//                    .title("Missing")
+//                    .teacherId(1)
+//                    .studyDate(LocalDate.now().plusDays(1))
+//                    .build();
+//
+//            ApiException ex = assertThrows(ApiException.class, () -> userDAO.update(missing));
+//            assertThat(ex.getCode(), is(404));
+//        }
+//
+//        @Test
+//        void delete_withNullId_throwsApiException() {
+//            ApiException ex = assertThrows(ApiException.class, () -> userDAO.delete(null));
+//            assertThat(ex.getCode(), is(400));
+//        }
+//
+//        @Test
+//        void delete_withMissingId_throwsApiException() {
+//            ApiException ex = assertThrows(ApiException.class, () -> userDAO.delete(999_999));
+//            assertThat(ex.getCode(), is(404));
+//        }
+//    }
+}

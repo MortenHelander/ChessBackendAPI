@@ -3,24 +3,22 @@ package app.entities;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @ToString
 @Getter
-public class UserStats {
+public class Move {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    private Integer gamesPlayed;
-    private Integer wins;
-    private Integer losses;
-    private double winrate;
-    private double mmr;
-    @OneToOne
-    @MapsId
-    @ToString.Exclude
+    private int moveNumber;
+    private String uci;
+    private LocalDateTime playedAt;
+    @ManyToOne
     @Setter
-    private User user;
+    private Game game;
 }
