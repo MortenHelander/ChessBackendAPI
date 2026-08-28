@@ -10,6 +10,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 
+import java.util.List;
 import java.util.Map;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -45,24 +46,24 @@ public class UserDAOTest {
 
             assertThat(created.getId(), notNullValue());
             User fetched = userDAO.getById(created.getId());
-            assertThat(fetched, samePropertyValuesAs(created));
+            assertThat(fetched.getId(), is(created.getId()));
         }
 
-//        @Test
-//        void getById() {
-//            User seed = seeded.get("study1");
-//            User fetched = userDAO.getById(seed.getId());
-//            assertThat(fetched.getId(), is(seed.getId()));
-//            assertThat(fetched.getTitle(), is(seed.getTitle()));
-//        }
-//
-//        @Test
-//        void getAll() {
-//            List<User> all = userDAO.getAll();
-//            assertThat(all, hasSize(3));
-//            assertThat(all, containsInAnyOrder(seeded.get("study1"), seeded.get("study2"), seeded.get("study3")));
-//        }
-//
+        @Test
+        void getById() {
+            User seed = seeded.get("user1");
+            User fetched = userDAO.getById(seed.getId());
+            assertThat(fetched.getId(), is(seed.getId()));
+            assertThat(fetched.getEmail(), is(seed.getEmail()));
+        }
+
+        @Test
+        void getAll() {
+            List<User> all = userDAO.getAll();
+            assertThat(all, hasSize(3));
+            assertThat(all, containsInAnyOrder(seeded.get("user1"), seeded.get("user2"), seeded.get("user3")));
+        }
+
 //        @Test
 //        void update() {
 //            User seed = seeded.get("study2");

@@ -17,14 +17,13 @@ public final class UserTestPopulator {
         try (EntityManager em = emf.createEntityManager()) {
 
             em.getTransaction().begin();
-            LocalDate baseDate = LocalDate.of(2028,2,1);
             User user1 = new User("Morten", "Helander", "morten.helander@hotmail.com", "Sheriff", "password123");
             User user2 = new User("Theis", "Rudkjær", "theis@hotmail.com", "SVG-man", "anotherpassword1441");
             User user3 = new User("Andreas", "Jensen", "andreas@hotmail.com", "Frontjoe", "andreas1234567");
 
 
             try {
-                em.createNativeQuery("TRUNCATE TABLE user RESTART IDENTITY CASCADE").executeUpdate();
+                em.createNativeQuery("TRUNCATE TABLE users RESTART IDENTITY CASCADE").executeUpdate();
                 em.persist(user1);
                 em.persist(user2);
                 em.persist(user3);

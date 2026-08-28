@@ -2,11 +2,14 @@ package app.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.proxy.HibernateProxy;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
+@Table(name = "users")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -21,9 +24,9 @@ public class User {
     private String email;
     private String username;
     private String password;
-    @OneToOne(mappedBy = "person", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private UserStats userStats;
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @Builder.Default
     private Set<Player> players = new HashSet<>();
 
@@ -47,5 +50,21 @@ public class User {
         if (player != null){
             player.setUser(this);
         }
+    }
+
+    @Override
+    public final boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null)
+            return false;
+        Class<?> oEffectiveClass = o instanceof HibernateProxy ? ((HibernateProxy) o).getHibernateLazyInitializer()
+                .getPersistentClass() : o.getClass();
+        Class<?> thisEffectiveClass = this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer()
+                .getPersistentClass() : this.getClass();
+        if (thisEffectiveClass != oEffectiveClass)
+            return false;
+        User user = (User) o;
+        return getId() != null && Objects.equals(getId(), user.getId());
     }
 }
