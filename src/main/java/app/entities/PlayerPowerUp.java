@@ -4,13 +4,13 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "power_ups")
+@Table(name = "player_power_ups")
 @NoArgsConstructor
 @Builder
 @AllArgsConstructor
 @ToString
 @Getter
-public class PowerUp {
+public class PlayerPowerUp {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

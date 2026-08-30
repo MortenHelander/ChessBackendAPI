@@ -25,6 +25,7 @@ public class User {
     private String username;
     private String password;
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    @PrimaryKeyJoinColumn
     private UserStats userStats;
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @Builder.Default
@@ -66,5 +67,10 @@ public class User {
             return false;
         User user = (User) o;
         return getId() != null && Objects.equals(getId(), user.getId());
+    }
+
+    @Override
+    public final int hashCode() {
+        return getClass().hashCode();
     }
 }

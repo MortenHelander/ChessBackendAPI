@@ -1,6 +1,7 @@
 package app.testutils;
 
 import app.entities.User;
+import app.entities.UserStats;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.PersistenceException;
@@ -18,8 +19,26 @@ public final class UserTestPopulator {
 
             em.getTransaction().begin();
             User user1 = new User("Morten", "Helander", "morten.helander@hotmail.com", "Sheriff", "password123");
+            user1.addUserStats(UserStats.builder()
+                    .gamesPlayed(0)
+                    .wins(0)
+                    .losses(0)
+                    .mmr(1000)
+                    .build());
             User user2 = new User("Theis", "Rudkjær", "theis@hotmail.com", "SVG-man", "anotherpassword1441");
+            user2.addUserStats(UserStats.builder()
+                    .gamesPlayed(25)
+                    .wins(12)
+                    .losses(13)
+                    .mmr(900)
+                    .build());
             User user3 = new User("Andreas", "Jensen", "andreas@hotmail.com", "Frontjoe", "andreas1234567");
+            user3.addUserStats(UserStats.builder()
+                    .gamesPlayed(200)
+                    .wins(150)
+                    .losses(50)
+                    .mmr(1500)
+                    .build());
 
 
             try {

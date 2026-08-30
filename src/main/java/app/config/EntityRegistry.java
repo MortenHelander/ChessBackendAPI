@@ -12,7 +12,7 @@ final class EntityRegistry {
         configuration.addAnnotatedClass(Player.class);
         configuration.addAnnotatedClass(Game.class);
         configuration.addAnnotatedClass(Move.class);
-        configuration.addAnnotatedClass(PowerUp.class);
+        configuration.addAnnotatedClass(PlayerPowerUp.class);
         configuration.addAnnotatedClass(UserStats.class);
         // TODO: Add more entities here...
     }

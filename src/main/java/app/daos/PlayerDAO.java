@@ -1,7 +1,7 @@
 package app.daos;
 
+import app.entities.Player;
 import app.entities.User;
-import app.entities.UserStats;
 import app.exceptions.ApiException;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
@@ -10,98 +10,91 @@ import jakarta.persistence.TypedQuery;
 
 import java.util.List;
 
-public class UserDAO implements IDAO<User, Integer>{
+public class PlayerDAO implements IDAO<Player, Integer> {
 
     private EntityManagerFactory emf;
 
-    public UserDAO(EntityManagerFactory emf){
+    public PlayerDAO(EntityManagerFactory emf){
         this.emf = emf;
     }
 
     @Override
-    public User create(User user) {
-        if (user == null) {
-            throw new ApiException(400, "Provided user is null");
+    public Player create(Player player) {
+        if (player == null) {
+            throw new ApiException(400, "Provided player is null");
         }
         try (EntityManager em = emf.createEntityManager()) {
             em.getTransaction().begin();
             try {
-                user.addUserStats(UserStats.builder()
-                        .gamesPlayed(0)
-                        .wins(0)
-                        .losses(0)
-                        .draws(0)
-                        .mmr(500)
-                        .build());
-                em.persist(user);
+                em.persist(player);
                 em.getTransaction().commit();
             } catch (PersistenceException e) {
                 if (em.getTransaction().isActive()) {
                     em.getTransaction().rollback();
                 }
-                throw new ApiException(500, "Creation of user failed: " + e.getMessage());
+                throw new ApiException(500, "Creation of player failed: " + e.getMessage());
             } catch (RuntimeException e) {
                 if (em.getTransaction().isActive()) {
                     em.getTransaction().rollback();
                 }
                 throw e;
             }
-            return user;
+            return player;
         }
     }
 
     @Override
-    public User getById(Integer id) {
+    public Player getById(Integer id) {
         if (id == null){
             throw new ApiException(400, "UserID is required");
         }
         try(EntityManager em = emf.createEntityManager()){
             try {
-                User user = em.find(User.class, id);
-                if (user != null) {
-                    return user;
+                Player player = em.find(Player.class, id);
+                if (player != null) {
+                    return player;
                 }
-                throw new ApiException(404, "User not found");
+                throw new ApiException(404, "Player not found");
             } catch (PersistenceException e){
-                throw new ApiException(500, "Get user failed: " + e.getMessage());
+                throw new ApiException(500, "Get player failed: " + e.getMessage());
             }
         }
     }
 
     @Override
-    public List<User> getAll() {
+    public List<Player> getAll() {
         try(EntityManager em = emf.createEntityManager()){
             try{
-                TypedQuery<User> query = em.createQuery("SELECT u FROM User u", User.class);
+                TypedQuery<Player> query = em.createQuery("SELECT p FROM Player p", Player.class);
                 return query.getResultList();
             } catch (PersistenceException e){
-                throw new ApiException(500, "Get all users failed: " + e.getMessage());
+                throw new ApiException(500, "Get all players failed: " + e.getMessage());
             }
         }
     }
 
     @Override
-    public User update(User user) {
-        if (user == null){
+    public Player update(Player player) {
+        if (player == null){
             throw new ApiException(400, "Provided user is null");
-        } else if (user.getId() == null){
+        } else if (player.getId() == null){
             throw new ApiException(400, "UserID is required");
         }
-        User updated;
+        Player updated;
         try(EntityManager em = emf.createEntityManager()){
             em.getTransaction().begin();
             try{
-                User existing = em.find(User.class, user.getId());
+                Player existing = em.find(Player.class, player.getId());
                 if (existing == null){
-                    throw new ApiException(404, "User not found");
+                    throw new ApiException(404, "Player not found");
                 }
-                updated = em.merge(user);
+                updated = em.merge(player);
                 em.getTransaction().commit();
             } catch (PersistenceException e) {
                 if (em.getTransaction().isActive()) {
                     em.getTransaction().rollback();
                 }
-                throw new ApiException(500, "Update user failed: " + e.getMessage());
+                throw new ApiException(500, "Update player failed: " + e.getMessage());
             } catch (RuntimeException e) {
                 if (em.getTransaction().isActive()) {
                     em.getTransaction().rollback();
@@ -120,11 +113,11 @@ public class UserDAO implements IDAO<User, Integer>{
         try(EntityManager em = emf.createEntityManager()){
             em.getTransaction().begin();
             try{
-                User userToRemove = em.find(User.class, id);
-                if (userToRemove != null){
-                    em.remove(userToRemove);
+                Player playerToRemove = em.find(Player.class, id);
+                if (playerToRemove != null){
+                    em.remove(playerToRemove);
                 } else {
-                    throw new ApiException(404, "User not found");
+                    throw new ApiException(404, "Player not found");
                 }
                 em.getTransaction().commit();
             } catch (PersistenceException e) {
@@ -140,5 +133,4 @@ public class UserDAO implements IDAO<User, Integer>{
         }
         return true;
     }
-
 }
