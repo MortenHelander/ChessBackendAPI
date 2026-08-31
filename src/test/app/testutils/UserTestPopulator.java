@@ -5,8 +5,6 @@ import app.entities.UserStats;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.PersistenceException;
-
-import java.time.LocalDate;
 import java.util.LinkedHashMap;
 import java.util.Map;
 

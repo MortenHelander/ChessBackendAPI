@@ -4,6 +4,7 @@ import app.config.HibernateTestConfig;
 import app.entities.Result;
 import app.entities.User;
 import app.entities.UserStats;
+import app.exceptions.ApiException;
 import app.testutils.UserTestPopulator;
 import jakarta.persistence.EntityManagerFactory;
 import org.junit.jupiter.api.AfterAll;
@@ -16,20 +17,19 @@ import java.util.Map;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class UserStatsDAOTest {
 
     private final EntityManagerFactory emf = HibernateTestConfig.getEntityManagerFactory();
 
-    private UserDAO userDAO;
     private UserStatsDAO userStatsDAO;
     private Map<String, User> seeded;
 
     @BeforeEach
     void beforeEach(){
         seeded = UserTestPopulator.populate(emf);
-        userDAO = new UserDAO(emf);
         userStatsDAO = new UserStatsDAO(emf);
     }
 
@@ -64,5 +64,31 @@ public class UserStatsDAOTest {
         assertThat(seed.getLosses(), is(updated.getLosses()));
         assertThat(seed.getDraws(), is(updated.getDraws()));
 
+    }
+
+    @Test
+    void getById_withNullId_throwsApiException() {
+        ApiException ex = assertThrows(ApiException.class, () -> userStatsDAO.getById(null));
+        assertThat(ex.getCode(), is(400));
+    }
+
+    @Test
+    void getById_withMissingId_throwsApiException() {
+        ApiException ex = assertThrows(ApiException.class, () -> userStatsDAO.getById(999_999));
+        assertThat(ex.getCode(), is(404));
+    }
+
+    @Test
+    void recordResult_withNullResult_throwsNullPointerException() {
+        NullPointerException ex = assertThrows(NullPointerException.class, () -> userStatsDAO.recordResult(seeded.get("user1").getId(), null));
+        assertThat(ex.getMessage(), is("Provided result is null"));
+    }
+
+    @Test
+    void recordResult_withMissingId_throwsApiException() {
+        Integer missing = 99999;
+
+        ApiException ex = assertThrows(ApiException.class, () -> userStatsDAO.recordResult(missing, Result.WIN));
+        assertThat(ex.getCode(), is(404));
     }
 }

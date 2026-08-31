@@ -32,6 +32,11 @@ public class Player {
     @Builder.Default
     private Set<PlayerPowerUp> playerPowerUps = new HashSet<>();
 
+    public Player(Color color, boolean isAi) {
+        this.color = color;
+        this.isAi = isAi;
+    }
+
     public void addPowerUp(PlayerPowerUp playerPowerUp){
         this.playerPowerUps.add(playerPowerUp);
         if (playerPowerUp != null){
