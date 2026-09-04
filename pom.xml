@@ -115,6 +115,12 @@
             <artifactId>slf4j-api</artifactId>
             <version>${org.slf4j}</version>
         </dependency>
+        <dependency>
+            <groupId>tools.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>3.2.2</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 
 </project>

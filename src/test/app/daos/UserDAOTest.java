@@ -45,7 +45,7 @@ public class UserDAOTest {
 
             assertThat(created.getId(), notNullValue());
             User fetched = userDAO.getById(created.getId());
-            assertThat(fetched.getId(), is(created.getId()));
+            assertThat(fetched, is(created));
         }
 
         @Test

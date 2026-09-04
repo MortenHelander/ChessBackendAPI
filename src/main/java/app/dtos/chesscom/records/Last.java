@@ -1,0 +1,7 @@
+package app.dtos.chesscom.records;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+public record Last(int rating) {
+}

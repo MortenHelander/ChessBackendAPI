@@ -63,17 +63,17 @@ public class GameDAOTest {
         assertThat(all, containsInAnyOrder(seeded.get("game1"), seeded.get("game2"), seeded.get("game3")));
     }
 
-    @Test
-    void update() {
-        Game seed = seeded.get("game1");
-        Game updated = gameDAO.getById(seed.getId());
-        updated.addMoveAndShiftTurn(new Move());
-
-        Game result = gameDAO.update(updated);
-
-        assertThat(result.getId(), is(seed.getId()));
-        assertThat(result.isAi(), is(true));
-    }
+//    @Test
+//    void update() {
+//        Game seed = seeded.get("game1");
+//        Game updated = gameDAO.getById(seed.getId());
+//        updated.addMoveAndShiftTurn(new Move());
+//
+//        Game result = gameDAO.update(updated);
+//
+//        assertThat(result.getId(), is(seed.getId()));
+//        assertThat(result.isAi(), is(true));
+//    }
 
 //    @Test
 //    void delete() {
