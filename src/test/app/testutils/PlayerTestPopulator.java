@@ -1,6 +1,6 @@
 package app.testutils;
 
-import app.entities.Color;
+import app.entities.enums.Color;
 import app.entities.Player;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;

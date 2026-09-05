@@ -1,12 +1,10 @@
 package app.daos;
 
 import app.config.HibernateTestConfig;
-import app.entities.Color;
+import app.entities.enums.Color;
 import app.entities.Player;
-import app.entities.User;
 import app.exceptions.ApiException;
 import app.testutils.PlayerTestPopulator;
-import app.testutils.UserTestPopulator;
 import jakarta.persistence.EntityManagerFactory;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;

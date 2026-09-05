@@ -1,6 +1,8 @@
 package app.testutils;
 
 import app.entities.*;
+import app.entities.enums.Color;
+import app.entities.enums.GameMode;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.PersistenceException;

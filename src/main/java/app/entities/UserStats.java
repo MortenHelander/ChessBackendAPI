@@ -1,5 +1,6 @@
 package app.entities;
 
+import app.entities.enums.Result;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.proxy.HibernateProxy;

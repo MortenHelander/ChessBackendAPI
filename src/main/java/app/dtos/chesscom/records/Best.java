@@ -3,5 +3,5 @@ package app.dtos.chesscom.records;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public record Best(String rating) {
+public record Best(int rating) {
 }

@@ -1,7 +1,6 @@
 package app.daos;
 
-import app.entities.Result;
-import app.entities.User;
+import app.entities.enums.Result;
 import app.entities.UserStats;
 import app.exceptions.ApiException;
 import jakarta.persistence.EntityManager;

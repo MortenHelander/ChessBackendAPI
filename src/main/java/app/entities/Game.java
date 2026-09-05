@@ -1,5 +1,8 @@
 package app.entities;
 
+import app.entities.enums.Color;
+import app.entities.enums.GameMode;
+import app.entities.enums.GameStatus;
 import app.exceptions.ApiException;
 import jakarta.persistence.*;
 import lombok.*;
@@ -23,10 +26,10 @@ public class Game {
     @Enumerated(value = EnumType.STRING)
     private GameStatus gameStatus;
     @Enumerated(value = EnumType.STRING)
-    private WinnerColor winnerColor;
+    private Color winnerColor;
     private boolean isWhitesTurn;
 
-    @OneToMany(mappedBy = "game", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "game", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("moveNumber ASC")
     private List<Move> moves = new ArrayList<>();
 
@@ -53,11 +56,15 @@ public class Game {
         isWhitesTurn = !isWhitesTurn;
         if (move != null){
             move.setGame(this);
-            move.setMoveNumber(moves.size());
+            move.setMoveNumber(moves.size()+1);
+            move.setPlayedAt(LocalDateTime.now());
+
+            //gets the names of positions to use for stockfish api
+            move.setUci(move.getFrom().name().toLowerCase() + move.getTo().name().toLowerCase());
         }
     }
 
-    public void finishGame(GameStatus status, WinnerColor winnerColor){
+    public void finishGame(GameStatus status, Color winnerColor){
         if (this.gameStatus != GameStatus.IN_PROGRESS){
             throw new ApiException(400, "Game is already finished");
         }

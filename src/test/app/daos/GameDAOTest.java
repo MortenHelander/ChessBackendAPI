@@ -2,7 +2,10 @@ package app.daos;
 
 import app.config.HibernateTestConfig;
 import app.entities.*;
+import app.entities.enums.Color;
+import app.entities.enums.GameMode;
 import app.exceptions.ApiException;
+import app.gameengine.Position;
 import app.testutils.GameTestPopulator;
 import jakarta.persistence.EntityManagerFactory;
 import org.junit.jupiter.api.AfterAll;
@@ -63,72 +66,63 @@ public class GameDAOTest {
         assertThat(all, containsInAnyOrder(seeded.get("game1"), seeded.get("game2"), seeded.get("game3")));
     }
 
-//    @Test
-//    void update() {
-//        Game seed = seeded.get("game1");
-//        Game updated = gameDAO.getById(seed.getId());
-//        updated.addMoveAndShiftTurn(new Move());
-//
-//        Game result = gameDAO.update(updated);
-//
-//        assertThat(result.getId(), is(seed.getId()));
-//        assertThat(result.isAi(), is(true));
-//    }
+    @Test
+    void update() {
+        Game seed = seeded.get("game2");
+        Game updated = gameDAO.getById(seed.getId());
+        updated.addMoveAndShiftTurn(new Move(Position.A1, Position.A3));
 
-//    @Test
-//    void delete() {
-//        Game seed = seeded.get("player3");
-//
-//        boolean deleted = gameDAO.delete(seed.getId());
-//
-//        assertThat(deleted, is(true));
-//        assertThrows(ApiException.class, () -> gameDAO.getById(seed.getId()));
-//    }
-//
-//    @Test
-//    void create_withNullPlayer_throwsApiException() {
-//        ApiException ex = assertThrows(ApiException.class, () -> gameDAO.create(null));
-//        assertThat(ex.getCode(), is(400));
-//    }
-//
-//    @Test
-//    void getById_withNullId_throwsApiException() {
-//        ApiException ex = assertThrows(ApiException.class, () -> gameDAO.getById(null));
-//        assertThat(ex.getCode(), is(400));
-//    }
-//
-//    @Test
-//    void getById_withMissingId_throwsApiException() {
-//        ApiException ex = assertThrows(ApiException.class, () -> gameDAO.getById(999_999));
-//        assertThat(ex.getCode(), is(404));
-//    }
-//
-//    @Test
-//    void update_withNullPlayer_throwsApiException() {
-//        ApiException ex = assertThrows(ApiException.class, () -> gameDAO.update(null));
-//        assertThat(ex.getCode(), is(400));
-//    }
-//
-//    @Test
-//    void update_withMissingId_throwsApiException() {
-//        Player missing = Player.builder()
-//                .id(999_999)
-//                .isAi(false)
-//                .build();
-//
-//        ApiException ex = assertThrows(ApiException.class, () -> gameDAO.update(missing));
-//        assertThat(ex.getCode(), is(404));
-//    }
-//
-//    @Test
-//    void delete_withNullId_throwsApiException() {
-//        ApiException ex = assertThrows(ApiException.class, () -> gameDAO.delete(null));
-//        assertThat(ex.getCode(), is(400));
-//    }
-//
-//    @Test
-//    void delete_withMissingId_throwsApiException() {
-//        ApiException ex = assertThrows(ApiException.class, () -> gameDAO.delete(999_999));
-//        assertThat(ex.getCode(), is(404));
-//    }
+        Game result = gameDAO.update(updated);
+
+        assertThat(result.getId(), is(seed.getId()));
+        assertThat(result.isWhitesTurn(), is(false));
+        assertThat(result.getMoves().size(), is(1));
+    }
+
+    @Test
+    void delete() {
+        Game seed = seeded.get("game3");
+
+        boolean deleted = gameDAO.delete(seed.getId());
+
+        assertThat(deleted, is(true));
+        assertThrows(ApiException.class, () -> gameDAO.getById(seed.getId()));
+    }
+
+    @Test
+    void create_withNullGame_throwsApiException() {
+        ApiException ex = assertThrows(ApiException.class, () -> gameDAO.create(null));
+        assertThat(ex.getCode(), is(400));
+    }
+
+    @Test
+    void getById_withNullId_throwsApiException() {
+        ApiException ex = assertThrows(ApiException.class, () -> gameDAO.getById(null));
+        assertThat(ex.getCode(), is(400));
+    }
+
+    @Test
+    void getById_withMissingId_throwsApiException() {
+        ApiException ex = assertThrows(ApiException.class, () -> gameDAO.getById(999_999));
+        assertThat(ex.getCode(), is(404));
+    }
+
+    @Test
+    void update_withNullGame_throwsApiException() {
+        ApiException ex = assertThrows(ApiException.class, () -> gameDAO.update(null));
+        assertThat(ex.getCode(), is(400));
+    }
+
+
+    @Test
+    void delete_withNullId_throwsApiException() {
+        ApiException ex = assertThrows(ApiException.class, () -> gameDAO.delete(null));
+        assertThat(ex.getCode(), is(400));
+    }
+
+    @Test
+    void delete_withMissingId_throwsApiException() {
+        ApiException ex = assertThrows(ApiException.class, () -> gameDAO.delete(999_999));
+        assertThat(ex.getCode(), is(404));
+    }
 }

@@ -1,5 +1,7 @@
 package app.entities;
 
+import app.entities.enums.PowerUpStatus;
+import app.entities.enums.PowerUpType;
 import jakarta.persistence.*;
 import lombok.*;
 

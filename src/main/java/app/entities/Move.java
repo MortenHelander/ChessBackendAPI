@@ -2,6 +2,7 @@ package app.entities;
 
 import app.gameengine.Position;
 import jakarta.persistence.*;
+import jdk.jfr.Name;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -9,8 +10,6 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "moves")
 @NoArgsConstructor
-@AllArgsConstructor
-@Builder
 @ToString
 @Getter
 public class Move {
@@ -19,13 +18,20 @@ public class Move {
     private Integer id;
     @Setter
     private int moveNumber;
+    @Setter
     private String uci;
+    @Setter
     private LocalDateTime playedAt;
+    @Column(name = "from_position")
     private Position from;
+    @Column(name = "to_position")
     private Position to;
     @ManyToOne
     @Setter
     private Game game;
 
-
+    public Move(Position from, Position to) {
+        this.from = from;
+        this.to = to;
+    }
 }
