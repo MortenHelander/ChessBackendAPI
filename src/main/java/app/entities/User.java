@@ -26,12 +26,16 @@ public class User {
     private String password;
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     @PrimaryKeyJoinColumn
+    @ToString.Exclude
     private UserStats userStats;
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ToString.Exclude
     @Builder.Default
     private Set<Player> players = new HashSet<>();
 
     public User(String firstName, String lastName, String email, String username, String password) {
+        //init players set if called from constructor
+        this();
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;

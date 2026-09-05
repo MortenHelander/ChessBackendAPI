@@ -81,7 +81,8 @@ public class GameDAO implements IDAO<Game, Integer>{
         }
         try(EntityManager em = emf.createEntityManager()){
             try {
-                TypedQuery<Game> query = em.createQuery("SELECT DISTINCT g FROM Game g JOIN g.players p JOIN p.users u WHERE u.id = :id", Game.class);
+                TypedQuery<Game> query = em.createQuery("SELECT DISTINCT g FROM Game g JOIN g.players p JOIN p.user u WHERE u.id = :id", Game.class);
+                query.setParameter("id", id);
                 return query.getResultList();
             } catch (PersistenceException e){
                 throw new ApiException(500, "Get all games by UserID: " + id +  " failed: " + e.getMessage());

@@ -7,12 +7,15 @@ import app.entities.enums.GameMode;
 import app.exceptions.ApiException;
 import app.gameengine.Position;
 import app.testutils.GameTestPopulator;
+import app.testutils.PlayerTestPopulator;
+import app.testutils.UserTestPopulator;
 import jakarta.persistence.EntityManagerFactory;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -45,9 +48,9 @@ public class GameDAOTest {
         Game game = Game.newGame(GameMode.FUN, new Player(Color.WHITE, false), new Player(Color.BLACK, false));
 
         Game created = gameDAO.create(game);
+        Game fetched = gameDAO.getById(created.getId());
 
         assertThat(created.getId(), notNullValue());
-        Game fetched = gameDAO.getById(created.getId());
         assertThat(fetched.getId(), is(created.getId()));
     }
 
@@ -64,6 +67,20 @@ public class GameDAOTest {
         List<Game> all = gameDAO.getAll();
         assertThat(all, hasSize(3));
         assertThat(all, containsInAnyOrder(seeded.get("game1"), seeded.get("game2"), seeded.get("game3")));
+    }
+
+    @Test
+    void getAllByUserID() {
+
+        //fetch games for user ID 1
+        List<Game> fetched = gameDAO.getAllGameByUserId(1);
+
+        assertThat(fetched, hasSize(3));
+        assertThat(fetched, containsInAnyOrder(
+                seeded.get("game1"),
+                seeded.get("game2"),
+                seeded.get("game3")
+        ));
     }
 
     @Test

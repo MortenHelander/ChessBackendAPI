@@ -16,7 +16,7 @@ public final class UserTestPopulator {
         try (EntityManager em = emf.createEntityManager()) {
 
             em.getTransaction().begin();
-            User user1 = new User("Morten", "Helander", "morten.helander@hotmail.com", "Sheriff", "password123");
+            User user1 = new User("Morten", "Helander", "morten@hotmail.com", "Sheriff", "password123");
             user1.addUserStats(UserStats.builder()
                     .gamesPlayed(0)
                     .wins(0)

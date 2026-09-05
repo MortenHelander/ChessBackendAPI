@@ -26,6 +26,7 @@ public class Player {
     @ManyToOne
     @Setter
     private User user;
+    @ToString.Exclude
     @ManyToOne
     @Setter
     private Game game;

@@ -3,6 +3,7 @@ package app.testutils;
 import app.entities.*;
 import app.entities.enums.Color;
 import app.entities.enums.GameMode;
+import app.gameengine.Position;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.PersistenceException;
@@ -14,22 +15,34 @@ public class GameTestPopulator {
 
     public static Map<String, Game> populate(EntityManagerFactory emf) {
         try (EntityManager em = emf.createEntityManager()) {
-
             em.getTransaction().begin();
-            Game game1 = Game.newGame(GameMode.CLASSIC, new Player(Color.WHITE, false), new Player(Color.BLACK, false));
-            Game game2 = Game.newGame(GameMode.TRAINING, new Player(Color.WHITE, false), new Player(Color.BLACK, true));
-            Game game3 = Game.newGame(GameMode.FUN, new Player(Color.WHITE, false), new Player(Color.BLACK, false));
 
-            try {
-                em.createNativeQuery("TRUNCATE TABLE games RESTART IDENTITY CASCADE").executeUpdate();
-                em.persist(game1);
-                em.persist(game2);
-                em.persist(game3);
-                em.flush();
-            } catch (PersistenceException e) {
-                if (em.getTransaction().isActive()) em.getTransaction().rollback();
-                throw e;
-            }
+            em.createNativeQuery("TRUNCATE TABLE moves, players, games, user_stats, users RESTART IDENTITY CASCADE")
+                    .executeUpdate();
+
+            User user1 = new User("Morten", "Helander", "morten@hotmail.com", "Sheriff", "password123");
+            em.persist(user1);
+
+            Player p1 = new Player(Color.WHITE, false);
+            Player p2 = new Player(Color.BLACK, false);
+            user1.addPlayer(p1);
+            Game game1 = Game.newGame(GameMode.CLASSIC, p1, p2);
+
+            Player p3 = new Player(Color.WHITE, false);
+            Player p4 = new Player(Color.BLACK, true);
+            user1.addPlayer(p3);
+            Game game2 = Game.newGame(GameMode.TRAINING, p3, p4);
+
+            Player p5 = new Player(Color.WHITE, false);
+            Player p6 = new Player(Color.BLACK, false);
+            user1.addPlayer(p5);
+            Game game3 = Game.newGame(GameMode.FUN, p5, p6);
+
+            // Only persist the games — cascade handles the players
+            em.persist(game1);
+            em.persist(game2);
+            em.persist(game3);
+
             em.getTransaction().commit();
 
             Map<String, Game> seeded = new LinkedHashMap<>();

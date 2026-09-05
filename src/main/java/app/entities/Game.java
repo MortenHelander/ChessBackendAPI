@@ -31,9 +31,10 @@ public class Game {
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "game", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("moveNumber ASC")
+    @ToString.Exclude
     private List<Move> moves = new ArrayList<>();
 
-    @OneToMany(mappedBy = "game", cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "game", cascade = CascadeType.ALL)
     private Set<Player> players = new HashSet<>();
 
 

@@ -12,6 +12,8 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @ToString
 @Getter
+@Builder
+@AllArgsConstructor
 public class Move {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,6 +29,7 @@ public class Move {
     @Column(name = "to_position")
     private Position to;
     @ManyToOne
+    @ToString.Exclude
     @Setter
     private Game game;
 
