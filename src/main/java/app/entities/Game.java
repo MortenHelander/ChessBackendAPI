@@ -9,6 +9,7 @@ import lombok.*;
 import org.hibernate.proxy.HibernateProxy;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 @Entity
@@ -57,8 +58,9 @@ public class Game {
         isWhitesTurn = !isWhitesTurn;
         if (move != null){
             move.setGame(this);
-            move.setMoveNumber(moves.size()+1);
-            move.setPlayedAt(LocalDateTime.now());
+            move.setMoveNumber(moves.size());
+            //java default is nanosecond (9 decimals) while postgres stores with only 6 decimals, so cutting off for similarity and testing
+            move.setPlayedAt(LocalDateTime.now().truncatedTo(ChronoUnit.MICROS));
 
             //gets the names of positions to use for stockfish api
             move.setUci(move.getFrom().name().toLowerCase() + move.getTo().name().toLowerCase());

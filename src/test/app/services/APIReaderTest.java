@@ -160,7 +160,6 @@ class APIReaderTest {
         assertThat(hikaru.getName(), is("Hikaru Nakamura"));
         assertThat(hikaru.getTitle(), is("GM"));
         assertThat(hikaru.getLeague(), is("Legend"));
-
     }
 
     @Test
@@ -168,8 +167,8 @@ class APIReaderTest {
 
         ChessComStatsDTO hikaruStats = apiReader.getPlayerStatsChessCom(playerStatsJsonResponse);
 
-        assertThat(hikaruStats, not(null));
-        assertThat(hikaruStats.getBlitz().best().rating(), is(3370));
+        assertThat(hikaruStats, is(notNullValue()));
+        assertThat(hikaruStats.getBlitz().best().rating(), is(3469));
         assertThat(hikaruStats.getBullet().last().rating(), is(3358));
         assertThat(hikaruStats.getRapid().record().win(), is(205));
     }

@@ -2,6 +2,6 @@ package app.entities.enums;
 
 public enum PowerUpStatus {
 
-    //applied for instant powerUps the other three for held ones
-    APPLIED, HELD, USED, DISCARDED
+    //applied and discarded for instant powerUps the other two for held ones
+    AUTOMATICALLY_APPLIED, AUTOMATICALLY_DISCARDED, HELD, USED
 }

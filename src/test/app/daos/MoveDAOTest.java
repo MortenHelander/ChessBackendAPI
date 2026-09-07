@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import static org.hamcrest.MatcherAssert.assertThat;
 
+import java.util.List;
 import java.util.Map;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -23,13 +24,12 @@ class MoveDAOTest {
     private final EntityManagerFactory emf = HibernateTestConfig.getEntityManagerFactory();
 
     private MoveDAO moveDAO;
-    private Map<String, Game> gameSeeded;
+    private Map<String, Game> seeded;
 
     @BeforeEach
     void beforeEach(){
-        gameSeeded = GameTestPopulator.populate(emf);
+        seeded = GameTestPopulator.populate(emf);
         moveDAO = new MoveDAO(emf);
-
     }
 
     @AfterAll
@@ -50,7 +50,7 @@ class MoveDAOTest {
 
     @Test
     void getById() {
-        Game game = gameSeeded.get("game1");
+        Game game = seeded.get("game1");
         Move seed = game.getMoves().getFirst();
 
         Move fetched = moveDAO.getById(seed.getId());
@@ -60,5 +60,17 @@ class MoveDAOTest {
     @Test
     void getAllMovesByGameId() {
 
+        Game game1 = seeded.get("game1");
+        List<Move> expected = game1.getMoves();
+
+        List<Move> fetched = moveDAO.getAllMovesByGameId(1);
+
+        assertThat(fetched, hasSize(4));
+        assertThat(fetched, containsInAnyOrder(
+                expected.get(0),
+                expected.get(1),
+                expected.get(2),
+                expected.get(3)
+        ));
     }
 }

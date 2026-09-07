@@ -66,7 +66,7 @@ public class MoveDAO {
         }
         try(EntityManager em = emf.createEntityManager()){
             try {
-                TypedQuery<Move> query = em.createQuery("SELECT DISTINCT m FROM Move m JOIN m.games g WHERE g.id = :id", Move.class);
+                TypedQuery<Move> query = em.createQuery("SELECT DISTINCT m FROM Move m JOIN m.game g WHERE g.id = :id", Move.class);
                 query.setParameter("id", id);
                 return query.getResultList();
             } catch (PersistenceException e){

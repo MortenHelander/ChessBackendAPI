@@ -35,6 +35,7 @@ public class Player {
     private Set<PlayerPowerUp> playerPowerUps = new HashSet<>();
 
     public Player(Color color, boolean isAi) {
+        this();
         this.color = color;
         this.isAi = isAi;
     }
