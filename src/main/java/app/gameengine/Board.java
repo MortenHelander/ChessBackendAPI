@@ -12,7 +12,7 @@ import java.util.Map;
 public class Board {
     private Piece lastMovedPieceWhite;
     private Piece lastMovedPieceBlack;
-    private Map<Piece, Position> allPieces = new HashMap<>();
+    private Map<Position, Piece> allPieces = new HashMap<>();
 
     public void initializeNewBoard() throws IOException {
         char letter = 'A';
@@ -23,34 +23,34 @@ public class Board {
             String position = String.valueOf(letter)+number;
             Pawn pawn = new Pawn(PieceSVG.PAWN.loadSVG("white"), true, "pawn", false, false);
             letter++;
-            allPieces.put(pawn, Position.valueOf(position));
+            allPieces.put(Position.valueOf(position), pawn);
         }
 
         //white rooks
         Rook wRook = new Rook(PieceSVG.ROOK.loadSVG("white"),true, "rook", false);
-        allPieces.put(wRook, Position.A1);
+        allPieces.put(Position.A1, wRook);
         Rook wRook2 = new Rook(PieceSVG.ROOK.loadSVG("white"), true, "rook", false);
-        allPieces.put(wRook2, Position.H1);
+        allPieces.put(Position.H1, wRook2);
 
         //white knights
         Knight wKnight = new Knight(PieceSVG.KNIGHT.loadSVG("white"), true, "knight");
-        allPieces.put(wKnight, Position.B1);
+        allPieces.put(Position.B1, wKnight);
         Knight wKnight2 = new Knight(PieceSVG.KNIGHT.loadSVG("white"), true, "knight");
-        allPieces.put(wKnight2, Position.G1);
+        allPieces.put(Position.G1, wKnight2);
 
         //white bishops
         Bishop wBishop = new Bishop(PieceSVG.BISHOP.loadSVG("white"), true, "bishop");
-        allPieces.put(wBishop, Position.C1);
+        allPieces.put(Position.C1, wBishop);
         Bishop wBishop2 = new Bishop(PieceSVG.BISHOP.loadSVG("white"), true, "bishop");
-        allPieces.put(wBishop2, Position.F1);
+        allPieces.put(Position.F1, wBishop2);
 
         //white queen
         Queen wQueen = new Queen(PieceSVG.QUEEN.loadSVG("white"), true, "queen");
-        allPieces.put(wQueen, Position.D1);
+        allPieces.put(Position.D1, wQueen);
 
         //white king
         King wKing = new King(PieceSVG.KING.loadSVG("white"), true, "king", false);
-        allPieces.put(wKing, Position.E1);
+        allPieces.put(Position.E1, wKing);
 
         //black pawns
         letter = 'A';
@@ -59,34 +59,34 @@ public class Board {
             String position = String.valueOf(letter)+number;
             Pawn pawn = new Pawn(PieceSVG.PAWN.loadSVG("black"), false, "pawn", false, false);
             letter++;
-            allPieces.put(pawn, Position.valueOf(position));
+            allPieces.put(Position.valueOf(position), pawn);
         }
 
         //black rooks
         Rook bRook = new Rook(PieceSVG.ROOK.loadSVG("black"),false, "rook", false);
-        allPieces.put(bRook, Position.A8);
+        allPieces.put(Position.A8, bRook);
         Rook bRook2 = new Rook(PieceSVG.ROOK.loadSVG("black"), false, "rook", false);
-        allPieces.put(bRook2, Position.H8);
+        allPieces.put(Position.H8, bRook2);
 
         //black knights
         Knight bKnight = new Knight(PieceSVG.KNIGHT.loadSVG("black"), false, "knight");
-        allPieces.put(bKnight, Position.B8);
+        allPieces.put(Position.B8, bKnight);
         Knight bKnight2 = new Knight(PieceSVG.KNIGHT.loadSVG("black"), false, "knight");
-        allPieces.put(bKnight2, Position.G8);
+        allPieces.put(Position.G8, bKnight2);
 
         //white bishops
         Bishop bBishop = new Bishop(PieceSVG.BISHOP.loadSVG("black"), false, "bishop");
-        allPieces.put(bBishop, Position.C8);
+        allPieces.put(Position.C8, bBishop);
         Bishop bBishop2 = new Bishop(PieceSVG.BISHOP.loadSVG("black"), false, "bishop");
-        allPieces.put(bBishop2, Position.F8);
+        allPieces.put(Position.F8, bBishop2);
 
         //black queen
         Queen bQueen = new Queen(PieceSVG.QUEEN.loadSVG("black"), false, "queen");
-        allPieces.put(bQueen, Position.D8);
+        allPieces.put(Position.D8, bQueen);
 
         //black king
         King bKing = new King(PieceSVG.KING.loadSVG("black"), false, "king", false);
-        allPieces.put(bKing, Position.E8);
+        allPieces.put(Position.E8, bKing);
     }
 
 
@@ -103,13 +103,9 @@ public class Board {
             return enPassantMove(piece, oldPosition, newPosition);
         }
         //check if correctly called
-        if (allPieces.containsKey(piece)){
-            //remove enemy piece if there is one
-            if (allPieces.containsValue(newPosition)){
-                allPieces.remove(PieceFinder.findPiece(this, newPosition));
-            }
+        if (allPieces.containsValue(piece)){
             endTurn(piece, newPosition);
-            allPieces.put(piece, newPosition);
+            allPieces.put(newPosition, piece);
             return true;
         } else {
             return false;
@@ -123,9 +119,9 @@ public class Board {
             Piece rook = PieceFinder.findPiece(this, PositionConverter.fromCoordinates(kingPosition.getX()+3, kingPosition.getY()));
             Position newKingPosition = PositionConverter.fromCoordinates(kingPosition.getX()+2, kingPosition.getY());
             Position newRookPosition = PositionConverter.fromCoordinates(kingPosition.getX()+1, kingPosition.getY());
-            if (allPieces.containsKey(king) && allPieces.containsKey(rook)) {
-                allPieces.put(king, newKingPosition);
-                allPieces.put(rook, newRookPosition);
+            if (allPieces.containsValue(king) && allPieces.containsValue(rook)) {
+                allPieces.put(newKingPosition, king);
+                allPieces.put(newRookPosition, rook);
                 endTurn(king, kingPosition);
                 return true;
             }
@@ -135,9 +131,9 @@ public class Board {
             Piece rook = PieceFinder.findPiece(this, PositionConverter.fromCoordinates(kingPosition.getX()-4, kingPosition.getY()));
             Position newKingPosition = PositionConverter.fromCoordinates(kingPosition.getX()-2, kingPosition.getY());
             Position newRookPosition = PositionConverter.fromCoordinates(kingPosition.getX()-1, kingPosition.getY());
-            if (allPieces.containsKey(king) && allPieces.containsKey(rook)) {
-                allPieces.put(king, newKingPosition);
-                allPieces.put(rook, newRookPosition);
+            if (allPieces.containsValue(king) && allPieces.containsValue(rook)) {
+                allPieces.put(newKingPosition, king);
+                allPieces.put(newRookPosition, rook);
                 endTurn(king, kingPosition);
                 return true;
             }
