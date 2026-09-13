@@ -2,15 +2,14 @@ package app.services;
 
 import app.dtos.chesscom.ChessComPlayerDTO;
 import app.dtos.chesscom.ChessComStatsDTO;
-import app.dtos.chesscom.records.Best;
 import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.Matchers.is;
 
-class APIReaderTest {
-    private APIReader apiReader = new APIReader();
+class ChessComClientTest {
+    private ChessComClient chessComClient = new ChessComClient();
 
     private String playerJsonResponse = """
             {
@@ -154,7 +153,7 @@ class APIReaderTest {
     @Test
     void getPlayerInfoChessCom() {
 
-        ChessComPlayerDTO hikaru = apiReader.getPlayerInfoChessCom(playerJsonResponse);
+        ChessComPlayerDTO hikaru = chessComClient.getPlayerInfoChessCom(playerJsonResponse);
 
         assertThat(hikaru.getUsername(), is("hikaru"));
         assertThat(hikaru.getName(), is("Hikaru Nakamura"));
@@ -165,7 +164,7 @@ class APIReaderTest {
     @Test
     void getPlayerStatsChessCom(){
 
-        ChessComStatsDTO hikaruStats = apiReader.getPlayerStatsChessCom(playerStatsJsonResponse);
+        ChessComStatsDTO hikaruStats = chessComClient.getPlayerStatsChessCom(playerStatsJsonResponse);
 
         assertThat(hikaruStats, is(notNullValue()));
         assertThat(hikaruStats.getBlitz().best().rating(), is(3469));
