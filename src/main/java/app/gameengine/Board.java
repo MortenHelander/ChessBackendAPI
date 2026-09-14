@@ -113,16 +113,11 @@ public class Board {
     public MoveResult promotion(Promotion promotion){
 
         MoveResult moveResult;
-        try {
-            Piece promotionPiece = PromotionHelper.getPromotionPiece(promotion);
-            moveExecutor.promotion(this, promotionPiece, promotion.promotionSquare());
-            moveResult = MoveResult.completed();
-            turnHelper.handleLastPieceStatus(promotionPiece);
-            return moveResult;
-        } catch (IOException e) {
-            moveResult = MoveResult.awaitingPromotion(promotion.promotionSquare());
-            return moveResult;
-        }
+        Piece promotionPiece = PromotionHelper.getPromotionPiece(promotion);
+        moveExecutor.promotion(this, promotionPiece, promotion.promotionSquare());
+        moveResult = MoveResult.completed();
+        turnHelper.endTurn(promotionPiece, promotion.promotionSquare());
+        return moveResult;
     }
 
     public Map<Position, Piece> getAllWhitePieces(){
