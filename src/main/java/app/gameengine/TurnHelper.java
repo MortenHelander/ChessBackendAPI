@@ -12,6 +12,11 @@ public class TurnHelper {
         CastlingHelper.setCastlingPieceMoveStatus(piece);
         PawnMoveHelper.setPawnMoveStatus(piece, newPosition);
         handleLastPieceStatus(piece);
+        if (piece.isWhite()){
+            handleLastPieceStatus(lastMovedPieceWhite);
+        } else {
+            handleLastPieceStatus(lastMovedPieceBlack);
+        }
     }
 
     public void handleLastPieceStatus(Piece piece){

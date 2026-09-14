@@ -1,5 +1,6 @@
 package app.gameengine.pieces;
 
+import app.gameengine.Board;
 import app.gameengine.Position;
 import lombok.Getter;
 

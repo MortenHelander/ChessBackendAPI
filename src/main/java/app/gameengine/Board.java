@@ -99,69 +99,11 @@ public class Board {
         if (moveType == null){
             return false;
         }
-        boolean moved = moveExecutor.executeMove();
+        boolean moved = moveExecutor.executeMove(this, piece, moveType, oldPosition, newPosition);
         if (moved){
             turnHelper.endTurn(piece, newPosition);
         }
         return moved;
-    }
-
-    private boolean castlingMove(Piece king, Position kingPosition, Position rookPosition){
-
-        //if castling right
-        if (kingPosition.getX() < rookPosition.getX()){
-            Piece rook = PieceFinder.findPiece(this, PositionConverter.fromCoordinates(kingPosition.getX()+3, kingPosition.getY()));
-            Position newKingPosition = PositionConverter.fromCoordinates(kingPosition.getX()+2, kingPosition.getY());
-            Position newRookPosition = PositionConverter.fromCoordinates(kingPosition.getX()+1, kingPosition.getY());
-            if (allPieces.containsValue(king) && allPieces.containsValue(rook)) {
-                allPieces.remove(kingPosition);
-                allPieces.remove(rookPosition);
-                allPieces.put(newKingPosition, king);
-                allPieces.put(newRookPosition, rook);
-                endTurn(king, kingPosition);
-                return true;
-            }
-
-            //if castling left
-        }else if (kingPosition.getX() > rookPosition.getX()){
-            Piece rook = PieceFinder.findPiece(this, PositionConverter.fromCoordinates(kingPosition.getX()-4, kingPosition.getY()));
-            Position newKingPosition = PositionConverter.fromCoordinates(kingPosition.getX()-2, kingPosition.getY());
-            Position newRookPosition = PositionConverter.fromCoordinates(kingPosition.getX()-1, kingPosition.getY());
-            if (allPieces.containsValue(king) && allPieces.containsValue(rook)) {
-                allPieces.remove(kingPosition);
-                allPieces.remove(rookPosition);
-                allPieces.put(newKingPosition, king);
-                allPieces.put(newRookPosition, rook);
-                endTurn(king, kingPosition);
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private boolean enPassantMove(Piece piece, Position oldPosition, Position newPosition){
-        if (piece instanceof Pawn pawn){
-            //if en passant right
-            if (oldPosition.getX() < newPosition.getX()){
-                Position enemyPiecePosition = PositionConverter.fromCoordinates(oldPosition.getX()+1, oldPosition.getY());
-                Piece enemyPiece = PieceFinder.findPiece(this, enemyPiecePosition);
-                if (enemyPiece instanceof Pawn enemyPawn && enemyPawn.isEnPassantTakeable()){
-                    allPieces.put(newPosition, piece);
-                    allPieces.remove(enemyPiecePosition, enemyPiece);
-                    return true;
-                }
-                //if en passant left
-            } else if (oldPosition.getX() > newPosition.getX()){
-                Position enemyPiecePosition = PositionConverter.fromCoordinates(oldPosition.getX()-1, oldPosition.getY());
-                Piece enemyPiece = PieceFinder.findPiece(this, enemyPiecePosition);
-                if (enemyPiece instanceof Pawn enemyPawn && enemyPawn.isEnPassantTakeable()){
-                    allPieces.put(newPosition, piece);
-                    allPieces.remove(enemyPiecePosition, enemyPiece);
-                    return true;
-                }
-            }
-        }
-        return false;
     }
 
     public void promotion(Piece piece, Position position){
