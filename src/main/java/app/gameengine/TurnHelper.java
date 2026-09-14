@@ -10,24 +10,19 @@ public class TurnHelper {
 
     public void endTurn(Piece piece, Position newPosition){
         CastlingHelper.setCastlingPieceMoveStatus(piece);
-        PawnMoveHelper.setPawnMoveStatus(piece, newPosition);
-        handleLastPieceStatus(piece);
-        if (piece.isWhite()){
-            handleLastPieceStatus(lastMovedPieceWhite);
-        } else {
-            handleLastPieceStatus(lastMovedPieceBlack);
-        }
-    }
 
-    public void handleLastPieceStatus(Piece piece){
-
-        if (piece instanceof Pawn pawn && pawn.isEnPassantTakeable()){
+        Piece opponentLastMoved = piece.isWhite() ? lastMovedPieceBlack : lastMovedPieceWhite;
+        if (opponentLastMoved instanceof Pawn pawn && pawn.isEnPassantTakeable()){
             PawnMoveHelper.setPawnMoveStatusMovedLastRound(pawn);
         }
+
+        PawnMoveHelper.setPawnMoveStatus(piece, newPosition);
+
         if (piece.isWhite()){
             lastMovedPieceWhite = piece;
         } else {
             lastMovedPieceBlack = piece;
         }
     }
+
 }

@@ -16,16 +16,16 @@ public class MoveExecutor {
         boolean moved = false;
 
         if (moveType == MoveType.NORMAL){
-            moved = normalMove(board, piece, moveType, oldPosition, newPosition);
+            moved = normalMove(board, piece, oldPosition, newPosition);
         }else if (moveType == MoveType.CASTLING){
-            moved = castlingMove(board, piece, moveType, oldPosition, newPosition);
+            moved = castlingMove(board, piece, oldPosition, newPosition);
         }else if (moveType == MoveType.EN_PASSANT){
-            moved = enPassantMove(board, piece, moveType, oldPosition, newPosition);
-        }else if ()
+            moved = enPassantMove(board, piece, oldPosition, newPosition);
+        }
         return moved;
     }
 
-    public boolean normalMove(Board board, Piece piece, MoveType moveType, Position oldPosition, Position newPosition){
+    private boolean normalMove(Board board, Piece piece, Position oldPosition, Position newPosition){
         if (board.getAllPieces().containsValue(piece)) {
             //remove piece from old position
             board.getAllPieces().remove(oldPosition);
@@ -35,7 +35,7 @@ public class MoveExecutor {
         return false;
     }
 
-    public boolean castlingMove(Board board, Piece king, MoveType moveType, Position oldPosition, Position newPosition){
+    private boolean castlingMove(Board board, Piece king, Position oldPosition, Position newPosition){
 
         //if castling right
         if (oldPosition.getX() < newPosition.getX()){
@@ -63,7 +63,7 @@ public class MoveExecutor {
         return false;
     }
 
-    public boolean enPassantMove(Board board, Piece piece, MoveType moveType, Position oldPosition, Position newPosition){
+    private boolean enPassantMove(Board board, Piece piece, Position oldPosition, Position newPosition){
 
         if (piece instanceof Pawn pawn){
             //if en passant right
@@ -89,7 +89,7 @@ public class MoveExecutor {
         return false;
     }
 
-    public boolean promotionMove(){
-
+    public void promotion(Board board, Piece promotionPiece, Position promotionSquare){
+        board.getAllPieces().put(promotionSquare, promotionPiece);
     }
 }

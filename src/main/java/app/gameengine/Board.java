@@ -93,47 +93,35 @@ public class Board {
     }
 
 
-    public boolean move(Piece piece, Position oldPosition, Position newPosition){
+    public MoveResult move(Piece piece, Position oldPosition, Position newPosition){
 
         MoveType moveType = MoveIdentifier.identifyMove(this, piece, oldPosition, newPosition);
         if (moveType == null){
-            return false;
+            return MoveResult.failed();
+        }
+        if (moveType == MoveType.PROMOTION){
+            moveExecutor.executeMove(this, piece, MoveType.NORMAL, oldPosition, newPosition);
+            return MoveResult.awaitingPromotion(newPosition);
         }
         boolean moved = moveExecutor.executeMove(this, piece, moveType, oldPosition, newPosition);
         if (moved){
             turnHelper.endTurn(piece, newPosition);
         }
-        return moved;
+        return MoveResult.completed();
     }
 
-    public void promotion(Piece piece, Position position){
+    public MoveResult promotion(Promotion promotion){
 
-        if (piece != null){
-            Piece enemyPieceCandidate = PieceFinder.findPiece(this, position);
-            if (enemyPieceCandidate != null){
-                allPieces.remove(position, enemyPieceCandidate);
-            }
-            allPieces.put(position, piece);
-            endTurn(piece, position);
-        }
-    }
-
-    private void endTurn(Piece piece, Position newPosition){
-        CastlingHelper.setCastlingPieceMoveStatus(piece);
-        handleLastPieceStatus(piece);
-        PawnMoveHelper.setPawnMoveStatusMovedThisRound(piece, newPosition);
-
-    }
-
-    private void handleLastPieceStatus(Piece piece){
-
-        if (piece instanceof Pawn pawn && pawn.isEnPassantTakeable()){
-            PawnMoveHelper.setPawnMoveStatusMovedLastRound(pawn);
-        }
-        if (piece.isWhite()){
-            lastMovedPieceWhite = piece;
-        } else {
-            lastMovedPieceBlack = piece;
+        MoveResult moveResult;
+        try {
+            Piece promotionPiece = PromotionHelper.getPromotionPiece(promotion);
+            moveExecutor.promotion(this, promotionPiece, promotion.promotionSquare());
+            moveResult = MoveResult.completed();
+            turnHelper.handleLastPieceStatus(promotionPiece);
+            return moveResult;
+        } catch (IOException e) {
+            moveResult = MoveResult.awaitingPromotion(promotion.promotionSquare());
+            return moveResult;
         }
     }
 

@@ -12,7 +12,7 @@ public class MoveIdentifier {
         if (PawnMoveHelper.isEnPassantMove(board, piece, oldPosition, newPosition)){
             return MoveType.EN_PASSANT;
         }
-        if (PromotionHelper.isPromotionMove(board, piece, oldPosition, newPosition)){
+        if (PromotionHelper.isPromotionMove(piece, newPosition)){
             return MoveType.PROMOTION;
         }
         if (board.getAllPieces().containsValue(piece)){
