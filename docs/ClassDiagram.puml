@@ -1,0 +1,133 @@
+@startuml
+'https://plantuml.com/class-diagram
+
+
+
+class User{
+- int id
+- String firstName
+- String lastName
+- String email
+- String username
+- String password
+- UserStats userStats
+- Set<Player> players
+}
+
+class UserStats{
+- Integer id
+- Integer gamesPlayed
+- Integer wins
+- Integer losses
+- Integer draws
+}
+
+class ChessComUser{
+- String username
+- String name
+- String title
+- String league
+- Ranks and ratings
+}
+
+class Player{
+- int id
+- Color color
+- boolean isAi
+- User user
+- Game game
+}
+
+
+class Game{
+- int id
+- LocalDate startedAt
+- GameStatus
+- boolean isWhitesTurn
+- List<Player>
+- List<Move>
+}
+
+class Move{
+- int id
+- int moveNumber
+- String uci
+- LocalDateTime playedAt
+- Position from
+- Position to
+- Game game
+
+}
+
+class PlayerPowerUp{
+- int id
+- PowerUpType
+- PowerUpStatus
+- Player
+}
+
+class ChessComUserDTO{
+-RecordsForJsonFields
+}
+
+class ChessComClient{
+- ObjectMapper
++ getChessComUser(username)
+}
+
+class ChessComUserDAO{
++ basicCruds()
+}
+
+class GameDAO{
++ basicCruds()
++ getGameByUserId()
+}
+
+class MoveDAO{
++ create()
++ get()
++ getAllByGameId()
+}
+
+class PlayerDAO{
++ basicCruds()
++ getAllByUserId()
++ getAllByGameId()
+}
+
+class PlayerPowerUpDAO{
++ create()
++ get()
++ update()
++ getAllByGameId()
+}
+
+class UserDAO{
++ basicCruds()
+}
+
+class UserStatsDAO{
++ get()
++ getAll()
++ recordResult(int userId, Result result)
+}
+
+
+
+User "1" -- "*" Player
+User "1" -- "1" UserStats
+User "1" -- "1" ChessComUser
+Player "*" -- "1" Game
+Player "1" -- "*" PlayerPowerUp
+Game "1" -- "*" Move
+
+User -.-> UserDAO
+UserStats -.-> UserStatsDAO
+ChessComUser -.-> ChessComUserDAO
+Player -.-> PlayerDAO
+PlayerPowerUp -.-> PlayerPowerUpDAO
+Game -.-> GameDAO
+Move -.-> MoveDAO
+
+@enduml
