@@ -3,6 +3,11 @@ package app.services;
 import app.dtos.lichess.LichessDailyPuzzleDTO;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
+
 public class LichessClientTest {
 
     String json = """
@@ -57,5 +62,12 @@ public class LichessClientTest {
     @Test
     void getDailyPuzzle(){
         LichessDailyPuzzleDTO dailyPuzzle = GenericClient.convertJsonGeneric(json, LichessDailyPuzzleDTO.class);
+
+        assertThat(dailyPuzzle.getGame().id(), is("P3gwP0JC"));
+        assertThat(dailyPuzzle.getPuzzle().id(), is("lpmqI"));
+        assertThat(dailyPuzzle.getPuzzle().rating(), is(1981));
+        assertThat(dailyPuzzle.getPuzzle().solution(), containsInRelativeOrder("g4h5", "g6h5", "d7g4"));
+        assertThat(dailyPuzzle.getPuzzle().fen(), is("8/3Q4/5qkp/3p4/1p2n1B1/1Pr4P/P1P2bP1/2R2K2 w - - 1 1"));
+        assertThat(dailyPuzzle.getPuzzle().lastMove(), is("h7g6"));
     }
 }

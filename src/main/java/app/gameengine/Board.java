@@ -15,7 +15,7 @@ public class Board {
     private MoveExecutor moveExecutor;
     private Map<Position, Piece> allPieces = new HashMap<>();
 
-    public void initializeNewBoard() throws IOException {
+    public void initializeNewBoard() {
         turnHelper = new TurnHelper();
         moveExecutor = new MoveExecutor();
         char letter = 'A';

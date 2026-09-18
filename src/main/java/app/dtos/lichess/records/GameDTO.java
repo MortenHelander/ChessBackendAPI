@@ -1,4 +1,7 @@
 package app.dtos.lichess.records;
 
-public record GameDTO(Puzzle puzzle) {
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+@JsonIgnoreProperties
+public record GameDTO(String id) {
 }

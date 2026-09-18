@@ -1,6 +1,8 @@
 package app.dtos.lichess.records;
 
-import java.util.List;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-public record Puzzle(int id, long rating, List<String> solution, String fen, String lastMove) {
+import java.util.List;
+@JsonIgnoreProperties
+public record Puzzle(String id, int rating, List<String> solution, String fen, String lastMove) {
 }

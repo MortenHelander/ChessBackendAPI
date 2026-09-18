@@ -35,6 +35,6 @@ public class LichessClient {
             throw new RuntimeException(e);
         }
         System.out.println(response.body());
-        return GenericClient.convertJsonGeneric(objectMapper, response.body(), LichessDailyPuzzleDTO.class);
+        return GenericClient.convertJsonGeneric(response.body(), LichessDailyPuzzleDTO.class);
     }
 }

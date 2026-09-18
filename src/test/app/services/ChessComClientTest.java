@@ -164,7 +164,7 @@ class ChessComClientTest {
     @Test
     void getPlayerStatsChessCom(){
 
-        ChessComStatsDTO hikaruStats = chessComClient.getPlayerStatsChessCom(playerStatsJsonResponse);
+        ChessComStatsDTO hikaruStats = GenericClient.convertJsonGeneric(playerStatsJsonResponse, ChessComStatsDTO.class);
 
         assertThat(hikaruStats, is(notNullValue()));
         assertThat(hikaruStats.getBlitz().best().rating(), is(3469));
