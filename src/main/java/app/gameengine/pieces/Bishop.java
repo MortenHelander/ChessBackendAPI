@@ -1,7 +1,9 @@
 package app.gameengine.pieces;
 
-import app.gameengine.Direction;
+import app.gameengine.Board;
+import app.gameengine.move_logic.Direction;
 import app.gameengine.Position;
+import app.gameengine.move_logic.SlidingMoveHelper;
 
 import java.util.ArrayList;
 import java.util.List;

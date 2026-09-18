@@ -1,5 +1,7 @@
 package app.gameengine;
 
+import app.gameengine.move_logic.CastlingHelper;
+import app.gameengine.move_logic.PawnMoveHelper;
 import app.gameengine.pieces.Pawn;
 import app.gameengine.pieces.Piece;
 

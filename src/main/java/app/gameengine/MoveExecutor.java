@@ -1,9 +1,8 @@
 package app.gameengine;
 
+import app.gameengine.move_logic.PieceFinder;
 import app.gameengine.pieces.Pawn;
 import app.gameengine.pieces.Piece;
-
-import java.util.Map;
 
 public class MoveExecutor {
 
@@ -39,13 +38,13 @@ public class MoveExecutor {
 
         //if castling right
         if (oldPosition.getX() < newPosition.getX()){
-            Piece rook = PieceFinder.findPiece(this, PositionConverter.fromCoordinates(oldPosition.getX()+3, oldPosition.getY()));
+            Piece rook = PieceFinder.findPiece(board, PositionConverter.fromCoordinates(oldPosition.getX()+3, oldPosition.getY()));
             Position newRookPosition = PositionConverter.fromCoordinates(oldPosition.getX()+1, oldPosition.getY());
             return executeCastlingMove(board, king, oldPosition, newPosition, rook, newRookPosition);
 
             //if castling left
         }else if (oldPosition.getX() > newPosition.getX()){
-            Piece rook = PieceFinder.findPiece(this, PositionConverter.fromCoordinates(oldPosition.getX()-4, oldPosition.getY()));
+            Piece rook = PieceFinder.findPiece(board, PositionConverter.fromCoordinates(oldPosition.getX()-4, oldPosition.getY()));
             Position newRookPosition = PositionConverter.fromCoordinates(oldPosition.getX()-1, oldPosition.getY());
             return executeCastlingMove(board, king, oldPosition, newPosition, rook, newRookPosition);
         }
@@ -69,7 +68,7 @@ public class MoveExecutor {
             //if en passant right
             if (oldPosition.getX() < newPosition.getX()){
                 Position enemyPiecePosition = PositionConverter.fromCoordinates(oldPosition.getX()+1, oldPosition.getY());
-                Piece enemyPiece = PieceFinder.findPiece(this, enemyPiecePosition);
+                Piece enemyPiece = PieceFinder.findPiece(board, enemyPiecePosition);
                 if (enemyPiece instanceof Pawn enemyPawn && enemyPawn.isEnPassantTakeable()){
                     board.getAllPieces().put(newPosition, piece);
                     board.getAllPieces().remove(enemyPiecePosition, enemyPiece);
@@ -78,7 +77,7 @@ public class MoveExecutor {
                 //if en passant left
             } else if (oldPosition.getX() > newPosition.getX()){
                 Position enemyPiecePosition = PositionConverter.fromCoordinates(oldPosition.getX()-1, oldPosition.getY());
-                Piece enemyPiece = PieceFinder.findPiece(this, enemyPiecePosition);
+                Piece enemyPiece = PieceFinder.findPiece(board, enemyPiecePosition);
                 if (enemyPiece instanceof Pawn enemyPawn && enemyPawn.isEnPassantTakeable()){
                     board.getAllPieces().put(newPosition, piece);
                     board.getAllPieces().remove(enemyPiecePosition, enemyPiece);

@@ -1,5 +1,7 @@
 package app.gameengine;
 
+import app.gameengine.move_logic.PawnMoveHelper;
+import app.gameengine.move_logic.PromotionHelper;
 import app.gameengine.pieces.Piece;
 
 public class MoveIdentifier {

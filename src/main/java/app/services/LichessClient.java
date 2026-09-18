@@ -1,5 +1,6 @@
 package app.services;
 
+import app.dtos.lichess.LichessDailyPuzzleDTO;
 import app.utils.Utils;
 import tools.jackson.databind.ObjectMapper;
 
@@ -13,7 +14,7 @@ public class LichessClient {
     private final ObjectMapper objectMapper = new ObjectMapper();
     private String userAgent = Utils.getPropertyValue("USER_AGENT", "config.properties");
 
-    public String getJsonPlayerInfo(){
+    public LichessDailyPuzzleDTO getDailyPuzzle(){
 
         String endpoint = "https://lichess.org/api/puzzle/daily";
 
@@ -34,6 +35,6 @@ public class LichessClient {
             throw new RuntimeException(e);
         }
         System.out.println(response.body());
-        return response.body();
+        return GenericClient.convertJsonGeneric(objectMapper, response.body(), LichessDailyPuzzleDTO.class);
     }
 }

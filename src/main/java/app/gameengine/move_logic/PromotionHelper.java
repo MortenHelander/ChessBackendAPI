@@ -1,8 +1,8 @@
-package app.gameengine;
+package app.gameengine.move_logic;
 
+import app.gameengine.Position;
+import app.gameengine.Promotion;
 import app.gameengine.pieces.*;
-
-import java.io.IOException;
 
 public class PromotionHelper {
 

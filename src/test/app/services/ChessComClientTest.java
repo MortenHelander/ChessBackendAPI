@@ -153,7 +153,7 @@ class ChessComClientTest {
     @Test
     void getPlayerInfoChessCom() {
 
-        ChessComPlayerDTO hikaru = chessComClient.getPlayerInfoChessCom(playerJsonResponse);
+        ChessComPlayerDTO hikaru = GenericClient.convertJsonGeneric(playerJsonResponse, ChessComPlayerDTO.class);
 
         assertThat(hikaru.getUsername(), is("hikaru"));
         assertThat(hikaru.getName(), is("Hikaru Nakamura"));

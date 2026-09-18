@@ -1,6 +1,8 @@
 package app.gameengine.pieces;
 
+import app.gameengine.Board;
 import app.gameengine.Position;
+import app.gameengine.move_logic.PawnMoveHelper;
 import lombok.Getter;
 import lombok.Setter;
 

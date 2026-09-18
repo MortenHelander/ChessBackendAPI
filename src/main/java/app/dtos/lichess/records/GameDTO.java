@@ -1,4 +1,4 @@
 package app.dtos.lichess.records;
 
-public record GameDTO(Perf perf) {
+public record GameDTO(Puzzle puzzle) {
 }

@@ -1,5 +1,6 @@
 package app.gameengine;
 
+import app.gameengine.move_logic.PromotionHelper;
 import app.gameengine.pieces.*;
 import lombok.Getter;
 

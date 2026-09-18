@@ -66,6 +66,10 @@ class PlayerPowerUp{
 - Player
 }
 
+class LichessDailyDTO{
+- GameDTO
+}
+
 class ChessComUserDTO{
 -RecordsForJsonFields
 }
@@ -113,6 +117,14 @@ class UserStatsDAO{
 + recordResult(int userId, Result result)
 }
 
+class StockFishClient{
++ getBestMove()
++ getWorstMove()
+}
+
+class LichessClient{
+getDailyPuzzle()
+}
 
 
 User "1" -- "*" Player
