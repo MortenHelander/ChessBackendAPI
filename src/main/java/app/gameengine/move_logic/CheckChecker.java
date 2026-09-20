@@ -2,6 +2,7 @@ package app.gameengine.move_logic;
 
 import app.gameengine.Board;
 import app.gameengine.Position;
+import app.gameengine.pieces.King;
 import app.gameengine.pieces.Piece;
 
 import java.util.ArrayList;
@@ -19,11 +20,17 @@ public class CheckChecker {
             //temporarily move piece
             board.getAllPieces().put(move, piece);
 
+            //temporarily remove piece from current position
+            board.getAllPieces().remove(currentPosition, piece);
+
             //check king for checkmate
             boolean isChecked = isKingChecked(board, piece);
 
             //put the piece back to original position
             board.getAllPieces().put(currentPosition, piece);
+
+            //remove temporary move
+            board.getAllPieces().remove(move, piece);
 
             //restore enemy piece if exist
             if (potentialEnemy != null) {
@@ -54,6 +61,14 @@ public class CheckChecker {
     }
 
     public static boolean isCheckMate(Board board, boolean isWhitesTurn){
+        return hasNoLegalMoves(board, isWhitesTurn) && isSideInCheck(board, isWhitesTurn);
+    }
+
+    public static boolean isStaleMate(Board board, boolean isWhitesTurn){
+        return hasNoLegalMoves(board, isWhitesTurn) && !isSideInCheck(board, isWhitesTurn);
+    }
+
+    private static boolean hasNoLegalMoves(Board board, boolean isWhitesTurn){
 
         Map<Position, Piece> allyPieces;
         List<Position> possiblePositions = new ArrayList<>();
@@ -72,4 +87,18 @@ public class CheckChecker {
 
         return possiblePositions.isEmpty();
     }
+
+    private static boolean isSideInCheck(Board board, boolean isWhitesTurn){
+        Map<Position, Piece> allyPieces;
+
+        if (isWhitesTurn){
+            allyPieces = board.getAllWhitePieces();
+        } else {
+            allyPieces = board.getAllBlackPieces();
+        }
+        Position kingPosition = PieceFinder.findAllyKingPosition(allyPieces);
+        Piece king = allyPieces.get(kingPosition);
+        return isKingChecked(board, king);
+    }
+
 }
