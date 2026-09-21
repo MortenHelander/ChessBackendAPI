@@ -32,11 +32,6 @@ public class UserDAOTest {
             userDAO = new UserDAO(emf);
         }
 
-        @AfterAll
-        void shutdown() {
-            emf.close();
-        }
-
         @Test
         void create() {
             User user = new User("Simon", "Hansen", "simon@mail.dk", "simonsen", "simon123");

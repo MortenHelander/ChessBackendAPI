@@ -33,10 +33,6 @@ public class UserStatsDAOTest {
         userStatsDAO = new UserStatsDAO(emf);
     }
 
-    @AfterAll
-    void shutdown() {
-        emf.close();
-    }
 
     @Test
     void getById(){

@@ -1,7 +1,7 @@
-package app.gameengine;
+package app.gameengine.move_logic;
 
-import app.gameengine.move_logic.Direction;
-import app.gameengine.move_logic.SlidingMoveHelper;
+import app.gameengine.Board;
+import app.gameengine.Position;
 import app.gameengine.pieces.Bishop;
 import app.gameengine.pieces.Pawn;
 import app.gameengine.pieces.Queen;

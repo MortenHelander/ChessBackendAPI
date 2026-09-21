@@ -107,7 +107,7 @@ class NoneSlidingMoveHelperTest {
 
         List<Position> moves = NoneSlidingMoveHelper.getPossiblePositions(board, king, Position.E5.getX(), Position.E5.getY(), offsets);
 
-        assertThat(moves.size(), is(8));
+        assertThat(moves.size(), is(7));
         assertThat(moves.contains(Position.E4), is(false));
     }
 
@@ -142,5 +142,4 @@ class NoneSlidingMoveHelperTest {
         assertThat(moves.size(), is(8));
         assertThat(moves.contains(Position.E4), is(true));
     }
-
 }

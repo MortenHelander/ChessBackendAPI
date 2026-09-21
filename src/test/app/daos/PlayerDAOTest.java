@@ -33,10 +33,6 @@ public class PlayerDAOTest {
         playerDAO = new PlayerDAO(emf);
     }
 
-    @AfterAll
-    void shutdown() {
-        emf.close();
-    }
 
     @Test
     void create() {

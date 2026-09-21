@@ -32,10 +32,6 @@ class MoveDAOTest {
         moveDAO = new MoveDAO(emf);
     }
 
-    @AfterAll
-    void shutdown() {
-        emf.close();
-    }
 
     @Test
     void create() {
