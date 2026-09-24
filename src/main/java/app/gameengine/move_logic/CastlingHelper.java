@@ -36,7 +36,7 @@ public class CastlingHelper {
 
             Position rookLeftCandidatePosition = PositionConverter.fromCoordinates(x-4, y);
             Piece rookLeftCandidate = PieceFinder.findPiece(board, rookLeftCandidatePosition);
-            if (rookLeftCandidate instanceof Rook rook && !rook.isHasMoved() && !isSquareAttacked(board, piece, rookLeftCandidatePosition)){
+            if (rookLeftCandidate instanceof Rook rook && !rook.isHasMoved()){
                 Position leftPosition = PositionConverter.fromCoordinates(x-2, y);
                 candidates.add(leftPosition);
             }
@@ -49,7 +49,7 @@ public class CastlingHelper {
 
             Position rookRightCandidatePosition = PositionConverter.fromCoordinates(x+3, y);
             Piece rookRightCandidate = PieceFinder.findPiece(board, rookRightCandidatePosition);
-            if (rookRightCandidate instanceof Rook rook && !rook.isHasMoved() && !isSquareAttacked(board, piece, rookRightCandidatePosition)){
+            if (rookRightCandidate instanceof Rook rook && !rook.isHasMoved()){
                 Position rightPosition = PositionConverter.fromCoordinates(x+2, y);
                 candidates.add(rightPosition);
             }

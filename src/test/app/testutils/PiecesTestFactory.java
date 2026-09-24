@@ -1,6 +1,5 @@
 package app.testutils;
 
-import app.gameengine.Position;
 import app.gameengine.pieces.*;
 
 public class PiecesTestFactory {

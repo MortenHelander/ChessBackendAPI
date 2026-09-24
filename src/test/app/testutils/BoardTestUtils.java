@@ -4,8 +4,6 @@ import app.gameengine.Board;
 import app.gameengine.Position;
 import app.gameengine.pieces.Piece;
 
-import java.io.IOException;
-
 public class BoardTestUtils {
 
     public static Board emptyBoard() {

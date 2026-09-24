@@ -34,26 +34,29 @@ public class MoveExecutor {
         return false;
     }
 
-    private boolean castlingMove(Board board, Piece king, Position oldPosition, Position newPosition){
+    private boolean castlingMove(Board board, Piece king, Position oldKingPosition, Position newPosition){
 
         //if castling right
-        if (oldPosition.getX() < newPosition.getX()){
-            Piece rook = PieceFinder.findPiece(board, PositionConverter.fromCoordinates(oldPosition.getX()+3, oldPosition.getY()));
-            Position newRookPosition = PositionConverter.fromCoordinates(oldPosition.getX()+1, oldPosition.getY());
-            return executeCastlingMove(board, king, oldPosition, newPosition, rook, newRookPosition);
+        if (oldKingPosition.getX() < newPosition.getX()){
+            Piece rook = PieceFinder.findPiece(board, PositionConverter.fromCoordinates(oldKingPosition.getX()+3, oldKingPosition.getY()));
+            Position newRookPosition = PositionConverter.fromCoordinates(oldKingPosition.getX()+1, oldKingPosition.getY());
+            Position oldRookPosition = (PositionConverter.fromCoordinates(oldKingPosition.getX()+3, oldKingPosition.getY()));
+            return executeCastlingMove(board, king, oldKingPosition, newPosition, rook, newRookPosition, oldRookPosition);
 
             //if castling left
-        }else if (oldPosition.getX() > newPosition.getX()){
-            Piece rook = PieceFinder.findPiece(board, PositionConverter.fromCoordinates(oldPosition.getX()-4, oldPosition.getY()));
-            Position newRookPosition = PositionConverter.fromCoordinates(oldPosition.getX()-1, oldPosition.getY());
-            return executeCastlingMove(board, king, oldPosition, newPosition, rook, newRookPosition);
+        }else if (oldKingPosition.getX() > newPosition.getX()){
+            Piece rook = PieceFinder.findPiece(board, PositionConverter.fromCoordinates(oldKingPosition.getX()-4, oldKingPosition.getY()));
+            Position newRookPosition = PositionConverter.fromCoordinates(oldKingPosition.getX()-1, oldKingPosition.getY());
+            Position oldRookPosition = (PositionConverter.fromCoordinates(oldKingPosition.getX()-4, oldKingPosition.getY()));
+            return executeCastlingMove(board, king, oldKingPosition, newPosition, rook, newRookPosition, oldRookPosition);
         }
         return false;
     }
 
-    private boolean executeCastlingMove(Board board, Piece king, Position oldPosition, Position newPosition, Piece rook, Position newRookPosition) {
+    private boolean executeCastlingMove(Board board, Piece king, Position oldKingPosition, Position newPosition, Piece rook, Position newRookPosition, Position oldRookPosition) {
         if (board.getAllPieces().containsValue(king) && board.getAllPieces().containsValue(rook)) {
-            board.getAllPieces().remove(oldPosition);
+            board.getAllPieces().remove(oldRookPosition);
+            board.getAllPieces().remove(oldKingPosition);
             board.getAllPieces().remove(newPosition);
             board.getAllPieces().put(newPosition, king);
             board.getAllPieces().put(newRookPosition, rook);
@@ -70,6 +73,7 @@ public class MoveExecutor {
                 Position enemyPiecePosition = PositionConverter.fromCoordinates(oldPosition.getX()+1, oldPosition.getY());
                 Piece enemyPiece = PieceFinder.findPiece(board, enemyPiecePosition);
                 if (enemyPiece instanceof Pawn enemyPawn && enemyPawn.isEnPassantTakeable()){
+                    board.getAllPieces().remove(oldPosition);
                     board.getAllPieces().put(newPosition, piece);
                     board.getAllPieces().remove(enemyPiecePosition, enemyPiece);
                     return true;
@@ -79,6 +83,7 @@ public class MoveExecutor {
                 Position enemyPiecePosition = PositionConverter.fromCoordinates(oldPosition.getX()-1, oldPosition.getY());
                 Piece enemyPiece = PieceFinder.findPiece(board, enemyPiecePosition);
                 if (enemyPiece instanceof Pawn enemyPawn && enemyPawn.isEnPassantTakeable()){
+                    board.getAllPieces().remove(oldPosition);
                     board.getAllPieces().put(newPosition, piece);
                     board.getAllPieces().remove(enemyPiecePosition, enemyPiece);
                     return true;
