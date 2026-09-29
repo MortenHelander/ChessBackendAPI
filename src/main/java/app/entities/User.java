@@ -19,10 +19,10 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+    private String username;
     private String firstName;
     private String lastName;
     private String email;
-    private String username;
     private String password;
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     @PrimaryKeyJoinColumn

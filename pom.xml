@@ -127,6 +127,16 @@
             <version>3.27.7</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+        <groupId>io.javalin</groupId>
+        <artifactId>javalin</artifactId>
+        <version>6.7.0</version>
+    </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+            <version>2.18.3</version>
+        </dependency>
     </dependencies>
 
 </project>
