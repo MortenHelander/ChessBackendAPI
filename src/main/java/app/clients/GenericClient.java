@@ -1,4 +1,4 @@
-package app.services;
+package app.clients;
 
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.ObjectMapper;

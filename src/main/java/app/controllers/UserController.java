@@ -22,9 +22,9 @@ public class UserController implements EndpointGroup {
 
     @Override
     public void addEndpoints() {
+        post("/api/v1/users", this::createNewUser);
         get("/api/v1/users", this::getAllUsers);
         get("/api/v1/users/{id}", this::getUser);
-        post("/api/v1/users", this::createNewUser);
         put("/api/v1/users/{id}", this::updateUser);
         delete("/api/v1/users/{id}", this::deleteUser);
     }

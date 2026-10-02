@@ -1,5 +1,7 @@
 package app.services;
 
+import app.clients.ChessComClient;
+import app.clients.GenericClient;
 import app.dtos.chesscom.ChessComPlayerDTO;
 import app.dtos.chesscom.ChessComStatsDTO;
 import org.junit.jupiter.api.Test;

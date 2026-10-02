@@ -1,9 +1,7 @@
-package app.services;
+package app.clients;
 
-import app.dtos.chesscom.ChessComPlayerDTO;
-import app.dtos.chesscom.ChessComStatsDTO;
+import app.dtos.lichess.LichessDailyPuzzleDTO;
 import app.utils.Utils;
-import tools.jackson.core.JacksonException;
 import tools.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
@@ -12,19 +10,13 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
-public class ChessComClient {
+public class LichessClient {
     private final ObjectMapper objectMapper = new ObjectMapper();
     private String userAgent = Utils.getPropertyValue("USER_AGENT", "config.properties");
 
+    public LichessDailyPuzzleDTO getDailyPuzzle(){
 
-    public String getJsonPlayerInfo(String playerName, boolean needStats){
-
-        String stats = "";
-        if (needStats){
-            stats = "/stats";
-        }
-
-        String endpoint = "https://api.chess.com/pub/player/" + playerName + stats;
+        String endpoint = "https://lichess.org/api/puzzle/daily";
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(endpoint))
@@ -43,22 +35,6 @@ public class ChessComClient {
             throw new RuntimeException(e);
         }
         System.out.println(response.body());
-        return response.body();
-    }
-
-    public ChessComPlayerDTO getPlayerInfoChessCom(String json){
-        try{
-            return objectMapper.readValue(json, ChessComPlayerDTO.class);
-        } catch (JacksonException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public ChessComStatsDTO getPlayerStatsChessCom(String json){
-        try{
-            return objectMapper.readValue(json, ChessComStatsDTO.class);
-        } catch (JacksonException e) {
-            throw new RuntimeException(e);
-        }
+        return GenericClient.convertJsonGeneric(response.body(), LichessDailyPuzzleDTO.class);
     }
 }
