@@ -52,6 +52,7 @@ public class Game {
         game.gameStatus = GameStatus.IN_PROGRESS;
         game.startedAt = LocalDateTime.now();
         game.isWhitesTurn = true;
+        game.winnerColor = Color.NO_COLOR;
         game.addPlayer(whitePlayer);
         game.addPlayer(blackPlayer);
         return game;

@@ -110,6 +110,4 @@ public class GameService {
         Move persistedMove = persistedGame.getMoves().getLast();
         return MoveMapper.toDto(persistedMove);
     }
-
-
 }

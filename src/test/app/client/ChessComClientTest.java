@@ -1,4 +1,4 @@
-package app.services;
+package app.client;
 
 import app.clients.ChessComClient;
 import app.clients.GenericClient;

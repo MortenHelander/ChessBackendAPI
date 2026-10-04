@@ -13,7 +13,7 @@ public class UserService {
         this.userDAO = userDAO;
     }
 
-    public List<UserResponseDTO> getAllUsers(){
-
-    }
+//    public List<UserResponseDTO> getAllUsers(){
+//
+//    }
 }

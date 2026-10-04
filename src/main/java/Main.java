@@ -18,32 +18,7 @@ public class Main {
         EntityManagerFactory emf = HibernateConfig.getEntityManagerFactory();
         ApplicationConfig applicationConfig = new ApplicationConfig(emf);
 
-        Javalin app = Javalin.create(config -> {
-            config.jsonMapper(new JavalinJackson().updateMapper(mapper -> {
-                mapper.registerModule(new JavaTimeModule());
-            }));
-            config.router.apiBuilder(applicationConfig);
-        });
-
-        app.exception(ApiException.class, (e, ctx) -> {
-            if (e.getCode() >= 500) {
-                log.error("Server error: {}", e.getMessage());
-            } else {
-                log.warn("Client error ({}): {}", e.getCode(), e.getMessage());
-            }
-            ctx.status(e.getCode()).json(Map.of("error", e.getMessage()));
-        });
-
-        app.exception(InvalidGameActionException.class, (e, ctx) -> {
-            log.warn("Invalid game action: {}", e.getMessage());
-            ctx.status(400).json(Map.of("error", e.getMessage()));
-        });
-
-        app.exception(Exception.class, (exception, ctx) -> {
-            log.error("Unhandled exception", exception);
-            ctx.status(500).json(Map.of("error", "Internal server error"));
-        });
-
+        Javalin app = applicationConfig.createApp();
         app.start(7070);
     }
 }
