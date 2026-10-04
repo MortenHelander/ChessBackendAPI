@@ -81,7 +81,7 @@ public class GameController implements EndpointGroup {
         ctx.json(response);
     }
 
-    public void endGame(){
+    public void endGame(Context ctx){
         //to do for when learning about tokens
     }
 }

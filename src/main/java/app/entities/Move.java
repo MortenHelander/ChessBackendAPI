@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import jdk.jfr.Name;
 import lombok.*;
 import org.hibernate.proxy.HibernateProxy;
+import org.jetbrains.annotations.Nullable;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -30,6 +31,8 @@ public class Move {
     private Position from;
     @Column(name = "to_position")
     private Position to;
+    @Nullable
+    private String promotionLetter;
     @ManyToOne
     @ToString.Exclude
     @Setter
@@ -38,6 +41,12 @@ public class Move {
     public Move(Position from, Position to) {
         this.from = from;
         this.to = to;
+    }
+
+    public Move(Position from, Position to, @Nullable String promotionLetter){
+        this.from = from;
+        this.to = to;
+        this.promotionLetter = promotionLetter;
     }
 
     @Override

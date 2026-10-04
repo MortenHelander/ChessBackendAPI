@@ -69,7 +69,7 @@ public class PromotionHelper {
     public static String getPromotionPieceLetter(String pieceType) {
         String letter;
 
-        switch (pieceType) {
+        switch (pieceType.toLowerCase()) {
             case "queen":
                 letter = "q";
                 break;
@@ -86,5 +86,27 @@ public class PromotionHelper {
                 throw new InvalidPromotionTypeException(pieceType);
         }
         return letter;
+    }
+
+    public static String getPromotionPieceType(String promotionLetter) {
+        String pieceType;
+
+        switch (promotionLetter.toLowerCase()) {
+            case "q":
+                pieceType = "queen";
+                break;
+            case "n":
+                pieceType = "knight";
+                break;
+            case "b":
+                pieceType = "bishop";
+                break;
+            case "r":
+                pieceType = "rook";
+                break;
+            default:
+                throw new InvalidPromotionTypeException(promotionLetter);
+        }
+        return pieceType;
     }
 }

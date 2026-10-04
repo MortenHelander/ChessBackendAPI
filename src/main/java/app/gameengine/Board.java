@@ -94,19 +94,19 @@ public class Board {
     }
 
 
-    public MoveResult move(Piece piece, Position oldPosition, Position newPosition){
+    public MoveResult move(Piece piece, Position from, Position to){
 
-        MoveType moveType = MoveIdentifier.identifyMove(this, piece, oldPosition, newPosition);
+        MoveType moveType = MoveIdentifier.identifyMove(this, piece, from, to);
         if (moveType == null){
             return MoveResult.failed();
         }
         if (moveType == MoveType.PROMOTION){
-            moveExecutor.executeMove(this, piece, MoveType.NORMAL, oldPosition, newPosition);
-            return MoveResult.awaitingPromotion(newPosition);
+            moveExecutor.executeMove(this, piece, MoveType.NORMAL, from, to);
+            return MoveResult.awaitingPromotion(to);
         }
-        boolean moved = moveExecutor.executeMove(this, piece, moveType, oldPosition, newPosition);
+        boolean moved = moveExecutor.executeMove(this, piece, moveType, from, to);
         if (moved){
-            turnHelper.endTurn(piece, newPosition);
+            turnHelper.endTurn(piece, to);
         }
         return MoveResult.completed();
     }

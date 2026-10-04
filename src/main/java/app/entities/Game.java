@@ -38,6 +38,10 @@ public class Game {
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "game", cascade = CascadeType.ALL)
     private Set<Player> players = new HashSet<>();
 
+    @Version
+    @Column(name = "optlock", columnDefinition = "integer DEFAULT 0", nullable = false)
+    private long version;
+
 
     public static Game newGame(GameMode gameMode, Player whitePlayer, Player blackPlayer){
         if (whitePlayer.getColor() != Color.WHITE || blackPlayer.getColor() != Color.BLACK){
@@ -63,7 +67,11 @@ public class Game {
             move.setPlayedAt(LocalDateTime.now().truncatedTo(ChronoUnit.MICROS));
 
             //gets the names of positions to use for stockfish api
-            move.setUci(move.getFrom().name().toLowerCase() + move.getTo().name().toLowerCase());
+            if (move.getPromotionLetter() == null){
+                move.setUci(move.getFrom().name().toLowerCase() + move.getTo().name().toLowerCase());
+            }else {
+                move.setUci(move.getFrom().name().toLowerCase() + move.getTo().name().toLowerCase() + move.getPromotionLetter());
+            }
         }
     }
 
