@@ -84,6 +84,10 @@ public class GameService {
             throw new ApiException(400, "Not your turn");
         }
 
+        if (!MoveValidator.getLegalMoves(board, piece, from).contains(to)){
+            throw new ApiException(400, "Illegal move");
+        }
+
         MoveResult result = board.move(piece, from, to);
         if (!result.success()) {
             throw new ApiException(400, "Illegal move");

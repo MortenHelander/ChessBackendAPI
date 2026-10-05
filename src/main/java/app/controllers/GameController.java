@@ -43,7 +43,7 @@ public class GameController implements EndpointGroup {
     }
 
     public void getGame(Context ctx){
-        int id = ctx.pathParamAsClass("id", Integer.class)
+        Integer id = ctx.pathParamAsClass("id", Integer.class)
                 .check(value -> value > 0, "ID must be positive").get();
         GameResponseDTO gameResponseDTO = gameService.getGame(id);
         ctx.status(HttpStatus.OK); //200
@@ -51,7 +51,7 @@ public class GameController implements EndpointGroup {
     }
 
     public void deleteGame(Context ctx){
-        int id = ctx.pathParamAsClass("id", Integer.class)
+        Integer id = ctx.pathParamAsClass("id", Integer.class)
                 .check(value -> value > 0, "ID must be positive").get();
 
         gameService.deleteGame(id);
@@ -59,7 +59,7 @@ public class GameController implements EndpointGroup {
     }
 
     public void getMoves(Context ctx){
-        int id = ctx.pathParamAsClass("id", Integer.class)
+        Integer id = ctx.pathParamAsClass("id", Integer.class)
                 .check(value -> value > 0, "ID must be positive").get();
 
         List<MoveResponseDTO> moves = gameService.getMoves(id);
@@ -68,7 +68,7 @@ public class GameController implements EndpointGroup {
     }
 
     public void moveAndShiftTurn(Context ctx){
-        int id = ctx.pathParamAsClass("id", Integer.class)
+        Integer id = ctx.pathParamAsClass("id", Integer.class)
                 .check(value -> value > 0, "ID must be positive").get();
 
         MoveRequestDTO move = ctx.bodyValidator(MoveRequestDTO.class)

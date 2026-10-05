@@ -14,10 +14,14 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.javalin.Javalin;
 import io.javalin.apibuilder.EndpointGroup;
 import io.javalin.json.JavalinJackson;
+import io.javalin.validation.ValidationError;
+import io.javalin.validation.ValidationException;
 import jakarta.persistence.EntityManagerFactory;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Slf4j
 public class ApplicationConfig implements EndpointGroup {
@@ -60,6 +64,15 @@ public class ApplicationConfig implements EndpointGroup {
                 log.warn("Client error ({}): {}", e.getCode(), e.getMessage());
             }
             ctx.status(e.getCode()).json(Map.of("error", e.getMessage()));
+        });
+
+        app.exception(ValidationException.class, (e, ctx) -> {
+            String messages = e.getErrors().values().stream()
+                    .flatMap(List::stream)
+                    .map(ValidationError::getMessage)
+                    .collect(Collectors.joining(", "));
+            log.warn("Validation failed: {}", messages);
+            ctx.status(400).json(Map.of("error", messages));
         });
 
         app.exception(InvalidGameActionException.class, (e, ctx) -> {

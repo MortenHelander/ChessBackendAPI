@@ -93,6 +93,21 @@ public class GameEndpointsTest {
                 .body("error", is("Game with id "+ id + " not found"));
     }
 
+    @Test
+    void getGame_illegalId_returns400(){
+        Integer id = -5;
+
+        given()
+                .when()
+                .contentType(ContentType.JSON)
+                .when()
+                .get("/api/v1/games/{id}", id)
+                .then()
+                .log().all()
+                .statusCode(400)
+                .body("error", is("ID must be positive"));
+    }
+
 
     @Test
     void deleteGame_existing_returns204(){
@@ -147,6 +162,24 @@ public class GameEndpointsTest {
                 .body("error", is("Game with id "+ id + " not found"));
     }
 
+    @Test
+    void moveAndShiftTurn_fromPositionNull_returns400(){
+        Integer id = seed.get("game3").getId();
+
+        move(id, null ,"e3", null)
+                .statusCode(400)
+                .body("error", is("From position is required"));
+    }
+
+    @Test
+    void moveAndShiftTurn_toPositionNull_returns400(){
+        Integer id = seed.get("game3").getId();
+
+        move(id, "e3" ,null, null)
+                .statusCode(400)
+                .body("error", is("To position is required"));
+    }
+
 
     @Test
     void moveAndShiftTurn_legalMove_returns201() {
@@ -160,16 +193,63 @@ public class GameEndpointsTest {
     }
 
     @Test
-    void moveAndShiftTurn_illegalMove_returns201() {
+    void moveAndShiftTurn_noPieceOnFromSquare_returns400() {
         Integer id = seed.get("game3").getId();
 
         move(id, "e5", "h5", null)
                 .statusCode(400)
-                .body("error", is("No piece on selected square"))
-                .body("moveNumber", is(1))
-                .body("uci", is("e2e4"));
+                .body("error", is("No piece on selected square"));
     }
 
+
+    @Test
+    void moveAndShiftTurn_legalMove_notValidPieceAndTurn_returns400() {
+        Integer id = seed.get("game3").getId();
+
+        move(id, "e7", "e5", null)
+                .statusCode(400)
+                .body("error", is("Not your turn"));
+    }
+
+    @Test
+    void moveAndShiftTurn_illegalMove_returns400(){
+        Integer id = seed.get("game3").getId();
+
+        move(id, "e2", "e7", null)
+                .statusCode(400)
+                .body("error", is("Illegal move"));
+    }
+
+    @Test
+    void moveAndShiftTurn_foolsMate_blackWins() {
+        Integer id = seed.get("game3").getId();
+        playAll(id, "f2f3", "e7e5", "g2g4", "d8h4");
+
+        when().get("/api/v1/games/{id}", id)
+                .then().log().all().statusCode(200)
+                .body("gameStatus", is("CHECKMATE"))
+                .body("winnerColor", is("BLACK"));
+
+        move(id, "a2", "a3", null)
+                .statusCode(400).body("error", is("Game is finished"));
+    }
+
+    @Test
+    void moveAndShiftTurn_promotionAllConditionsMet_returns201(){
+        Integer id = seed.get("game3").getId();
+
+        playUpToPromotion(id);
+        move(id, "a7", "b8", "q")
+                .statusCode(201)
+                .body("uci", is("a7b8q"));
+        playAll(id, "a8b8", "e2e3");
+
+        when().get("/api/v1/games/{id}/moves", id)
+                .then().log().all()
+                .body("size()", is(11))
+                .body("uci", hasItem("a7b8q"));
+    }
+    //promotion works and the fails is: wrong square, no promotion, no promotion letter, wrong piece
 
 
 
@@ -182,5 +262,17 @@ public class GameEndpointsTest {
         return given().contentType(ContentType.JSON).body(body)
                 .when().post("/api/v1/games/{id}/moves", gameId)
                 .then().log().all();
+    }
+
+    private void playAll(int gameId, String... ucis) {
+        for (String uci : ucis) {
+            String promotion = uci.length() == 5 ? uci.substring(4) : null; //if the uci (e2e4 fx) has 5 letters the fith is promotion, otherwise it's null
+            move(gameId, uci.substring(0, 2), uci.substring(2, 4), promotion)
+                    .statusCode(201);
+        }
+    }
+
+    private void playUpToPromotion(int id) {
+        playAll(id, "a2a4", "b7b5", "a4b5", "a7a6", "b5a6", "c8b7", "a6a7", "h7h6");
     }
 }

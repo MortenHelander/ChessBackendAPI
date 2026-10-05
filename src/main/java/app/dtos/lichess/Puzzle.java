@@ -1,4 +1,4 @@
-package app.dtos.lichess.records;
+package app.dtos.lichess;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
