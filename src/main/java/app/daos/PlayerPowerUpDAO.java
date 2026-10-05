@@ -50,7 +50,7 @@ public class PlayerPowerUpDAO {
                 if (move != null) {
                     return move;
                 }
-                throw new ApiException(404, "Power-up not found");
+                throw ApiException.notFound("Power-up", id);
             } catch (PersistenceException e){
                 throw new ApiException(500, "Get power-up failed: " + e.getMessage());
             }
@@ -69,7 +69,7 @@ public class PlayerPowerUpDAO {
             try{
                 PlayerPowerUp existing = em.find(PlayerPowerUp.class, playerPowerUp.getId());
                 if (existing == null){
-                    throw new ApiException(404, "Power-up not found");
+                    throw ApiException.notFound("Power-up", playerPowerUp.getId());
                 }
                 updated = em.merge(playerPowerUp);
                 em.getTransaction().commit();

@@ -8,11 +8,13 @@ import org.slf4j.LoggerFactory;
 public class ApiException extends RuntimeException {
     @Getter
     private int code;
-    private static final Logger logger = LoggerFactory.getLogger(ApiException.class);
 
     public ApiException(int code, String msg){
         super(msg);
         this.code = code;
-        logger.error("ApiException (code={}): {}", code, msg);
+    }
+
+    public static ApiException notFound(String entity, Object id){
+        return new ApiException(404, entity + " with id " + id + " not found");
     }
 }

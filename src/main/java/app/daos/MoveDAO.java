@@ -45,7 +45,7 @@ public class MoveDAO {
 
     public Move getById(Integer id) {
         if (id == null){
-            throw new ApiException(400, "MoveID is required");
+            throw new ApiException(400, "MoveID is null");
         }
         try(EntityManager em = emf.createEntityManager()){
             try {
@@ -53,7 +53,7 @@ public class MoveDAO {
                 if (move != null) {
                     return move;
                 }
-                throw new ApiException(404, "Move not found");
+                throw ApiException.notFound("Move", id);
             } catch (PersistenceException e){
                 throw new ApiException(500, "Get move failed: " + e.getMessage());
             }

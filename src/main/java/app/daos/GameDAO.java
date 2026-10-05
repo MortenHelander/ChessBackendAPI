@@ -1,9 +1,6 @@
 package app.daos;
 
 import app.entities.Game;
-import app.entities.Player;
-import app.entities.User;
-import app.entities.UserStats;
 import app.exceptions.ApiException;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
@@ -56,7 +53,7 @@ public class GameDAO implements IDAO<Game, Integer>{
                 if (game != null) {
                     return game;
                 }
-                throw new ApiException(404, "Game not found");
+                throw ApiException.notFound("Game", id);
             } catch (PersistenceException e){
                 throw new ApiException(500, "Get game failed: " + e.getMessage());
             }
@@ -75,7 +72,7 @@ public class GameDAO implements IDAO<Game, Integer>{
         }
     }
 
-    public List<Game> getAllGameByUserId(Integer id){
+    public List<Game> getAllGamesByUserId(Integer id){
         if (id == null){
             throw new ApiException(400, "UserID is required");
         }
@@ -85,7 +82,7 @@ public class GameDAO implements IDAO<Game, Integer>{
                 query.setParameter("id", id);
                 return query.getResultList();
             } catch (PersistenceException e){
-                throw new ApiException(500, "Get all games by UserID: " + id +  " failed: " + e.getMessage());
+                throw new ApiException(500, "Get all moves by UserID: " + id +  " failed: " + e.getMessage());
             }
         }
     }
@@ -103,7 +100,7 @@ public class GameDAO implements IDAO<Game, Integer>{
             try{
                 Game existing = em.find(Game.class, game.getId());
                 if (existing == null){
-                    throw new ApiException(404, "Game not found");
+                    throw ApiException.notFound("Game", game.getId());
                 }
                 updated = em.merge(game);
                 em.getTransaction().commit();
@@ -123,7 +120,7 @@ public class GameDAO implements IDAO<Game, Integer>{
     }
 
     @Override
-    public boolean delete(Integer id) {
+    public boolean  delete(Integer id) {
         if (id == null){
             throw new ApiException(400, "GameID is required");
         }
@@ -134,7 +131,7 @@ public class GameDAO implements IDAO<Game, Integer>{
                 if (gameToRemove != null){
                     em.remove(gameToRemove);
                 } else {
-                    throw new ApiException(404, "Game not found");
+                    throw ApiException.notFound("Game", id);
                 }
                 em.getTransaction().commit();
             } catch (PersistenceException e) {

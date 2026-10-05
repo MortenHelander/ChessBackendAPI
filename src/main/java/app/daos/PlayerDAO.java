@@ -46,7 +46,7 @@ public class PlayerDAO implements IDAO<Player, Integer> {
     @Override
     public Player getById(Integer id) {
         if (id == null){
-            throw new ApiException(400, "UserID is required");
+            throw new ApiException(400, "PlayerID is required");
         }
         try(EntityManager em = emf.createEntityManager()){
             try {
@@ -54,7 +54,7 @@ public class PlayerDAO implements IDAO<Player, Integer> {
                 if (player != null) {
                     return player;
                 }
-                throw new ApiException(404, "Player not found");
+                throw ApiException.notFound("Player", id);
             } catch (PersistenceException e){
                 throw new ApiException(500, "Get player failed: " + e.getMessage());
             }
@@ -78,7 +78,7 @@ public class PlayerDAO implements IDAO<Player, Integer> {
         if (player == null){
             throw new ApiException(400, "Provided user is null");
         } else if (player.getId() == null){
-            throw new ApiException(400, "UserID is required");
+            throw new ApiException(400, "PlayerID is required");
         }
         Player updated;
         try(EntityManager em = emf.createEntityManager()){
@@ -86,7 +86,7 @@ public class PlayerDAO implements IDAO<Player, Integer> {
             try{
                 Player existing = em.find(Player.class, player.getId());
                 if (existing == null){
-                    throw new ApiException(404, "Player not found");
+                    throw ApiException.notFound("Player", player.getId());
                 }
                 updated = em.merge(player);
                 em.getTransaction().commit();
@@ -108,7 +108,7 @@ public class PlayerDAO implements IDAO<Player, Integer> {
     @Override
     public boolean delete(Integer id) {
         if (id == null){
-            throw new ApiException(400, "UserID is required");
+            throw new ApiException(400, "PlayerID is required");
         }
         try(EntityManager em = emf.createEntityManager()){
             em.getTransaction().begin();
@@ -117,7 +117,7 @@ public class PlayerDAO implements IDAO<Player, Integer> {
                 if (playerToRemove != null){
                     em.remove(playerToRemove);
                 } else {
-                    throw new ApiException(404, "Player not found");
+                    throw ApiException.notFound("Player", id);
                 }
                 em.getTransaction().commit();
             } catch (PersistenceException e) {

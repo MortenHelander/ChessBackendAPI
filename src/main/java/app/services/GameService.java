@@ -60,7 +60,8 @@ public class GameService {
 
     public List<MoveResponseDTO> getMoves(Integer id) {
 
-        List<Move> moves = moveDAO.getAllMovesByGameId(id);
+        Game game = gameDAO.getById(id); //check existing game first for error check
+        List<Move> moves = moveDAO.getAllMovesByGameId(game.getId());
         return MoveMapper.toDtosFromList(moves);
     }
 

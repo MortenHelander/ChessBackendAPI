@@ -26,6 +26,4 @@ public class GameMapper {
         }
         return dtos;
     }
-
-
 }

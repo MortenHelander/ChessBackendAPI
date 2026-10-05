@@ -61,7 +61,7 @@ public class UserDAO implements IDAO<User, Integer>{
                 if (user != null) {
                     return user;
                 }
-                throw new ApiException(404, "User not found");
+                throw ApiException.notFound("User", id);
             } catch (PersistenceException e){
                 throw new ApiException(500, "Get user failed: " + e.getMessage());
             }
@@ -93,7 +93,7 @@ public class UserDAO implements IDAO<User, Integer>{
             try{
                 User existing = em.find(User.class, user.getId());
                 if (existing == null){
-                    throw new ApiException(404, "User not found");
+                    throw ApiException.notFound("User", user.getId());
                 }
                 updated = em.merge(user);
                 em.getTransaction().commit();
@@ -124,7 +124,7 @@ public class UserDAO implements IDAO<User, Integer>{
                 if (userToRemove != null){
                     em.remove(userToRemove);
                 } else {
-                    throw new ApiException(404, "User not found");
+                    throw ApiException.notFound("User", id);
                 }
                 em.getTransaction().commit();
             } catch (PersistenceException e) {

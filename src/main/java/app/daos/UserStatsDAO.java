@@ -28,7 +28,7 @@ public class UserStatsDAO {
                 if (userStats != null) {
                     return userStats;
                 }
-                throw new ApiException(404, "Users stats not found");
+                throw ApiException.notFound("User-stats", id);
             } catch (PersistenceException e){
                 throw new ApiException(500, "Get user stats failed: " + e.getMessage());
             }
@@ -60,7 +60,7 @@ public class UserStatsDAO {
             try{
                 userStats = em.find(UserStats.class, id);
                 if (userStats == null){
-                    throw new ApiException(404, "User not found");
+                    throw ApiException.notFound("User-stats", id);
                 }
                 userStats.recordResult(result);
                 em.getTransaction().commit();
