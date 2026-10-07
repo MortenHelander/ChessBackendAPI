@@ -158,4 +158,18 @@ class CastlingHelperTest {
         assertThat(enemyQueenPossibleMoves, is(hasItem(Position.B8)));
         assertThat(candidates, is(hasItem(Position.C8)));
     }
+
+    @Test
+    void castlingWithEnemyPieceOnTheWay_shouldExcludeThatSide(){
+        Board board = BoardTestUtils.emptyBoard();
+        King king = PiecesTestFactory.whiteKing(false);
+        BoardTestUtils.place(board, Position.E1, king);
+        Rook queenSideRook = PiecesTestFactory.whiteRook(false);
+        BoardTestUtils.place(board, Position.H1, queenSideRook);
+        Knight enemyKnight = PiecesTestFactory.blackKnight();
+        BoardTestUtils.place(board, Position.G1, enemyKnight);
+
+        List<Position> candidates = CastlingHelper.getCastlingMoves(board, king, Position.E1);
+        assertThat(candidates, not(hasItem(Position.G1)));
+    }
 }

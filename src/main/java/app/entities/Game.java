@@ -81,7 +81,11 @@ public class Game {
             throw new ApiException(400, "Game is already finished");
         }
         this.gameStatus = status;
-        this.winnerColor = winnerColor;
+        if (status == GameStatus.CHECKMATE) {
+            this.winnerColor = winnerColor;
+        }else if (status == GameStatus.DRAW){
+            this.winnerColor = Color.NO_COLOR;
+        }
     }
 
 

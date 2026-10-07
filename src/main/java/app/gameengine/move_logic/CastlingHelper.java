@@ -96,7 +96,7 @@ public class CastlingHelper {
         if (emptySquares.size() == requiredEmptySquares){
             int notCheckedSquares = 0;
             for (int i = 0; i<2; i++) {
-                if (!isSquareAttacked(board, piece, emptySquares.get(i))){
+                if (!isSquareAttackedAndEmpty(board, piece, emptySquares.get(i))){
                     notCheckedSquares++;
                 }
             }
@@ -107,15 +107,15 @@ public class CastlingHelper {
         return false;
     }
 
-    private static boolean isSquareAttacked(Board board, Piece piece, Position square){
+    private static boolean isSquareAttackedAndEmpty(Board board, Piece piece, Position square){
 
         Map<Position, Piece> enemyPieces = PieceSorter.sortPieces(board, piece, false);
-        List<Position> enemyPositions = new ArrayList<>();
+        List<Position> enemyPossibleMoves = new ArrayList<>();
 
         for (Map.Entry<Position, Piece> piecePositionEntry : enemyPieces.entrySet()) {
-            enemyPositions.addAll(piecePositionEntry.getValue().getPossibleMoves(board, piecePositionEntry.getKey()));
+            enemyPossibleMoves.addAll(piecePositionEntry.getValue().getPossibleMoves(board, piecePositionEntry.getKey()));
         }
-        if (enemyPositions.contains(square)){
+        if (enemyPossibleMoves.contains(square) || PieceFinder.findPiece(board, square) != null){
             return true;
         } else {
             return false;
