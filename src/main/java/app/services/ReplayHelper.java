@@ -29,9 +29,6 @@ public class ReplayHelper {
 
             try {
                 MoveResult result = board.move(piece, move.getFrom(), move.getTo());
-                if (!result.success()) {
-                    throw new GameReplayException(label + " was rejected by the engine on replay");
-                }
                 if (result.isAwaitingPromotion()) {
                     String letter = move.getPromotionLetter();
                     if (letter == null) {

@@ -249,10 +249,39 @@ public class GameEndpointsTest {
                 .body("size()", is(11))
                 .body("uci", hasItem("a7b8q"));
     }
-    //promotion works and the fails is: wrong square, no promotion, no promotion letter, wrong piece
 
+    @Test
+    void moveAndShiftTurn_noSelectedPromotionPiece_returns400(){
+        Integer id = seed.get("game3").getId();
 
+        playUpToPromotion(id);
+        move(id, "a7", "b8", null)
+                .statusCode(400)
+                .body("error", is("Promotion piece required"));
+    }
 
+    @Test
+    void moveAndShiftTurn_wrongPromotionLetter_returns400() {
+        Integer id = seed.get("game3").getId();
+        String wrongLetter = "z";
+
+        playUpToPromotion(id);
+        move(id, "a7", "b8", wrongLetter)
+                .statusCode(400)
+                .body("error", is("Unknown promotion piece type: " + wrongLetter));
+    }
+
+    @Test
+    void moveAndShiftTurn_promotionAllConditionsMet_illegalMove_returns400() {
+        Integer id = seed.get("game3").getId();
+
+        playUpToPromotion(id);
+
+        //a8 is occupied by black rook, so white pawn can't move their legally
+        move(id, "a7", "a8", "q")
+                .statusCode(400)
+                .body("error", is("Illegal move"));
+    }
 
     private ValidatableResponse move(int gameId, String from, String to, String promotion) {
         Map<String, String> body = new HashMap<>();
