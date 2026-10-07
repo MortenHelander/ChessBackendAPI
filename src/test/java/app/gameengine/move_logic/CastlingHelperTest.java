@@ -172,4 +172,18 @@ class CastlingHelperTest {
         List<Position> candidates = CastlingHelper.getCastlingMoves(board, king, Position.E1);
         assertThat(candidates, not(hasItem(Position.G1)));
     }
+
+    @Test
+    void castlingWithEnemyPawnAttackingSquare_shouldExcludeThatSide(){
+        Board board = BoardTestUtils.emptyBoard();
+        King king = PiecesTestFactory.whiteKing(false);
+        BoardTestUtils.place(board, Position.E1, king);
+        Rook queenSideRook = PiecesTestFactory.whiteRook(false);
+        BoardTestUtils.place(board, Position.H1, queenSideRook);
+        Pawn enemyPawn = PiecesTestFactory.blackPawn(true, false);
+        BoardTestUtils.place(board, Position.E2, enemyPawn);
+
+        List<Position> candidates = CastlingHelper.getCastlingMoves(board, king, Position.E1);
+        assertThat(candidates, not(hasItem(Position.G1)));
+    }
 }

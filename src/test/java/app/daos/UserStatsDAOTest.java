@@ -7,7 +7,6 @@ import app.entities.UserStats;
 import app.exceptions.ApiException;
 import app.testutils.UserTestPopulator;
 import jakarta.persistence.EntityManagerFactory;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;

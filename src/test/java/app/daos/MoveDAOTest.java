@@ -6,7 +6,6 @@ import app.entities.Move;
 import app.gameengine.Position;
 import app.testutils.GameTestPopulator;
 import jakarta.persistence.EntityManagerFactory;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;

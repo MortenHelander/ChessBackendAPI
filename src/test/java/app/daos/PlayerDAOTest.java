@@ -6,7 +6,6 @@ import app.entities.Player;
 import app.exceptions.ApiException;
 import app.testutils.PlayerTestPopulator;
 import jakarta.persistence.EntityManagerFactory;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;

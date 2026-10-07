@@ -2,15 +2,12 @@ package app.daos;
 
 import app.config.HibernateTestConfig;
 import app.entities.Game;
-import app.entities.Move;
 import app.entities.Player;
 import app.entities.PlayerPowerUp;
 import app.entities.enums.PowerUpStatus;
 import app.entities.enums.PowerUpType;
-import app.gameengine.Position;
 import app.testutils.GameTestPopulator;
 import jakarta.persistence.EntityManagerFactory;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -20,7 +17,6 @@ import java.util.Map;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class PlayerPowerUpDAOTest {

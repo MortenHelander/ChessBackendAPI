@@ -2,10 +2,7 @@ package app.endpoints;
 
 import app.config.ApplicationConfig;
 import app.config.HibernateConfig;
-import app.config.HibernateTestConfig;
 import app.entities.Game;
-import app.entities.Player;
-import app.entities.enums.GameMode;
 import app.testutils.GameTestPopulator;
 import io.javalin.Javalin;
 import io.javalin.http.ContentType;

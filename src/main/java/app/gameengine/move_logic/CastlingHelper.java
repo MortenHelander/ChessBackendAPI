@@ -32,7 +32,7 @@ public class CastlingHelper {
         //check left of king
         Direction left = new Direction(-1, 0);
         //check if squares between king and left rook is empty and not checked on the way
-        if (isBetweenEmptyAndNotCheckedOnTheWay(board, piece, x, y, left, 3)){
+        if (isBetweenEmptyAndNotCheckedOnTheWay(board, piece, x, y, left, 3, position)){
 
             Position rookLeftCandidatePosition = PositionConverter.fromCoordinates(x-4, y);
             Piece rookLeftCandidate = PieceFinder.findPiece(board, rookLeftCandidatePosition);
@@ -45,7 +45,7 @@ public class CastlingHelper {
         //check right of king
         Direction right = new Direction(+1, 0);
         //check if squares between king and right rook is empty and not checked on the way
-        if (isBetweenEmptyAndNotCheckedOnTheWay(board, piece, x, y, right, 2)){
+        if (isBetweenEmptyAndNotCheckedOnTheWay(board, piece, x, y, right, 2, position)){
 
             Position rookRightCandidatePosition = PositionConverter.fromCoordinates(x+3, y);
             Piece rookRightCandidate = PieceFinder.findPiece(board, rookRightCandidatePosition);
@@ -90,13 +90,16 @@ public class CastlingHelper {
         return true;
     }
 
-    private static boolean isBetweenEmptyAndNotCheckedOnTheWay(Board board, Piece piece, int x, int y, Direction direction, int requiredEmptySquares){
+    private static boolean isBetweenEmptyAndNotCheckedOnTheWay(Board board, Piece piece, int x, int y, Direction direction, int requiredEmptySquares, Position currentPosition){
 
         List<Position> emptySquares = SlidingMoveHelper.getPossiblePositions(board, piece, x, y, direction);
         if (emptySquares.size() == requiredEmptySquares){
             int notCheckedSquares = 0;
             for (int i = 0; i<2; i++) {
-                if (!isSquareAttackedAndEmpty(board, piece, emptySquares.get(i))){
+                if (!isSquareEmpty(board, emptySquares.get(i))){
+                    return false;
+                }
+                if (!isSquareAttacked(board, piece, emptySquares.get(i), currentPosition)){
                     notCheckedSquares++;
                 }
             }
@@ -107,18 +110,27 @@ public class CastlingHelper {
         return false;
     }
 
-    private static boolean isSquareAttackedAndEmpty(Board board, Piece piece, Position square){
+    private static boolean isSquareEmpty(Board board, Position square){
+        return !board.getAllPieces().containsKey(square);
+    }
+
+    private static boolean isSquareAttacked(Board board, Piece piece, Position square, Position currentPosition){
 
         Map<Position, Piece> enemyPieces = PieceSorter.sortPieces(board, piece, false);
         List<Position> enemyPossibleMoves = new ArrayList<>();
 
+        //move king temporarily to check for pawns moves (only available to see attacks when enemy is in correct position)
+        board.getAllPieces().put(square, piece);
+        board.getAllPieces().remove(currentPosition, piece);
+
         for (Map.Entry<Position, Piece> piecePositionEntry : enemyPieces.entrySet()) {
             enemyPossibleMoves.addAll(piecePositionEntry.getValue().getPossibleMoves(board, piecePositionEntry.getKey()));
         }
-        if (enemyPossibleMoves.contains(square) || PieceFinder.findPiece(board, square) != null){
-            return true;
-        } else {
-            return false;
-        }
+        //put the piece back to original position
+        board.getAllPieces().put(currentPosition, piece);
+
+        //remove temporary move
+        board.getAllPieces().remove(square, piece);
+        return enemyPossibleMoves.contains(square);
     }
 }

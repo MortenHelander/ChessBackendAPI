@@ -2,7 +2,9 @@ package app.gameengine.move_logic;
 
 import app.gameengine.Board;
 import app.gameengine.Position;
+import app.gameengine.PositionConverter;
 import app.gameengine.pieces.King;
+import app.gameengine.pieces.Pawn;
 import app.gameengine.pieces.Piece;
 
 import java.util.ArrayList;
@@ -14,9 +16,21 @@ public class CheckChecker {
     public static List<Position> isCheckedAfterMove(Board board, Piece piece, Position currentPosition, List<Position> thisPiecePossibleMoves){
 
         thisPiecePossibleMoves.removeIf(move -> {
+
+
             //first check and save potential enemy piece to restore later
             Piece potentialEnemy = board.getAllPieces().get(move);
 
+            //simulation of en passant move, cannot leave the king in check
+            Position capturedPawnSquare = null;
+            Piece capturedPawn = null;
+            if (piece instanceof Pawn && move.getX() != currentPosition.getX() &&  potentialEnemy == null){
+                int x = move.getX();
+                int y = currentPosition.getY();
+                capturedPawnSquare = PositionConverter.fromCoordinates(x, y);
+                capturedPawn = PieceFinder.findPiece(board, capturedPawnSquare);
+                board.getAllPieces().remove(capturedPawnSquare);
+            }
             //temporarily move piece
             board.getAllPieces().put(move, piece);
 
@@ -35,6 +49,8 @@ public class CheckChecker {
             //restore enemy piece if exist
             if (potentialEnemy != null) {
                 board.getAllPieces().put(move, potentialEnemy);
+            }else if (capturedPawn != null){
+                board.getAllPieces().put(capturedPawnSquare, capturedPawn);
             }
 
             return isChecked;
@@ -100,5 +116,4 @@ public class CheckChecker {
         Piece king = allyPieces.get(kingPosition);
         return isKingChecked(board, king);
     }
-
 }
