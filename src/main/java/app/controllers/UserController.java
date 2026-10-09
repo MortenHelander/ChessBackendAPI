@@ -1,16 +1,5 @@
 package app.controllers;
 
-import app.dtos.users.UserCreateDTO;
-import app.dtos.users.UserResponseDTO;
-import app.dtos.users.UserUpdateDTO;
-import app.services.UserService;
-import io.javalin.apibuilder.EndpointGroup;
-import io.javalin.http.Context;
-import io.javalin.http.HttpStatus;
-import lombok.extern.slf4j.Slf4j;
-import java.util.List;
-import static io.javalin.apibuilder.ApiBuilder.*;
-
 //@Slf4j
 //public class UserController implements EndpointGroup {
 //    private UserService userService;

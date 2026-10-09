@@ -1,5 +1,6 @@
 package app.entities;
 
+import app.exceptions.ApiException;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.proxy.HibernateProxy;
@@ -20,9 +21,9 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private String username;
+    private String email;
     private String firstName;
     private String lastName;
-    private String email;
     private String password;
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     @PrimaryKeyJoinColumn
@@ -32,14 +33,16 @@ public class User {
     @ToString.Exclude
     @Builder.Default
     private Set<Player> players = new HashSet<>();
+    @ManyToMany
+    private Set<AccessRole> roles = new HashSet<>();
 
-    public User(String firstName, String lastName, String email, String username, String password) {
+    public User(String username, String email, String firstName, String lastName, String password) {
         //init players set if called from constructor
         this();
+        this.username = username;
+        this.email = email;
         this.firstName = firstName;
         this.lastName = lastName;
-        this.email = email;
-        this.username = username;
         this.password = password;
     }
 
@@ -54,6 +57,13 @@ public class User {
         this.players.add(player);
         if (player != null){
             player.setUser(this);
+        }
+    }
+
+    public void addRole(AccessRole role){
+        this.roles.add(role);
+        if (role != null){
+            role.getUsers().add(this);
         }
     }
 

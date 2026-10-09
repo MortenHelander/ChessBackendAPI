@@ -1,4 +1,4 @@
 package app.dtos.users;
 
-public record UserResponseDTO (String username, String firstName, UserStatsDTO userStatsDTO) {
+public record UserResponseDTO (Integer id, String username, String email, String firstName, UserStatsDTO userStatsDTO) {
 }

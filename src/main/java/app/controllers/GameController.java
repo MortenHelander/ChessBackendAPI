@@ -1,8 +1,10 @@
 package app.controllers;
 
+import app.dtos.games.GameCreateDTO;
 import app.dtos.games.GameResponseDTO;
 import app.dtos.games.MoveResponseDTO;
 import app.dtos.games.MoveRequestDTO;
+import app.entities.enums.GameMode;
 import app.services.GameService;
 import io.javalin.apibuilder.EndpointGroup;
 import io.javalin.http.Context;
@@ -10,6 +12,7 @@ import io.javalin.http.HttpStatus;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
+import java.util.Objects;
 
 import static io.javalin.apibuilder.ApiBuilder.*;
 import static io.javalin.apibuilder.ApiBuilder.delete;
@@ -26,6 +29,7 @@ public class GameController implements EndpointGroup {
     @Override
     public void addEndpoints() {
 
+        post("/api/v1/games", this::createGame);
         get("/api/v1/games", this::getAllGames);
         get("/api/v1/games/{id}", this::getGame);
         delete("/api/v1/games/{id}", this::deleteGame);
@@ -35,6 +39,19 @@ public class GameController implements EndpointGroup {
         post("/api/v1/games/{id}/finish", this::endGame);
     }
 
+    public void createGame(Context ctx){
+        GameCreateDTO createDto = ctx.bodyValidator(GameCreateDTO.class)
+                .check(dto -> dto.whiteUserId() != null, "No player 1 connected")
+                .check(dto -> dto.blackUserId() != null, "No player 2 connected")
+                .check(dto -> !Objects.equals(dto.whiteUserId(), dto.blackUserId()), "Player 1 and player 2 cannot be the same")
+                .check(dto -> dto.gameMode().matches(GameMode.CLASSIC.name()) || dto.gameMode().matches(GameMode.FUN.name())
+                        || dto.gameMode().matches(GameMode.TRAINING.name()), "No valid game mode chosen")
+                .get();
+
+        GameResponseDTO response = gameService.createGame(createDto);
+        ctx.status(HttpStatus.CREATED);
+        ctx.json(response);
+    }
 
     public void getAllGames(Context ctx){
         List<GameResponseDTO> games = gameService.getAllGames();

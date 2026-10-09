@@ -3,12 +3,14 @@ package app.services;
 import app.daos.GameDAO;
 import app.daos.MoveDAO;
 import app.daos.PlayerDAO;
+import app.dtos.games.GameCreateDTO;
 import app.dtos.games.GameResponseDTO;
 import app.dtos.games.MoveRequestDTO;
 import app.dtos.games.MoveResponseDTO;
 import app.entities.Game;
 import app.entities.Move;
 import app.entities.Player;
+import app.entities.User;
 import app.entities.enums.Color;
 import app.entities.enums.GameMode;
 import app.entities.enums.GameStatus;
@@ -24,21 +26,25 @@ import app.mappers.MoveMapper;
 import java.util.List;
 
 public class GameService {
+    private final UserService userService;
     private final PlayerDAO playerDAO;
     private final GameDAO gameDAO;
     private final MoveDAO moveDAO;
 
-    public GameService(PlayerDAO playerDAO, GameDAO gameDAO, MoveDAO moveDAO) {
+    public GameService(UserService userService, PlayerDAO playerDAO, GameDAO gameDAO, MoveDAO moveDAO) {
+        this.userService = userService;
         this.playerDAO = playerDAO;
         this.gameDAO = gameDAO;
         this.moveDAO = moveDAO;
     }
 
-    public GameResponseDTO createGame(GameMode gameMode, Integer whitePlayerId, Integer blackPlayerId) {
-        Player white = playerDAO.getById(whitePlayerId);
-        Player black = playerDAO.getById(blackPlayerId);
+    public GameResponseDTO createGame(GameCreateDTO gameCreateDTO) {
 
-        Game game = Game.newGame(gameMode, white, black);
+        User whiteUser = userService.getUser();
+        User blackUser = userService.getUser();
+
+
+        Game game = Game.newGame(GameMode.valueOf(gameCreateDTO.gameMode()), white, black);
         Game saved = gameDAO.create(game);
 
         return GameMapper.toDTO(saved);

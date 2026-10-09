@@ -37,7 +37,7 @@ public class ApplicationConfig implements EndpointGroup {
         GameDAO gameDAO = new GameDAO(emf);
         PlayerDAO playerDAO = new PlayerDAO(emf);
         MoveDAO moveDAO = new MoveDAO(emf);
-        GameService gameService = new GameService(playerDAO, gameDAO, moveDAO);
+        GameService gameService = new GameService(userService, playerDAO, gameDAO, moveDAO);
         this.gameController = new GameController(gameService);
     }
 

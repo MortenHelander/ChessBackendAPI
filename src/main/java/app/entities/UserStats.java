@@ -30,6 +30,15 @@ public class UserStats {
     @Setter
     private User user;
 
+    public UserStats(Integer id, Integer gamesPlayed, Integer wins, Integer losses, Integer draws, double mmr){
+        this.id = id;
+        this.gamesPlayed = gamesPlayed;
+        this.wins = wins;
+        this.losses = losses;
+        this.draws = draws;
+        this.mmr = mmr;
+    }
+
     public void recordResult(Result result){
 
         gamesPlayed ++;
