@@ -16,21 +16,21 @@ public final class UserTestPopulator {
         try (EntityManager em = emf.createEntityManager()) {
 
             em.getTransaction().begin();
-            User user1 = new User("Morten", "Helander", "morten@hotmail.com", "Sheriff", "password123");
+            User user1 = new User("sheriffen", "morten@hotmail.com", "Morten", "Helander", "password123");
             user1.addUserStats(UserStats.builder()
                     .gamesPlayed(0)
                     .wins(0)
                     .losses(0)
                     .mmr(1000)
                     .build());
-            User user2 = new User("Theis", "Rudkjær", "theis@hotmail.com", "SVG-man", "anotherpassword1441");
+            User user2 = new User("svg-man", "theis@hotmail.com", "Theis", "Rudkjær", "anotherpassword1441");
             user2.addUserStats(UserStats.builder()
                     .gamesPlayed(25)
                     .wins(12)
                     .losses(13)
                     .mmr(900)
                     .build());
-            User user3 = new User("Andreas", "Jensen", "andreas@hotmail.com", "Frontjoe", "andreas1234567");
+            User user3 = new User("frontjoe", "andreas@hotmail.com", "Andreas", "Jensen", "andreas1234567");
             user3.addUserStats(UserStats.builder()
                     .gamesPlayed(200)
                     .wins(150)

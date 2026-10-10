@@ -14,6 +14,7 @@ final class EntityRegistry {
         configuration.addAnnotatedClass(Move.class);
         configuration.addAnnotatedClass(PlayerPowerUp.class);
         configuration.addAnnotatedClass(UserStats.class);
+        configuration.addAnnotatedClass(AccessRole.class);
         // TODO: Add more entities here...
     }
 }

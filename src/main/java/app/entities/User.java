@@ -69,6 +69,13 @@ public class User {
         }
     }
 
+    public void updateDetails(String username, String email, String firstName, String lastName){
+        this.username = username;
+        this.email = email;
+        this.firstName = firstName;
+        this.lastName = lastName;
+    }
+
     @Override
     public final boolean equals(Object o) {
         if (this == o)

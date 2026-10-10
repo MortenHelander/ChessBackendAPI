@@ -1,8 +1,12 @@
 package app.controllers;
 
+import app.dtos.users.UserLoginRequestDTO;
 import app.dtos.users.UserRegisterDTO;
 import app.dtos.users.UserResponseDTO;
+import app.dtos.users.VerifiedUserDTO;
 import app.exceptions.ApiException;
+import app.security.JWTService;
+import app.services.AuthService;
 import app.services.UserService;
 import app.utils.EmailValidator;
 import app.utils.PasswordValidator;
@@ -13,7 +17,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import static io.javalin.apibuilder.ApiBuilder.get;
 import static io.javalin.apibuilder.ApiBuilder.post;
@@ -21,9 +24,11 @@ import static io.javalin.apibuilder.ApiBuilder.post;
 @Slf4j
 public class AuthController implements EndpointGroup {
     private final UserService userService;
+    private final AuthService authService;
 
-    public AuthController(UserService userService){
+    public AuthController(UserService userService, AuthService authService){
         this.userService = userService;
+        this.authService = authService;
     }
 
     @Override
@@ -48,6 +53,12 @@ public class AuthController implements EndpointGroup {
     }
 
     public void login(Context ctx){
+
+        UserLoginRequestDTO request = ctx.bodyValidator(UserLoginRequestDTO.class).get();
+
+        VerifiedUserDTO verified = userService.verifyUser(request);
+        String token = authService.createToken(verified);
+
 
     }
 }

@@ -9,6 +9,6 @@ public class PasswordHasher {
     }
 
     public static boolean checkPassword(String passwordRaw, String passwordHash){
-        return BCrypt.checkpw(passwordHash, passwordHash);
+        return BCrypt.checkpw(passwordRaw, passwordHash);
     }
 }

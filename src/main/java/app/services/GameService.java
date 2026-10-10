@@ -40,14 +40,15 @@ public class GameService {
 
     public GameResponseDTO createGame(GameCreateDTO gameCreateDTO) {
 
-        User whiteUser = userService.getUser();
-        User blackUser = userService.getUser();
-
-
-        Game game = Game.newGame(GameMode.valueOf(gameCreateDTO.gameMode()), white, black);
-        Game saved = gameDAO.create(game);
-
-        return GameMapper.toDTO(saved);
+//        User whiteUser = userService.getUser();
+//        User blackUser = userService.getUser();
+//
+//
+//        Game game = Game.newGame(GameMode.valueOf(gameCreateDTO.gameMode()), white, black);
+//        Game saved = gameDAO.create(game);
+//
+//        return GameMapper.toDTO(saved);
+        return null;
     }
 
     public List<GameResponseDTO> getAllGames() {

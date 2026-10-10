@@ -9,7 +9,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Set;
 
-public class JWTokenSecurity {
+public class JWTService {
 
 
     public String createToken(VerifiedUserDTO user, String issuer, String expirationTime, String secret) {
@@ -43,7 +43,7 @@ public class JWTokenSecurity {
         }
     }
 
-    public UserDTO getUserWithRolesFromToken(String token) {
+    public VerifiedUserDTO getUserWithRolesFromToken(String token) {
         var jwt = JWT.decode(token);
         String username = jwt.getSubject();
         List<String> roles = jwt.getClaim("roles").asList(String.class);
@@ -51,7 +51,7 @@ public class JWTokenSecurity {
                 || roles.stream().anyMatch(role -> role == null || role.isBlank())) {
             throw new JWTVerificationException("Token must contain a username and roles");
         }
-        return new UserDTO(username, Set.copyOf(roles));
+        return new VerifiedUserDTO(username, Set.copyOf(roles));
     }
 
 

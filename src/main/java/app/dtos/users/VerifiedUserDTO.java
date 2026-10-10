@@ -1,6 +1,6 @@
 package app.dtos.users;
 
-import java.util.List;
+import java.util.Set;
 
-public record VerifiedUserDTO(String username, List<String> roles) {
+public record VerifiedUserDTO(String username, Set<String> roles) {
 }
