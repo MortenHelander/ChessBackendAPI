@@ -26,6 +26,12 @@ public class UserDAO implements IDAO<User, Integer>{
         try (EntityManager em = emf.createEntityManager()) {
             em.getTransaction().begin();
             try {
+                if (isUsernameTaken(em, user.getUsername())) {
+                    throw new ApiException(409, "Username is taken");
+                }
+                if (isEmailTaken(em, user.getEmail())) {
+                    throw new ApiException(409, "Email is taken");
+                }
                 user.addUserStats(UserStats.builder()
                         .gamesPlayed(0)
                         .wins(0)
@@ -141,4 +147,25 @@ public class UserDAO implements IDAO<User, Integer>{
         return true;
     }
 
+    private boolean isUsernameTaken(EntityManager em, String username) {
+        try {
+            TypedQuery<Long> query = em.createQuery(
+                    "SELECT COUNT(u) FROM User u WHERE u.username = :value", Long.class);
+            query.setParameter("value", username);
+            return query.getSingleResult() > 0;
+        } catch (PersistenceException e) {
+            throw new ApiException(500, "Check for username failed: " + e.getMessage());
+        }
+    }
+
+    private boolean isEmailTaken(EntityManager em, String email) {
+        try {
+            TypedQuery<Long> query = em.createQuery(
+                    "SELECT COUNT(u) FROM User u WHERE u.email = :value", Long.class);
+            query.setParameter("value", email);
+            return query.getSingleResult() > 0;
+        } catch (PersistenceException e) {
+            throw new ApiException(500, "Check for email failed: " + e.getMessage());
+        }
+    }
 }
