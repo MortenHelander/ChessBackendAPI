@@ -5,6 +5,7 @@ import app.exceptions.ApiException;
 import app.security.TokenService;
 import app.utils.Utils;
 import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,17 +16,16 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.List;
-import java.util.Set;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
 
 public class TokenServiceTest {
+    String ISSUER = "third-semester-backend-project";
+    long TOKEN_EXPIRE_TIME = 1000000;
+    String SECRET_KEY = ".JgKf@D;:kqIQG]aoM:vFwf[]W|YS?a{}4[:2D[H-Jv";
 
     TokenService tokenService;
-    String ISSUER = Utils.getPropertyValue("ISSUER", "config.properties");
-    long TOKEN_EXPIRE_TIME = Long.parseLong(Utils.getPropertyValue("TOKEN_EXPIRE_TIME", "config.properties"));
-    String SECRET_KEY = Utils.getPropertyValue("SECRET_KEY", "config.properties");
     UserVerifiedPasswordDTO testUser;
     Base64.Decoder decoder;
     Base64.Encoder encoder;
@@ -46,6 +46,36 @@ public class TokenServiceTest {
 
         assertThat(testUser.username(), is(verified.username()));
         assertThat(testUser.roles(), is(verified.roles()));
+    }
+
+    @Test
+    void tokenConstructor_EmptySecret_throwsIllegalArgument(){
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> new TokenService(ISSUER, TOKEN_EXPIRE_TIME, ""));
+        assertThat(ex.getMessage(), is("Secret key is empty"));
+    }
+
+    @Test
+    void tokenConstructor_TooShortSecret_throwsIllegalArgument(){
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> new TokenService(ISSUER, TOKEN_EXPIRE_TIME, "not-at-least-32-chars"));
+        assertThat(ex.getMessage(), is("Secret key is too short"));
+    }
+
+    @Test
+    void tokenConstructor_emptyIssuer_throwsIllegalArgument(){
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> new TokenService("", TOKEN_EXPIRE_TIME, SECRET_KEY));
+        assertThat(ex.getMessage(), is("Issuer is empty"));
+    }
+
+    @Test
+    void tokenConstructor_expirationTimeIsZero_throwsIllegalArgument(){
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> new TokenService(ISSUER, 0, SECRET_KEY));
+        assertThat(ex.getMessage(), is("Token expiration time too short"));
+    }
+
+    @Test
+    void tokenConstructor_expirationTimeIsNegative_throwsIllegalArgument(){
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> new TokenService(ISSUER, -360000, SECRET_KEY));
+        assertThat(ex.getMessage(), is("Token expiration time too short"));
     }
 
     @Test
@@ -77,16 +107,68 @@ public class TokenServiceTest {
         parts[1] = encoder.encodeToString(payload.getBytes(StandardCharsets.UTF_8));
         String forgedToken = parts[0] + "." + parts[1] + "." + parts[2];
 
-        ApiException ex = assertThrows(ApiException.class, () -> tokenService.verify(forgedToken));
+        invalidTokenCall(forgedToken);
+    }
+
+    @Test
+    void verifyBlankUsername_throws401(){
+        UserVerifiedPasswordDTO emptyUser = new UserVerifiedPasswordDTO("", new HashSet<>(Set.of("User")));
+        String token = tokenService.createToken(emptyUser);
+        invalidTokenCall(token);
+    }
+
+    @Test
+    void verifyNullToken_throws401(){
+        invalidTokenCall(null);
+    }
+
+    @Test
+    void verifyBlankToken_throws401(){
+        invalidTokenCall("");
+    }
+
+    @Test
+    void verifyWrongIssuer_throws401(){
+        TokenService serviceA = new TokenService("issuer", 60_000, "secret-A-which-is-at-least-32-chars!!");
+        TokenService serviceB = new TokenService("wrong-issuer", 60_000, "secret-A-which-is-at-least-32-chars!!");
+        String token = serviceA.createToken(testUser); // signed with secret A
+
+        ApiException ex = assertThrows(ApiException.class, () -> serviceB.verify(token));
         assertThat(ex.getCode(), is(401));
         assertThat(ex.getMessage(), is("Invalid or expired token"));
     }
 
+    @Test
+    void verifyExpiredToken_throws401(){
+        Instant now = Instant.now();
+        String token = JWT.create()
+                .withIssuer(ISSUER)
+                .withSubject(testUser.username())
+                .withArrayClaim("roles", testUser.roles().toArray(String[]::new))
+                .withIssuedAt(now)
+                .withExpiresAt(Instant.now().minusSeconds(60))
+                .sign(Algorithm.HMAC256(SECRET_KEY));
 
+        invalidTokenCall(token);
+    }
 
-    //verify_garbage / null / empty_throws401
-    //verify_wrongIssuer_throws401            // 2nd service: same secret, different issuer
-    //verify_expiredToken_throws401           // build by hand with JWT.create().withExpiresAt(past)
-    //verify_tokenWithoutRoles_throws401      // hand-built: no "roles" claim
-    //constructor_rejects: blank secret, short secret, blank issuer, expiration 0 / negative
+    @Test
+    void verifyTokenWithoutRoles_throws401(){
+        Instant now = Instant.now();
+        String token = JWT.create()
+                .withIssuer(ISSUER)
+                .withSubject(testUser.username())
+                    // missing ArrayClaim that checks roles
+                .withIssuedAt(now)
+                .withExpiresAt(now.plusMillis(TOKEN_EXPIRE_TIME))
+                .sign(Algorithm.HMAC256(SECRET_KEY));
+
+        invalidTokenCall(token);
+    }
+
+    private void invalidTokenCall(String token){
+        ApiException ex = assertThrows(ApiException.class, () -> tokenService.verify(token));
+        assertThat(ex.getCode(), is(401));
+        assertThat(ex.getMessage(), is("Invalid or expired token"));
+    }
 }

@@ -57,7 +57,5 @@ public class AuthController implements EndpointGroup {
 
         UserVerifiedPasswordDTO verified = userService.verifyUser(request);
         String token = tokenService.createToken(verified);
-
-
     }
 }
