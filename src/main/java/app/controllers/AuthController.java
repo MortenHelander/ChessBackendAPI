@@ -3,10 +3,9 @@ package app.controllers;
 import app.dtos.users.UserLoginRequestDTO;
 import app.dtos.users.UserRegisterDTO;
 import app.dtos.users.UserResponseDTO;
-import app.dtos.users.VerifiedUserDTO;
+import app.dtos.users.UserVerifiedPasswordDTO;
 import app.exceptions.ApiException;
-import app.security.JWTService;
-import app.services.AuthService;
+import app.security.TokenService;
 import app.services.UserService;
 import app.utils.EmailValidator;
 import app.utils.PasswordValidator;
@@ -24,11 +23,11 @@ import static io.javalin.apibuilder.ApiBuilder.post;
 @Slf4j
 public class AuthController implements EndpointGroup {
     private final UserService userService;
-    private final AuthService authService;
+    private final TokenService tokenService;
 
-    public AuthController(UserService userService, AuthService authService){
+    public AuthController(UserService userService, TokenService tokenService){
         this.userService = userService;
-        this.authService = authService;
+        this.tokenService = tokenService;
     }
 
     @Override
@@ -56,8 +55,8 @@ public class AuthController implements EndpointGroup {
 
         UserLoginRequestDTO request = ctx.bodyValidator(UserLoginRequestDTO.class).get();
 
-        VerifiedUserDTO verified = userService.verifyUser(request);
-        String token = authService.createToken(verified);
+        UserVerifiedPasswordDTO verified = userService.verifyUser(request);
+        String token = tokenService.createToken(verified);
 
 
     }

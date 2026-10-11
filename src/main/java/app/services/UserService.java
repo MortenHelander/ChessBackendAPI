@@ -4,7 +4,7 @@ import app.daos.UserDAO;
 import app.dtos.users.UserLoginRequestDTO;
 import app.dtos.users.UserRegisterDTO;
 import app.dtos.users.UserResponseDTO;
-import app.dtos.users.VerifiedUserDTO;
+import app.dtos.users.UserVerifiedPasswordDTO;
 import app.entities.User;
 import app.exceptions.ApiException;
 import app.mappers.UserMapper;
@@ -24,7 +24,7 @@ public class UserService {
         return UserMapper.responseDTOFromEntity(created);
     }
 
-    public VerifiedUserDTO verifyUser(UserLoginRequestDTO userLoginRequestDTO){
+    public UserVerifiedPasswordDTO verifyUser(UserLoginRequestDTO userLoginRequestDTO){
         User user = userDAO.getByUsername(userLoginRequestDTO.username());
         if (user == null || !PasswordHasher.checkPassword(userLoginRequestDTO.password(), user.getPassword())){
             throw new ApiException(401, "Invalid username or password");

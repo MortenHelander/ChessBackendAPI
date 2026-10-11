@@ -2,7 +2,7 @@ package app.mappers;
 
 import app.dtos.users.UserRegisterDTO;
 import app.dtos.users.UserResponseDTO;
-import app.dtos.users.VerifiedUserDTO;
+import app.dtos.users.UserVerifiedPasswordDTO;
 import app.entities.AccessRole;
 import app.entities.User;
 import app.security.AccessRoleName;
@@ -21,13 +21,13 @@ public class UserMapper {
         return new UserResponseDTO(user.getId(), user.getEmail(), user.getUsername(), user.getFirstName(), UserStatsMapper.fromEntity(user.getUserStats()));
     }
 
-    public static VerifiedUserDTO verifiedDTOFromEntity(User user){
+    public static UserVerifiedPasswordDTO verifiedDTOFromEntity(User user){
         Set<AccessRoleName> rolesNames = user.getRoles().stream().map(AccessRole::getRoleName).collect(Collectors.toSet());
         Set<String> rolesAsString = new HashSet<>();
         for (AccessRoleName rolesName : rolesNames) {
             String role = rolesName.name();
             rolesAsString.add(role);
         }
-        return new VerifiedUserDTO(user.getUsername(), rolesAsString);
+        return new UserVerifiedPasswordDTO(user.getUsername(), rolesAsString);
     }
 }
