@@ -5,12 +5,13 @@ import app.exceptions.ApiException;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
+import lombok.extern.slf4j.Slf4j;
 
 import java.time.Instant;
 import java.util.List;
 import java.util.Set;
 
-
+@Slf4j
 public class TokenService {
     private final String issuer;
     private final long expirationMillis;
@@ -60,6 +61,7 @@ public class TokenService {
             }
             return new UserVerifiedPasswordDTO(username, Set.copyOf(roles));
         } catch (JWTVerificationException e) {
+            log.error("Could not verify token: {}", String.valueOf(e));
             throw new ApiException(401, "Invalid or expired token");
         }
     }

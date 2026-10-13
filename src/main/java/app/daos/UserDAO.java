@@ -1,8 +1,10 @@
 package app.daos;
 
+import app.entities.AccessRole;
 import app.entities.User;
 import app.entities.UserStats;
 import app.exceptions.ApiException;
+import app.security.AccessRoleName;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.PersistenceException;
@@ -39,6 +41,12 @@ public class UserDAO implements IDAO<User, Integer> {
                         .draws(0)
                         .mmr(500)
                         .build());
+                AccessRole accessRole = em.find(AccessRole.class, AccessRoleName.USER);
+                if (accessRole == null){
+                    accessRole = new AccessRole(AccessRoleName.USER);
+                    em.persist(accessRole);
+                }
+                user.addRole(accessRole);
                 em.persist(user);
                 em.getTransaction().commit();
             } catch (PersistenceException e) {
@@ -76,7 +84,7 @@ public class UserDAO implements IDAO<User, Integer> {
 
     public User getByUsername(String username) {
         try (EntityManager em = emf.createEntityManager()) {
-            TypedQuery<User> query = em.createQuery("SELECT u FROM User u WHERE u.username = :username", User.class);
+            TypedQuery<User> query = em.createQuery("SELECT u FROM User u LEFT JOIN FETCH u.roles WHERE u.username = :username", User.class);
             query.setParameter("username", username);
             return query.getSingleResult();
         } catch (PersistenceException e) {

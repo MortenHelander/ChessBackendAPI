@@ -1,12 +1,10 @@
-package security;
+package app.services;
 
 import app.dtos.users.UserVerifiedPasswordDTO;
 import app.exceptions.ApiException;
 import app.security.TokenService;
-import app.utils.Utils;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
-import com.auth0.jwt.interfaces.DecodedJWT;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -17,7 +15,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 public class TokenServiceTest {

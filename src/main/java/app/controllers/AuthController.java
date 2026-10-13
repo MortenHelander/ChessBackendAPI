@@ -1,10 +1,8 @@
 package app.controllers;
 
-import app.dtos.users.UserLoginRequestDTO;
-import app.dtos.users.UserRegisterDTO;
-import app.dtos.users.UserResponseDTO;
-import app.dtos.users.UserVerifiedPasswordDTO;
+import app.dtos.users.*;
 import app.exceptions.ApiException;
+import app.mappers.UserMapper;
 import app.security.TokenService;
 import app.services.UserService;
 import app.utils.EmailValidator;
@@ -12,15 +10,10 @@ import app.utils.PasswordValidator;
 import io.javalin.apibuilder.EndpointGroup;
 import io.javalin.http.Context;
 import io.javalin.http.HttpStatus;
-import lombok.extern.slf4j.Slf4j;
-
 import java.util.ArrayList;
 import java.util.List;
-
-import static io.javalin.apibuilder.ApiBuilder.get;
 import static io.javalin.apibuilder.ApiBuilder.post;
 
-@Slf4j
 public class AuthController implements EndpointGroup {
     private final UserService userService;
     private final TokenService tokenService;
@@ -53,9 +46,15 @@ public class AuthController implements EndpointGroup {
 
     public void login(Context ctx){
 
-        UserLoginRequestDTO request = ctx.bodyValidator(UserLoginRequestDTO.class).get();
+        UserLoginRequestDTO request = ctx.bodyValidator(UserLoginRequestDTO.class)
+                .check(dto -> dto.username() != null && !dto.username().isBlank() , "Username is required")
+                .check(dto -> dto.password() != null && !dto.password().isBlank() , "Password is required")
+                .get();
 
         UserVerifiedPasswordDTO verified = userService.verifyUser(request);
         String token = tokenService.createToken(verified);
+        UserLoginResponseDTO response = UserMapper.fromVerifiedDtoToResponseDto(verified, token);
+        ctx.status(200);
+        ctx.json(response);
     }
 }

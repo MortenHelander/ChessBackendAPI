@@ -15,13 +15,16 @@ import java.util.Set;
 @NoArgsConstructor
 public class AccessRole {
 
+    public AccessRole(AccessRoleName roleName) {
+        this.roleName = roleName;
+    }
+
     @Id
     @Column(name = "role_name", nullable = false, updatable = false)
     @Enumerated(value = EnumType.STRING)
     private AccessRoleName roleName;
-    @ManyToMany
+    @ManyToMany(mappedBy = "roles")
     private Set<User> users = new HashSet<>();
-
 
 
     @Override

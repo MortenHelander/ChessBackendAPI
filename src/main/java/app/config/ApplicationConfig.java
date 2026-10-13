@@ -1,5 +1,6 @@
 package app.config;
 
+import app.controllers.AuthController;
 import app.controllers.GameController;
 //import app.controllers.UserController;
 import app.daos.GameDAO;
@@ -8,8 +9,10 @@ import app.daos.PlayerDAO;
 import app.daos.UserDAO;
 import app.exceptions.ApiException;
 import app.gameengine.exceptions.InvalidGameActionException;
+import app.security.TokenService;
 import app.services.GameService;
 import app.services.UserService;
+import app.utils.Utils;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.javalin.Javalin;
 import io.javalin.apibuilder.EndpointGroup;
@@ -27,17 +30,28 @@ import java.util.stream.Collectors;
 public class ApplicationConfig implements EndpointGroup {
 //    private final UserController userController;
     private final GameController gameController;
+    private final AuthController authController;
+
 
     public ApplicationConfig(EntityManagerFactory emf){
 
+        //daos
         UserDAO userDAO = new UserDAO(emf);
-        UserService userService = new UserService(userDAO);
-//        this.userController = new UserController(userService);
-
         GameDAO gameDAO = new GameDAO(emf);
         PlayerDAO playerDAO = new PlayerDAO(emf);
         MoveDAO moveDAO = new MoveDAO(emf);
+
+        //services
+        TokenService tokenService = new TokenService(Utils.getPropertyValue("ISSUER", "config.properties"),
+                Long.parseLong(Utils.getPropertyValue("TOKEN_EXPIRE_TIME", "config.properties")),
+                Utils.getPropertyValue("SECRET_KEY", "config.properties"));
+
+        UserService userService = new UserService(userDAO);
         GameService gameService = new GameService(userService, playerDAO, gameDAO, moveDAO);
+//        this.userController = new UserController(userService);
+
+        //controllers
+        this.authController = new AuthController(userService, tokenService);
         this.gameController = new GameController(gameService);
     }
 
@@ -45,6 +59,7 @@ public class ApplicationConfig implements EndpointGroup {
     @Override
     public void addEndpoints() {
 //        userController.addEndpoints();
+        authController.addEndpoints();
         gameController.addEndpoints();
     }
 

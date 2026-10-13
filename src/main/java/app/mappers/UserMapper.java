@@ -1,5 +1,6 @@
 package app.mappers;
 
+import app.dtos.users.UserLoginResponseDTO;
 import app.dtos.users.UserRegisterDTO;
 import app.dtos.users.UserResponseDTO;
 import app.dtos.users.UserVerifiedPasswordDTO;
@@ -18,7 +19,7 @@ public class UserMapper {
     }
 
     public static UserResponseDTO responseDTOFromEntity(User user){
-        return new UserResponseDTO(user.getId(), user.getEmail(), user.getUsername(), user.getFirstName(), UserStatsMapper.fromEntity(user.getUserStats()));
+        return new UserResponseDTO(user.getId(), user.getUsername(), user.getEmail(), user.getFirstName(), UserStatsMapper.fromEntity(user.getUserStats()));
     }
 
     public static UserVerifiedPasswordDTO verifiedDTOFromEntity(User user){
@@ -29,5 +30,9 @@ public class UserMapper {
             rolesAsString.add(role);
         }
         return new UserVerifiedPasswordDTO(user.getUsername(), rolesAsString);
+    }
+
+    public static UserLoginResponseDTO fromVerifiedDtoToResponseDto(UserVerifiedPasswordDTO dto, String token){
+        return new UserLoginResponseDTO(dto.username(), token, dto.roles());
     }
 }
