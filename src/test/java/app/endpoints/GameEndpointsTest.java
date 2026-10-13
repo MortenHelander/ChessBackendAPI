@@ -29,7 +29,7 @@ public class GameEndpointsTest {
     @BeforeAll
     void init() {
         applicationConfig = new ApplicationConfig(emf);
-        app = applicationConfig.createApp();
+        app = applicationConfig.createApp(0);
         app.start(0);
         RestAssured.baseURI = "http://localhost";
         RestAssured.port = app.port();

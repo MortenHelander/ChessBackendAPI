@@ -36,8 +36,7 @@ public class AuthEndpointsTest {
     @BeforeAll
     void init() {
         applicationConfig = new ApplicationConfig(emf);
-        app = applicationConfig.createApp();
-        app.start(0);
+        app = applicationConfig.createApp(0);
         RestAssured.baseURI = "http://localhost";
         RestAssured.port = app.port();
 

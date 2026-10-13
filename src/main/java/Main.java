@@ -12,7 +12,6 @@ public class Main {
         EntityManagerFactory emf = HibernateConfig.getEntityManagerFactory();
         ApplicationConfig applicationConfig = new ApplicationConfig(emf);
 
-        Javalin app = applicationConfig.createApp();
-        app.start(7070);
+        Javalin app = applicationConfig.createApp(7070);
     }
 }

@@ -9,6 +9,8 @@ import app.daos.PlayerDAO;
 import app.daos.UserDAO;
 import app.exceptions.ApiException;
 import app.gameengine.exceptions.InvalidGameActionException;
+import app.handlers.AccessHandler;
+import app.handlers.ExceptionHandler;
 import app.security.TokenService;
 import app.services.GameService;
 import app.services.UserService;
@@ -16,21 +18,18 @@ import app.utils.Utils;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.javalin.Javalin;
 import io.javalin.apibuilder.EndpointGroup;
+import io.javalin.config.JavalinConfig;
 import io.javalin.json.JavalinJackson;
-import io.javalin.validation.ValidationError;
-import io.javalin.validation.ValidationException;
 import jakarta.persistence.EntityManagerFactory;
-import lombok.extern.slf4j.Slf4j;
 
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
-@Slf4j
 public class ApplicationConfig implements EndpointGroup {
+    private final AccessHandler accessHandler;
+    private final ExceptionHandler exceptionHandler;
 //    private final UserController userController;
     private final GameController gameController;
     private final AuthController authController;
+
 
 
     public ApplicationConfig(EntityManagerFactory emf){
@@ -48,13 +47,17 @@ public class ApplicationConfig implements EndpointGroup {
 
         UserService userService = new UserService(userDAO);
         GameService gameService = new GameService(userService, playerDAO, gameDAO, moveDAO);
-//        this.userController = new UserController(userService);
+
+        //handlers
+        this.exceptionHandler = new ExceptionHandler();
+        this.accessHandler = new AccessHandler(tokenService);
+
 
         //controllers
         this.authController = new AuthController(userService, tokenService);
+        //        this.userController = new UserController(userService);
         this.gameController = new GameController(gameService);
     }
-
 
     @Override
     public void addEndpoints() {
@@ -63,42 +66,19 @@ public class ApplicationConfig implements EndpointGroup {
         gameController.addEndpoints();
     }
 
+    private void configuration(JavalinConfig config){
+        config.jsonMapper(new JavalinJackson().updateMapper(mapper -> {
+            mapper.registerModule(new JavaTimeModule());
+        }));
+        config.routes.apiBuilder(this);
+        config.routes.beforeMatched(accessHandler::authenticate);
+        exceptionHandler.configureExceptionHandling(config);
+    }
 
-    public Javalin createApp(){
-        Javalin app = Javalin.create(config -> {
-            config.jsonMapper(new JavalinJackson().updateMapper(mapper -> {
-                mapper.registerModule(new JavaTimeModule());
-            }));
-            config.router.apiBuilder(this);
-        });
 
-        app.exception(ApiException.class, (e, ctx) -> {
-            if (e.getCode() >= 500) {
-                log.error("Server error: {}", e.getMessage());
-            } else {
-                log.warn("Client error ({}): {}", e.getCode(), e.getMessage());
-            }
-            ctx.status(e.getCode()).json(Map.of("error", e.getMessage()));
-        });
-
-        app.exception(ValidationException.class, (e, ctx) -> {
-            String messages = e.getErrors().values().stream()
-                    .flatMap(List::stream)
-                    .map(ValidationError::getMessage)
-                    .collect(Collectors.joining(", "));
-            log.warn("Validation failed: {}", messages);
-            ctx.status(400).json(Map.of("error", messages));
-        });
-
-        app.exception(InvalidGameActionException.class, (e, ctx) -> {
-            log.warn("Invalid game action: {}", e.getMessage());
-            ctx.status(400).json(Map.of("error", e.getMessage()));
-        });
-
-        app.exception(Exception.class, (exception, ctx) -> {
-            log.error("Unhandled exception", exception);
-            ctx.status(500).json(Map.of("error", "Internal server error"));
-        });
+    public Javalin createApp(int port){
+        Javalin app = Javalin.create(this::configuration);
+        app.start(port);
         return app;
     }
 }
