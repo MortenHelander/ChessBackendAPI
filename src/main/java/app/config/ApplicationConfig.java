@@ -71,7 +71,7 @@ public class ApplicationConfig implements EndpointGroup {
             mapper.registerModule(new JavaTimeModule());
         }));
         config.routes.apiBuilder(this);
-        config.routes.beforeMatched(accessHandler::authenticate);
+        config.routes.beforeMatched(accessHandler::handle);
         exceptionHandler.configureExceptionHandling(config);
     }
 

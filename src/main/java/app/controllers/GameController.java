@@ -5,6 +5,7 @@ import app.dtos.games.GameResponseDTO;
 import app.dtos.games.MoveResponseDTO;
 import app.dtos.games.MoveRequestDTO;
 import app.entities.enums.GameMode;
+import app.security.AccessRoleName;
 import app.services.GameService;
 import io.javalin.apibuilder.EndpointGroup;
 import io.javalin.http.Context;
@@ -29,14 +30,14 @@ public class GameController implements EndpointGroup {
     @Override
     public void addEndpoints() {
 
-        post("/api/v1/games", this::createGame);
-        get("/api/v1/games", this::getAllGames);
-        get("/api/v1/games/{id}", this::getGame);
-        delete("/api/v1/games/{id}", this::deleteGame);
+        post("/api/v1/games", this::createGame, AccessRoleName.USER);
+        get("/api/v1/games", this::getAllGames, AccessRoleName.USER);
+        get("/api/v1/games/{id}", this::getGame, AccessRoleName.USER);
+        delete("/api/v1/games/{id}", this::deleteGame, AccessRoleName.ADMIN);
 
-        get("/api/v1/games/{id}/moves", this::getMoves);
-        post("/api/v1/games/{id}/moves", this::moveAndShiftTurn);
-        post("/api/v1/games/{id}/finish", this::endGame);
+        get("/api/v1/games/{id}/moves", this::getMoves, AccessRoleName.USER);
+        post("/api/v1/games/{id}/moves", this::moveAndShiftTurn, AccessRoleName.USER);
+        post("/api/v1/games/{id}/finish", this::endGame, AccessRoleName.USER);
     }
 
     public void createGame(Context ctx){

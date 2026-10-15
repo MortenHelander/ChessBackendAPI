@@ -1,12 +1,19 @@
 package app.handlers;
 
+import app.dtos.users.UserLoginResponseDTO;
+import app.dtos.users.UserVerifiedPasswordDTO;
+import app.exceptions.ApiException;
+import app.security.AccessRoleName;
 import app.security.TokenService;
 import io.javalin.http.Context;
 import io.javalin.http.ForbiddenResponse;
+import io.javalin.security.RouteRole;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@Slf4j
 public class AccessHandler {
     private TokenService tokenService;
 
@@ -14,55 +21,43 @@ public class AccessHandler {
         this.tokenService = tokenService;
     }
 
-    public void authenticate(Context ctx) {
-//        // This is a preflight request => no need for authentication
-//        if (ctx.method().toString().equals("OPTIONS")) {
-//            ctx.status(200);
-//            return;
-//        }
-//        // If the endpoint is not protected with roles or is open to ANYONE role, then skip
-//        Set<String> allowedRoles = ctx.routeRoles().stream().map(role -> role.toString().toUpperCase()).collect(Collectors.toSet());
-//        if (isOpenEndpoint(allowedRoles))
-//            return;
-//
-//        // If there is no token we do not allow entry
-//        UserDTO verifiedTokenUser = validateAndGetUserFromToken(ctx);
-//        ctx.attribute("user", verifiedTokenUser); // -> ctx.attribute("user") in ApplicationConfig beforeMatched filter
+    public void handle(Context ctx){
+        if (ctx.method().toString().equals("OPTIONS")) {
+            ctx.status(200);
+            return;
+        }
+        Set<RouteRole> routeRoles = ctx.routeRoles();
+
+        if (routeRoles.isEmpty()){
+            log.error("Route {} {} has no roles", ctx.method(), ctx.path());
+            throw new ApiException(500, "Internal server error");
+        }
+
+        if (routeRoles.contains(AccessRoleName.ANYONE)){
+            return;
+        }
+        String token = readBearerToken(ctx);
+        UserVerifiedPasswordDTO user = tokenService.verify(token);
+
+        boolean allowed = routeRoles.stream()
+                .anyMatch(role -> user.roles().contains(role.toString()));
+
+        if (!allowed){
+            throw new ApiException(403, "Forbidden");
+        }
+
+        ctx.attribute("user", user);
     }
 
-    public void authorize(Context ctx) {
-//        Set<String> allowedRoles = ctx.routeRoles()
-//                .stream()
-//                .map(role -> role.toString().toUpperCase())
-//                .collect(Collectors.toSet());
-//
-//        // 1. Check if the endpoint is open to all (either by not having any roles or having the ANYONE role set
-//        if (isOpenEndpoint(allowedRoles))
-//            return;
-//        // 2. Get user and ensure it is not null
-//        UserDTO user = ctx.attribute("user");
-//        if (user == null) {
-//            throw new ForbiddenResponse("No user was added from the token");
-//        }
-//        // 3. See if any role matches
-//        if (!userHasAllowedRole(user, allowedRoles))
-//            throw new ForbiddenResponse("User was not authorized with roles: " + user.getRoles() + ". Needed roles are: " + allowedRoles);
+    private String readBearerToken(Context ctx){
+        String header = ctx.header("Authorization");
+        if (header == null || !header.startsWith("Bearer ")){
+            throw new ApiException(401, "Unauthorized");
+        }
+        String token = header.substring(7).trim();
+        if (token.isBlank()){
+            throw new ApiException(401, "Unauthorized");
+        }
+        return token;
     }
-
-//    private boolean isOpenEndpoint(Set<String> allowedRoles) {
-//        // If the endpoint is not protected with any roles:
-//        if (allowedRoles.isEmpty())
-//            return true;
-//
-//        // 1. Get permitted roles and Check if the endpoint is open to all with the ANYONE role
-//        if (allowedRoles.contains("ANYONE")) {
-//            return true;
-//        }
-//        return false;
-//    }
-//
-//    private static boolean userHasAllowedRole(UserDTO user, Set<String> allowedRoles) {
-//        return user.getRoles().stream()
-//                .anyMatch(role -> allowedRoles.contains(role.toUpperCase()));
-//    }
 }

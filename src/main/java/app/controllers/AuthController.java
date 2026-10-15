@@ -3,6 +3,7 @@ package app.controllers;
 import app.dtos.users.*;
 import app.exceptions.ApiException;
 import app.mappers.UserMapper;
+import app.security.AccessRoleName;
 import app.security.TokenService;
 import app.services.UserService;
 import app.utils.EmailValidator;
@@ -25,8 +26,8 @@ public class AuthController implements EndpointGroup {
 
     @Override
     public void addEndpoints() {
-        post("/api/v1/auth/register", this::register);
-        post("/api/v1/auth/login", this::login);
+        post("/api/v1/auth/register", this::register, AccessRoleName.ANYONE);
+        post("/api/v1/auth/login", this::login, AccessRoleName.ANYONE);
     }
 
     public void register(Context ctx){
