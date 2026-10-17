@@ -3,6 +3,7 @@ package app.config;
 import app.controllers.AuthController;
 import app.controllers.GameController;
 //import app.controllers.UserController;
+import app.controllers.GameSocketController;
 import app.controllers.UserController;
 import app.daos.GameDAO;
 import app.daos.MoveDAO;
@@ -30,6 +31,7 @@ public class ApplicationConfig implements EndpointGroup {
     private final UserController userController;
     private final GameController gameController;
     private final AuthController authController;
+    private final GameSocketController gameSocketController;
 
 
 
@@ -58,6 +60,7 @@ public class ApplicationConfig implements EndpointGroup {
         this.authController = new AuthController(userService, tokenService);
         this.userController = new UserController(userService);
         this.gameController = new GameController(gameService);
+        this.gameSocketController = new GameSocketController(tokenService);
     }
 
     @Override
