@@ -3,6 +3,7 @@ package app.config;
 import app.controllers.AuthController;
 import app.controllers.GameController;
 //import app.controllers.UserController;
+import app.controllers.UserController;
 import app.daos.GameDAO;
 import app.daos.MoveDAO;
 import app.daos.PlayerDAO;
@@ -26,7 +27,7 @@ import jakarta.persistence.EntityManagerFactory;
 public class ApplicationConfig implements EndpointGroup {
     private final AccessHandler accessHandler;
     private final ExceptionHandler exceptionHandler;
-//    private final UserController userController;
+    private final UserController userController;
     private final GameController gameController;
     private final AuthController authController;
 
@@ -55,13 +56,13 @@ public class ApplicationConfig implements EndpointGroup {
 
         //controllers
         this.authController = new AuthController(userService, tokenService);
-        //        this.userController = new UserController(userService);
+        this.userController = new UserController(userService);
         this.gameController = new GameController(gameService);
     }
 
     @Override
     public void addEndpoints() {
-//        userController.addEndpoints();
+        userController.addEndpoints();
         authController.addEndpoints();
         gameController.addEndpoints();
     }

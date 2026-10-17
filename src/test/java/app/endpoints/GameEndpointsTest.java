@@ -1,9 +1,10 @@
 package app.endpoints;
 
 import app.config.ApplicationConfig;
-import app.config.HibernateConfig;
+import app.config.HibernateTestConfig;
 import app.entities.Game;
 import app.testutils.GameTestPopulator;
+import app.testutils.TestTokens;
 import io.javalin.Javalin;
 import io.javalin.http.ContentType;
 import io.restassured.RestAssured;
@@ -14,23 +15,24 @@ import org.junit.jupiter.api.*;
 import java.util.HashMap;
 import java.util.Map;
 
+import static app.testutils.TestTokens.*;
 import static io.restassured.RestAssured.given;
-import static io.restassured.RestAssured.when;
 import static org.hamcrest.Matchers.*;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class GameEndpointsTest {
 
-    EntityManagerFactory emf = HibernateConfig.getEntityManagerFactory();
+    EntityManagerFactory emf = HibernateTestConfig.getEntityManagerFactory();
     ApplicationConfig applicationConfig;
     Javalin app;
     Map<String, Game> seed;
+    String userToken = TestTokens.userToken();
+    String adminToken = TestTokens.adminToken();
 
     @BeforeAll
     void init() {
         applicationConfig = new ApplicationConfig(emf);
-        app = applicationConfig.createApp(0);
-        app.start(0);
+        app = applicationConfig.createApp(0); // createApp already starts the server
         RestAssured.baseURI = "http://localhost";
         RestAssured.port = app.port();
     }
@@ -54,6 +56,7 @@ public class GameEndpointsTest {
     void getGames_hasSize3_returns200() {
 
         given()
+                .header("Authorization", bearer(userToken))
                 .when()
                 .contentType(ContentType.JSON)
                 .when()
@@ -68,6 +71,7 @@ public class GameEndpointsTest {
         Integer id = seed.get("game1").getId();
 
         given()
+                .header("Authorization", bearer(userToken))
                 .when()
                 .contentType(ContentType.JSON)
                 .when()
@@ -82,6 +86,7 @@ public class GameEndpointsTest {
         Integer id = 9999;
 
         given()
+                .header("Authorization", bearer(userToken))
                 .when()
                 .contentType(ContentType.JSON)
                 .when()
@@ -95,6 +100,7 @@ public class GameEndpointsTest {
         Integer id = -5;
 
         given()
+                .header("Authorization", bearer(userToken))
                 .when()
                 .contentType(ContentType.JSON)
                 .when()
@@ -111,6 +117,7 @@ public class GameEndpointsTest {
         Integer id = seed.get("game1").getId();
 
         given()
+                .header("Authorization", bearer(adminToken))
                 .when()
                 .contentType(ContentType.JSON)
                 .when()
@@ -124,6 +131,7 @@ public class GameEndpointsTest {
         Integer id = 9999;
 
         given()
+                .header("Authorization", bearer(adminToken))
                 .when()
                 .contentType(ContentType.JSON)
                 .when()
@@ -137,6 +145,7 @@ public class GameEndpointsTest {
         Integer id = seed.get("game1").getId();
 
         given()
+                .header("Authorization", bearer(userToken))
                 .when()
                 .contentType(ContentType.JSON)
                 .when()
@@ -151,6 +160,7 @@ public class GameEndpointsTest {
         Integer id = 9999;
 
         given()
+                .header("Authorization", bearer(userToken))
                 .when()
                 .contentType(ContentType.JSON)
                 .when()
@@ -222,7 +232,8 @@ public class GameEndpointsTest {
         Integer id = seed.get("game3").getId();
         playAll(id, "f2f3", "e7e5", "g2g4", "d8h4");
 
-        when().get("/api/v1/games/{id}", id)
+        given().header("Authorization", bearer(userToken))
+                .when().get("/api/v1/games/{id}", id)
                 .then().log().all().statusCode(200)
                 .body("gameStatus", is("CHECKMATE"))
                 .body("winnerColor", is("BLACK"));
@@ -241,7 +252,8 @@ public class GameEndpointsTest {
                 .body("uci", is("a7b8q"));
         playAll(id, "a8b8", "e2e3");
 
-        when().get("/api/v1/games/{id}/moves", id)
+        given().header("Authorization", bearer(userToken))
+                .when().get("/api/v1/games/{id}/moves", id)
                 .then().log().all()
                 .body("size()", is(11))
                 .body("uci", hasItem("a7b8q"));
@@ -285,7 +297,8 @@ public class GameEndpointsTest {
         body.put("from", from);
         body.put("to", to);
         if (promotion != null) body.put("promotionLetter", promotion);
-        return given().contentType(ContentType.JSON).body(body)
+        return given().header("Authorization", bearer(userToken))
+                .contentType(ContentType.JSON).body(body)
                 .when().post("/api/v1/games/{id}/moves", gameId)
                 .then().log().all();
     }

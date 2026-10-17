@@ -7,7 +7,9 @@ import app.security.AccessRoleName;
 import app.security.TokenService;
 import app.services.UserService;
 import app.utils.EmailValidator;
+import app.utils.NameValidator;
 import app.utils.PasswordValidator;
+import app.utils.UsernameValidator;
 import io.javalin.apibuilder.EndpointGroup;
 import io.javalin.http.Context;
 import io.javalin.http.HttpStatus;
@@ -34,6 +36,9 @@ public class AuthController implements EndpointGroup {
         UserRegisterDTO request = ctx.bodyValidator(UserRegisterDTO.class).get();
 
         List<String> messages = new ArrayList<>();
+        messages.addAll(UsernameValidator.validate(request.username()));
+        messages.addAll(NameValidator.validateFirstName(request.firstName()));
+        messages.addAll(NameValidator.validateLastName(request.lastName()));
         messages.addAll(EmailValidator.validate(request.email()));
         messages.addAll(PasswordValidator.validate(request.password(), request.passwordCheck()));
         if (!messages.isEmpty()){
