@@ -84,7 +84,7 @@ public class GameService {
         }
 
         Player foundPlayer = game.getPlayers().stream()
-                .filter(p -> p.getUser().getId().equals(userId)).findFirst()
+                .filter(p -> p.getUser() != null && p.getUser().getId().equals(userId)).findFirst()
                 .orElseThrow(() -> new ApiException(403, "You are not a player in this game"));
 
         boolean playerIsWhite = (foundPlayer.getColor() == Color.WHITE); //convert color enum to boolean

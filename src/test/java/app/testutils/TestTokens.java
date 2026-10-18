@@ -17,19 +17,19 @@ public final class TestTokens {
     }
 
     public static String userToken() {
-        return TOKEN_SERVICE.createToken(new UserVerifiedPasswordDTO("testuser", Set.of("USER")));
+        return TOKEN_SERVICE.createToken(new UserVerifiedPasswordDTO(4, "testuser", Set.of("USER")));
     }
 
     public static String adminToken() {
-        return TOKEN_SERVICE.createToken(new UserVerifiedPasswordDTO("testadmin", Set.of("ADMIN")));
+        return TOKEN_SERVICE.createToken(new UserVerifiedPasswordDTO(5, "testadmin", Set.of("ADMIN")));
     }
 
     public static String userAndAdminToken(){
-        return TOKEN_SERVICE.createToken(new UserVerifiedPasswordDTO("testadminanduser", Set.of("USER", "ADMIN")));
+        return TOKEN_SERVICE.createToken(new UserVerifiedPasswordDTO(6, "testadminanduser", Set.of("USER", "ADMIN")));
     }
 
-    public static String tokenFor(String username) {
-        return TOKEN_SERVICE.createToken(new UserVerifiedPasswordDTO(username, Set.of("USER")));
+    public static String tokenFor(Integer id, String username) {
+        return TOKEN_SERVICE.createToken(new UserVerifiedPasswordDTO(id, username, Set.of("USER")));
     }
 
     public static String bearer(String token) {

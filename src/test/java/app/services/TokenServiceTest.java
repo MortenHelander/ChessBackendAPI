@@ -31,7 +31,7 @@ public class TokenServiceTest {
     void beforeEach(){
         tokenService = new TokenService(ISSUER, TOKEN_EXPIRE_TIME, SECRET_KEY);
         Set<String> roles = Set.of("User");
-        testUser = new UserVerifiedPasswordDTO("mohel", roles);
+        testUser = new UserVerifiedPasswordDTO(7,"mohel", roles);
         decoder = Base64.getUrlDecoder();
         encoder = Base64.getUrlEncoder().withoutPadding();
     }
@@ -109,7 +109,7 @@ public class TokenServiceTest {
 
     @Test
     void verifyBlankUsername_throws401(){
-        UserVerifiedPasswordDTO emptyUser = new UserVerifiedPasswordDTO("", new HashSet<>(Set.of("User")));
+        UserVerifiedPasswordDTO emptyUser = new UserVerifiedPasswordDTO(1,"", new HashSet<>(Set.of("User")));
         String token = tokenService.createToken(emptyUser);
         invalidTokenCall(token);
     }

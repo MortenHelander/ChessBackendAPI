@@ -22,8 +22,10 @@ public class GameTestPopulator {
             em.createNativeQuery("TRUNCATE TABLE moves, players, games, user_stats, users RESTART IDENTITY CASCADE")
                     .executeUpdate();
 
-            User user1 = new User("Morten", "Helander", "morten@hotmail.com", "Sheriff", "password123");
+            User user1 = new User("Sheriff", "morten@hotmail.com", "Morten", "Helander", "password123");
             em.persist(user1);
+            User user2 = new User("svg-man", "theis@hotmail.com", "Theis", "Rudkjær", "anotherpassword1441");
+            em.persist(user2);
 
             Player p1 = new Player(Color.WHITE, false);
             PlayerPowerUp player1PowerUp1 = new PlayerPowerUp(PowerUpType.GOOD_AI, PowerUpStatus.AUTOMATICALLY_APPLIED);
@@ -33,8 +35,10 @@ public class GameTestPopulator {
             p1.addPowerUp(player1PowerUp2);
             p1.addPowerUp(player1PowerUp3);
 
-            Player p2 = new Player(Color.BLACK, false);
             user1.addPlayer(p1);
+            Player p2 = new Player(Color.BLACK, false);
+            user2.addPlayer(p2);
+
             Game game1 = Game.newGame(GameMode.CLASSIC, p1, p2);
             Move move1 = new Move(Position.D7, Position.D5);
             Move move2 = new Move(Position.A2, Position.A3);
@@ -53,6 +57,7 @@ public class GameTestPopulator {
             Player p5 = new Player(Color.WHITE, false);
             Player p6 = new Player(Color.BLACK, false);
             user1.addPlayer(p5);
+            user2.addPlayer(p6);
             Game game3 = Game.newGame(GameMode.FUN, p5, p6);
 
             // Only persist the games — cascade handles the players

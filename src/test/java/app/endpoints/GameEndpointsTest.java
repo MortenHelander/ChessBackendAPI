@@ -3,6 +3,8 @@ package app.endpoints;
 import app.config.ApplicationConfig;
 import app.config.HibernateTestConfig;
 import app.entities.Game;
+import app.entities.User;
+import app.entities.enums.Color;
 import app.testutils.GameTestPopulator;
 import app.testutils.TestTokens;
 import io.javalin.Javalin;
@@ -26,8 +28,13 @@ public class GameEndpointsTest {
     ApplicationConfig applicationConfig;
     Javalin app;
     Map<String, Game> seed;
+
     String userToken = TestTokens.userToken();
     String adminToken = TestTokens.adminToken();
+
+    // Tokens for the two real players in game3 – created after seeding
+    String whiteToken;
+    String blackToken;
 
     @BeforeAll
     void init() {
@@ -45,6 +52,10 @@ public class GameEndpointsTest {
     @BeforeEach
     void setUp() {
         seed = GameTestPopulator.populate(emf);
+
+        Game game3 = seed.get("game3");
+        whiteToken = tokenForPlayer(game3, Color.WHITE);
+        blackToken = tokenForPlayer(game3, Color.BLACK);
     }
 
     @AfterEach
@@ -173,7 +184,7 @@ public class GameEndpointsTest {
     void moveAndShiftTurn_fromPositionNull_returns400(){
         Integer id = seed.get("game3").getId();
 
-        move(id, null ,"e3", null)
+        move(whiteToken, id, null ,"e3", null)
                 .statusCode(400)
                 .body("error", is("From position is required"));
     }
@@ -182,7 +193,7 @@ public class GameEndpointsTest {
     void moveAndShiftTurn_toPositionNull_returns400(){
         Integer id = seed.get("game3").getId();
 
-        move(id, "e3" ,null, null)
+        move(whiteToken, id, "e3" ,null, null)
                 .statusCode(400)
                 .body("error", is("To position is required"));
     }
@@ -192,7 +203,7 @@ public class GameEndpointsTest {
     void moveAndShiftTurn_legalMove_returns201() {
         Integer id = seed.get("game3").getId();
 
-        move(id, "e2", "e4", null)
+        move(whiteToken, id, "e2", "e4", null)
                 .statusCode(201)
                 .body("id", notNullValue())
                 .body("moveNumber", is(1))
@@ -203,26 +214,50 @@ public class GameEndpointsTest {
     void moveAndShiftTurn_noPieceOnFromSquare_returns400() {
         Integer id = seed.get("game3").getId();
 
-        move(id, "e5", "h5", null)
+        move(whiteToken, id, "e5", "h5", null)
                 .statusCode(400)
                 .body("error", is("No piece on selected square"));
     }
 
+    //Who-is-moving tests
 
     @Test
-    void moveAndShiftTurn_legalMove_notValidPieceAndTurn_returns400() {
+    void moveAndShiftTurn_blackPlayerOnWhitesTurn_returns400() {
         Integer id = seed.get("game3").getId();
 
-        move(id, "e7", "e5", null)
+        // Black tries to move one of their own pieces, but it's white's turn
+        move(blackToken, id, "e7", "e5", null)
                 .statusCode(400)
                 .body("error", is("Not your turn"));
     }
 
     @Test
+    void moveAndShiftTurn_whitePlayerMovesOpponentsPiece_returns400() {
+        Integer id = seed.get("game3").getId();
+
+        // It is white's turn, but white grabs a black pawn.
+        move(whiteToken, id, "e7", "e5", null)
+                .statusCode(400)
+                .body("error", is("You can't move your opponent's pieces"));
+    }
+
+    @Test
+    void moveAndShiftTurn_userNotInGame_returns403() {
+        Integer id = seed.get("game3").getId();
+
+        // userToken's user (id 4) is not a player in game3
+        move(userToken, id, "e2", "e4", null)
+                .statusCode(403)
+                .body("error", is("You are not a player in this game"));
+    }
+
+    // -----------------------------------------------
+
+    @Test
     void moveAndShiftTurn_illegalMove_returns400(){
         Integer id = seed.get("game3").getId();
 
-        move(id, "e2", "e7", null)
+        move(whiteToken, id, "e2", "e7", null)
                 .statusCode(400)
                 .body("error", is("Illegal move"));
     }
@@ -230,7 +265,7 @@ public class GameEndpointsTest {
     @Test
     void moveAndShiftTurn_foolsMate_blackWins() {
         Integer id = seed.get("game3").getId();
-        playAll(id, "f2f3", "e7e5", "g2g4", "d8h4");
+        playAll(id, true, "f2f3", "e7e5", "g2g4", "d8h4");
 
         given().header("Authorization", bearer(userToken))
                 .when().get("/api/v1/games/{id}", id)
@@ -238,7 +273,8 @@ public class GameEndpointsTest {
                 .body("gameStatus", is("CHECKMATE"))
                 .body("winnerColor", is("BLACK"));
 
-        move(id, "a2", "a3", null)
+        // After black's mating move it's white's turn
+        move(whiteToken, id, "a2", "a3", null)
                 .statusCode(400).body("error", is("Game is finished"));
     }
 
@@ -247,10 +283,11 @@ public class GameEndpointsTest {
         Integer id = seed.get("game3").getId();
 
         playUpToPromotion(id);
-        move(id, "a7", "b8", "q")
+        move(whiteToken, id, "a7", "b8", "q")
                 .statusCode(201)
                 .body("uci", is("a7b8q"));
-        playAll(id, "a8b8", "e2e3");
+        // After white's promotion it is black's turn
+        playAll(id, false, "a8b8", "e2e3");
 
         given().header("Authorization", bearer(userToken))
                 .when().get("/api/v1/games/{id}/moves", id)
@@ -264,7 +301,7 @@ public class GameEndpointsTest {
         Integer id = seed.get("game3").getId();
 
         playUpToPromotion(id);
-        move(id, "a7", "b8", null)
+        move(whiteToken, id, "a7", "b8", null)
                 .statusCode(400)
                 .body("error", is("Promotion piece required"));
     }
@@ -275,7 +312,7 @@ public class GameEndpointsTest {
         String wrongLetter = "z";
 
         playUpToPromotion(id);
-        move(id, "a7", "b8", wrongLetter)
+        move(whiteToken, id, "a7", "b8", wrongLetter)
                 .statusCode(400)
                 .body("error", is("Unknown promotion piece type: " + wrongLetter));
     }
@@ -287,31 +324,46 @@ public class GameEndpointsTest {
         playUpToPromotion(id);
 
         //a8 is occupied by black rook, so white pawn can't move their legally
-        move(id, "a7", "a8", "q")
+        move(whiteToken, id, "a7", "a8", "q")
                 .statusCode(400)
                 .body("error", is("Illegal move"));
     }
 
-    private ValidatableResponse move(int gameId, String from, String to, String promotion) {
+    // ---------- Helpers ----------
+
+    private ValidatableResponse move(String token, int gameId, String from, String to, String promotion) {
         Map<String, String> body = new HashMap<>();
         body.put("from", from);
         body.put("to", to);
         if (promotion != null) body.put("promotionLetter", promotion);
-        return given().header("Authorization", bearer(userToken))
+        return given().header("Authorization", bearer(token))
                 .contentType(ContentType.JSON).body(body)
                 .when().post("/api/v1/games/{id}/moves", gameId)
                 .then().log().all();
     }
 
-    private void playAll(int gameId, String... ucis) {
+    private void playAll(int gameId, boolean whiteStarts, String... ucis) {
+        boolean whitesTurn = whiteStarts;
         for (String uci : ucis) {
             String promotion = uci.length() == 5 ? uci.substring(4) : null; //if the uci (e2e4 fx) has 5 letters the fith is promotion, otherwise it's null
-            move(gameId, uci.substring(0, 2), uci.substring(2, 4), promotion)
+            String token = whitesTurn ? whiteToken : blackToken;
+            move(token, gameId, uci.substring(0, 2), uci.substring(2, 4), promotion)
                     .statusCode(201);
+            whitesTurn = !whitesTurn;
         }
     }
 
     private void playUpToPromotion(int id) {
-        playAll(id, "a2a4", "b7b5", "a4b5", "a7a6", "b5a6", "c8b7", "a6a7", "h7h6");
+        playAll(id, true, "a2a4", "b7b5", "a4b5", "a7a6", "b5a6", "c8b7", "a6a7", "h7h6");
+    }
+
+    //creates a token for user who plays the givne color in the seeded game
+    private String tokenForPlayer(Game game, Color color) {
+        User user = game.getPlayers().stream()
+                .filter(p -> p.getColor() == color)
+                .findFirst()
+                .orElseThrow()
+                .getUser();
+        return tokenFor(user.getId(), user.getUsername());
     }
 }

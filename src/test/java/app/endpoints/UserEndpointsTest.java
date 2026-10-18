@@ -47,7 +47,7 @@ public class UserEndpointsTest {
     @BeforeEach
     void setUp() {
         seed = UserTestPopulator.populate(emf);
-        ownerToken = tokenFor(seed.get("user1").getUsername());
+        ownerToken = tokenFor(seed.get("user1").getId(), seed.get("user1").getUsername());
     }
 
     @AfterEach
@@ -242,7 +242,7 @@ public class UserEndpointsTest {
     @Test
     void updateUser_otherUsersProfile_returns403_andIsNotPersisted() {
         Integer id = seed.get("user1").getId();
-        String otherUsersToken = tokenFor(seed.get("user2").getUsername()); // "svg-man" tries to edit "sheriffen"
+        String otherUsersToken = tokenFor(seed.get("user2").getId(), seed.get("user2").getUsername()); // "svg-man" tries to edit "sheriffen"
 
         update(id, "hacked", "Jens", "Hansen", "jens@example.com", otherUsersToken)
                 .statusCode(403)
