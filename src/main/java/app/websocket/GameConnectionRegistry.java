@@ -1,4 +1,4 @@
-package app.config;
+package app.websocket;
 
 import app.dtos.games.GameEventDTO;
 import io.javalin.websocket.WsContext;

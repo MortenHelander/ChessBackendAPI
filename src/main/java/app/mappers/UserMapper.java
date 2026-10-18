@@ -29,10 +29,10 @@ public class UserMapper {
             String role = rolesName.name();
             rolesAsString.add(role);
         }
-        return new UserVerifiedPasswordDTO(user.getUsername(), rolesAsString);
+        return new UserVerifiedPasswordDTO(user.getId(), user.getUsername(), rolesAsString);
     }
 
     public static UserLoginResponseDTO fromVerifiedDtoToResponseDto(UserVerifiedPasswordDTO dto, String token){
-        return new UserLoginResponseDTO(dto.username(), token, dto.roles());
+        return new UserLoginResponseDTO(dto.id(), dto.username(), token, dto.roles());
     }
 }

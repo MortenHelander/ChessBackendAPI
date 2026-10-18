@@ -1,22 +1,26 @@
 package app.controllers;
 
-import app.config.GameConnectionRegistry;
+import app.websocket.GameConnectionRegistry;
+import app.dtos.games.GameEventDTO;
 import app.dtos.users.UserVerifiedPasswordDTO;
+import app.exceptions.ApiException;
 import app.security.AccessRoleName;
 import app.security.TokenService;
-import com.auth0.jwt.exceptions.JWTVerificationException;
 import io.javalin.apibuilder.EndpointGroup;
 import io.javalin.websocket.WsContext;
+import io.javalin.websocket.WsErrorContext;
+import lombok.extern.slf4j.Slf4j;
 
 import static io.javalin.apibuilder.ApiBuilder.ws;
 
+@Slf4j
 public class GameSocketController implements EndpointGroup {
-    private TokenService tokenService;
-    private GameConnectionRegistry registry;
+    private final TokenService tokenService;
+    private final GameConnectionRegistry registry;
 
-    public GameSocketController(TokenService tokenService){
+    public GameSocketController(TokenService tokenService, GameConnectionRegistry gameConnectionRegistry){
         this.tokenService = tokenService;
-        this.registry = new GameConnectionRegistry();
+        this.registry = gameConnectionRegistry;
     }
 
     @Override
@@ -35,19 +39,23 @@ public class GameSocketController implements EndpointGroup {
         UserVerifiedPasswordDTO user;
         try{
             user = tokenService.verify(token);
-        }catch (JWTVerificationException e){
-            wsContext.closeSession(401, "Invalid or expired token");
+        }catch (ApiException e){
+            wsContext.closeSession(1008, "Invalid or expired token");
             return;
         }
         wsContext.enableAutomaticPings();
         registry.join(gameId, wsContext);
+        registry.broadcast(gameId, new GameEventDTO("PLAYER_JOINED", user.username()));
     }
 
     public void onClose(WsContext wsContext){
-
+        Integer gameId = wsContext.pathParamAsClass("id", Integer.class).get();
+        registry.leave(gameId, wsContext);
     }
 
-    public void onError(WsContext wsContext){
-
+    public void onError(WsErrorContext wsContext){
+        Integer gameId = wsContext.pathParamAsClass("id", Integer.class).get();
+        log.error("WebSocket error in game {}", gameId, wsContext.error());
+        registry.leave(gameId, wsContext);
     }
 }

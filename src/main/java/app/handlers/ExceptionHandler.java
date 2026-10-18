@@ -6,6 +6,7 @@ import io.javalin.Javalin;
 import io.javalin.config.JavalinConfig;
 import io.javalin.validation.ValidationError;
 import io.javalin.validation.ValidationException;
+import jakarta.persistence.OptimisticLockException;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
@@ -37,6 +38,11 @@ public class ExceptionHandler {
         config.routes.exception(InvalidGameActionException.class, (e, ctx) -> {
             log.warn("Invalid game action: {}", e.getMessage());
             ctx.status(400).json(Map.of("error", e.getMessage()));
+        });
+
+        config.routes.exception(OptimisticLockException.class, (e, ctx) -> {
+            log.warn("Conflict error: {}", e.getMessage());
+            ctx.status(409).json(Map.of("error", e.getMessage()));
         });
 
         config.routes.exception(Exception.class, (exception, ctx) -> {

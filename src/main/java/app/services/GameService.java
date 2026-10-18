@@ -3,10 +3,12 @@ package app.services;
 import app.daos.GameDAO;
 import app.daos.MoveDAO;
 import app.daos.PlayerDAO;
+import app.daos.UserDAO;
 import app.dtos.games.GameCreateDTO;
 import app.dtos.games.GameResponseDTO;
 import app.dtos.games.MoveRequestDTO;
 import app.dtos.games.MoveResponseDTO;
+import app.dtos.users.UserResponseDTO;
 import app.entities.Game;
 import app.entities.Move;
 import app.entities.Player;
@@ -22,7 +24,9 @@ import app.gameengine.move_logic.PromotionHelper;
 import app.gameengine.pieces.Piece;
 import app.mappers.GameMapper;
 import app.mappers.MoveMapper;
+import app.mappers.UserMapper;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class GameService {
@@ -30,25 +34,28 @@ public class GameService {
     private final PlayerDAO playerDAO;
     private final GameDAO gameDAO;
     private final MoveDAO moveDAO;
+    private final UserDAO userDAO;
 
-    public GameService(UserService userService, PlayerDAO playerDAO, GameDAO gameDAO, MoveDAO moveDAO) {
+    public GameService(UserService userService, PlayerDAO playerDAO, GameDAO gameDAO, MoveDAO moveDAO, UserDAO userDAO) {
         this.userService = userService;
         this.playerDAO = playerDAO;
         this.gameDAO = gameDAO;
         this.moveDAO = moveDAO;
+        this.userDAO = userDAO;
     }
 
     public GameResponseDTO createGame(GameCreateDTO gameCreateDTO) {
+        User whiteUser = userDAO.getById(gameCreateDTO.whiteUserId());
+        User blackUser = userDAO.getById(gameCreateDTO.blackUserId());
 
-//        User whiteUser = userService.getUser();
-//        User blackUser = userService.getUser();
-//
-//
-//        Game game = Game.newGame(GameMode.valueOf(gameCreateDTO.gameMode()), white, black);
-//        Game saved = gameDAO.create(game);
-//
-//        return GameMapper.toDTO(saved);
-        return null;
+        Player whitePlayer = new Player(Color.WHITE, false);
+        Player blackPlayer = new Player(Color.BLACK, false);
+        whitePlayer.setUser(whiteUser);
+        blackPlayer.setUser(blackUser);
+
+        Game game = Game.newGame(GameMode.valueOf(gameCreateDTO.gameMode()), whitePlayer, blackPlayer);
+        Game saved = gameDAO.create(game);
+        return GameMapper.toDTO(saved);
     }
 
     public List<GameResponseDTO> getAllGames() {
@@ -56,7 +63,6 @@ public class GameService {
     }
 
     public GameResponseDTO getGame(Integer id) {
-
         Game game = gameDAO.getById(id);
         return GameMapper.toDTO(game);
     }
@@ -66,16 +72,24 @@ public class GameService {
     }
 
     public List<MoveResponseDTO> getMoves(Integer id) {
-
         Game game = gameDAO.getById(id); //check existing game first for error check
         List<Move> moves = moveDAO.getAllMovesByGameId(game.getId());
         return MoveMapper.toDtosFromList(moves);
     }
 
-    public MoveResponseDTO moveAndShiftTurn(Integer id, MoveRequestDTO moveRequest) {
-        Game game = gameDAO.getById(id);
+    public MoveResponseDTO moveAndShiftTurn(Integer gameId, MoveRequestDTO moveRequest, Integer userId) {
+        Game game = gameDAO.getById(gameId);
         if (game.getGameStatus() != GameStatus.IN_PROGRESS) {
             throw new ApiException(400, "Game is finished");
+        }
+
+        Player foundPlayer = game.getPlayers().stream()
+                .filter(p -> p.getUser().getId().equals(userId)).findFirst()
+                .orElseThrow(() -> new ApiException(403, "You are not a player in this game"));
+
+        boolean playerIsWhite = (foundPlayer.getColor() == Color.WHITE); //convert color enum to boolean
+        if (playerIsWhite != game.isWhitesTurn()){
+            throw new ApiException(400, "Not your turn");
         }
 
         Board board = ReplayHelper.rebuildBoard(game.getMoves());
@@ -85,16 +99,12 @@ public class GameService {
 
         if (piece == null) {
             throw new ApiException(400, "No piece on selected square");
+        } else if (piece.isWhite() != game.isWhitesTurn()) {
+            throw new ApiException(400, "You can't move your opponent's pieces");
         }
-
-        if (piece.isWhite() != game.isWhitesTurn()) {
-            throw new ApiException(400, "Not your turn");
-        }
-
-        if (!MoveValidator.getLegalMoves(board, piece, from).contains(to)){
+        if (!MoveValidator.getLegalMoves(board, piece, from).contains(to)) {
             throw new ApiException(400, "Illegal move");
         }
-
         MoveResult result = board.move(piece, from, to);
         if (!result.success()) {
             throw new ApiException(400, "Illegal move");
@@ -108,7 +118,6 @@ public class GameService {
         }
 
         boolean opponentIsWhite = !game.isWhitesTurn();
-
         if (CheckChecker.isCheckMate(board, opponentIsWhite)) {
             game.finishGame(GameStatus.CHECKMATE, game.isWhitesTurn() ? Color.WHITE : Color.BLACK);
         } else if (CheckChecker.isStaleMate(board, opponentIsWhite)) {

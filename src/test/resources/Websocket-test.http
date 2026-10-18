@@ -1,0 +1,102 @@
+###Register and login two users then check websocket connections
+
+###register user 1
+POST localhost:7070/api/v1/auth/register
+Accept: application/json
+Content-Type:application/json
+
+{
+  "username": "mohel",
+  "firstName": "Morten",
+  "lastName": "Helander",
+  "email": "morten@example.com",
+  "password": "Str0ng!Passw0rd",
+  "passwordCheck": "Str0ng!Passw0rd"
+}
+
+###register user 2
+POST localhost:7070/api/v1/auth/register
+Accept: application/json
+Content-Type:application/json
+
+{
+  "username": "anderson",
+  "firstName": "Andreas",
+  "lastName": "Jensen",
+  "email": "andreas@example.com",
+  "password": "Str0ng!Passw0rd",
+  "passwordCheck": "Str0ng!Passw0rd"
+}
+
+###login user 1 and save id and token
+POST localhost:7070/api/v1/auth/login
+Accept: application/json
+Content-Type: application/json
+
+{
+  "username": "mohel",
+  "password": "Str0ng!Passw0rd"
+}
+
+> {%
+    client.global.set("token1", response.body.token);
+    client.global.set("user1Id", response.body.id);
+%}
+
+###login user 2 and save token
+POST localhost:7070/api/v1/auth/login
+Accept: application/json
+Content-Type:application/json
+
+{
+  "username": "anderson",
+  "password": "Str0ng!Passw0rd"
+}
+> {%
+    client.global.set("token2", response.body.token);
+    client.global.set("user2Id", response.body.id);
+%}
+
+###Create game 1
+POST localhost:7070/api/v1/games
+Authorization: Bearer {{token1}}
+Content-Type: application/json
+
+{
+  "whiteUserId": {{user1Id}},
+  "blackUserId": {{user2Id}},
+  "gameMode": "CLASSIC"
+}
+> {%
+    client.global.set("gameId", response.body.id);
+%}
+
+###Websocket connection for user 1
+WEBSOCKET ws://localhost:7070/api/v1/games/{{gameId}}/ws?token={{token1}}
+
+###Websocket connection for user 2
+WEBSOCKET ws://localhost:7070/api/v1/games/{{gameId}}/ws?token={{token2}}
+
+###User1 makes a move
+POST localhost:7070/api/v1/games/{{gameId}}/moves
+Authorization: Bearer {{token1}}
+Content-Type: application/json
+
+{
+  "from": "e2",
+  "to": "e4"
+}
+
+###User1 moves a black piece on black's turn
+POST localhost:7070/api/v1/games/{{gameId}}/moves
+Authorization: Bearer {{token1}}
+Content-Type: application/json
+
+{ "from": "e7", "to": "e5" }
+
+###User2 moves a black piece on their turn
+POST localhost:7070/api/v1/games/{{gameId}}/moves
+Authorization: Bearer {{token2}}
+Content-Type: application/json
+
+{ "from": "e7", "to": "e5" }

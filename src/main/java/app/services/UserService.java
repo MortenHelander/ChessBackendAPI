@@ -6,25 +6,27 @@ import app.entities.User;
 import app.exceptions.ApiException;
 import app.mappers.UserMapper;
 import app.utils.PasswordHasher;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 public class UserService {
     private final UserDAO userDAO;
 
-    public UserService(UserDAO userDAO){
+    public UserService(UserDAO userDAO) {
         this.userDAO = userDAO;
     }
 
-    public UserResponseDTO createUser(UserRegisterDTO registerDTO){
+    public UserResponseDTO createUser(UserRegisterDTO registerDTO) {
         String hashedPw = PasswordHasher.hashPassword(registerDTO.password());
         User user = UserMapper.fromRegisterDTO(registerDTO, hashedPw);
         User created = userDAO.create(user);
         return UserMapper.responseDTOFromEntity(created);
     }
 
-    public List<UserResponseDTO> getAllUsers(){
+    public List<UserResponseDTO> getAllUsers() {
         List<User> users = userDAO.getAll();
         List<UserResponseDTO> userDtos = new ArrayList<>();
         for (User user : users) {
@@ -33,34 +35,36 @@ public class UserService {
         return userDtos;
     }
 
-    public UserResponseDTO getUserById(Integer id){
+    public UserResponseDTO getUserById(Integer id) {
         return UserMapper.responseDTOFromEntity(userDAO.getById(id));
     }
 
-    public UserResponseDTO getUserByUsername(String username){
-        if (username == null || username.isBlank()){
+    public UserResponseDTO getUserByUsername(String username) {
+        if (username == null || username.isBlank()) {
             throw new ApiException(404, "User with username: " + username + " not found");
         }
         User user = userDAO.getByUsername(username);
-        if (user == null){
+        if (user == null) {
+            log.error("404: Get user by username: {} failed", username);
             throw new ApiException(404, "User with username " + username + " not found");
         }
         return UserMapper.responseDTOFromEntity(user);
     }
 
-    public UserResponseDTO updateUser(Integer id, UserUpdateDTO request){
+    public UserResponseDTO updateUser(Integer id, UserUpdateDTO request) {
         User existing = userDAO.getById(id);
         existing.updateDetails(request.username(), request.email(), request.firstName(), request.lastName());
         return UserMapper.responseDTOFromEntity(userDAO.update(existing));
     }
 
-    public void deleteUser(Integer id){
+    public void deleteUser(Integer id) {
         userDAO.delete(id);
     }
 
-    public UserVerifiedPasswordDTO verifyUser(UserLoginRequestDTO userLoginRequestDTO){
+    public UserVerifiedPasswordDTO verifyUser(UserLoginRequestDTO userLoginRequestDTO) {
         User user = userDAO.getByUsername(userLoginRequestDTO.username());
-        if (user == null || !PasswordHasher.checkPassword(userLoginRequestDTO.password(), user.getPassword())){
+        if (user == null || !PasswordHasher.checkPassword(userLoginRequestDTO.password(), user.getPassword())) {
+            log.error("Verify user failed by user with username: {} ", userLoginRequestDTO.username());
             throw new ApiException(401, "Invalid username or password");
         }
         return UserMapper.verifiedDTOFromEntity(user);

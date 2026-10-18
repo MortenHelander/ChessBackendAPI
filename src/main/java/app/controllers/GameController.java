@@ -1,12 +1,12 @@
 package app.controllers;
 
-import app.dtos.games.GameCreateDTO;
-import app.dtos.games.GameResponseDTO;
-import app.dtos.games.MoveResponseDTO;
-import app.dtos.games.MoveRequestDTO;
+import app.dtos.games.*;
+import app.dtos.users.UserVerifiedPasswordDTO;
 import app.entities.enums.GameMode;
+import app.exceptions.ApiException;
 import app.security.AccessRoleName;
 import app.services.GameService;
+import app.websocket.GameConnectionRegistry;
 import io.javalin.apibuilder.EndpointGroup;
 import io.javalin.http.Context;
 import io.javalin.http.HttpStatus;
@@ -20,10 +20,12 @@ import static io.javalin.apibuilder.ApiBuilder.delete;
 
 @Slf4j
 public class GameController implements EndpointGroup {
-    private GameService gameService;
+    private final GameService gameService;
+    private final GameConnectionRegistry gameRegistry;
 
-    public GameController(GameService gameService){
+    public GameController(GameService gameService, GameConnectionRegistry gameRegistry){
         this.gameService = gameService;
+        this.gameRegistry = gameRegistry;
     }
 
 
@@ -86,7 +88,7 @@ public class GameController implements EndpointGroup {
     }
 
     public void moveAndShiftTurn(Context ctx){
-        Integer id = ctx.pathParamAsClass("id", Integer.class)
+        Integer gameId = ctx.pathParamAsClass("id", Integer.class)
                 .check(value -> value > 0, "ID must be positive").get();
 
         MoveRequestDTO move = ctx.bodyValidator(MoveRequestDTO.class)
@@ -94,7 +96,10 @@ public class GameController implements EndpointGroup {
                 .check(dto -> dto.to() != null && !dto.to().isBlank(), "To position is required")
                 .get();
 
-        MoveResponseDTO response = gameService.moveAndShiftTurn(id, move);
+        UserVerifiedPasswordDTO user = ctx.attribute("user");
+
+        MoveResponseDTO response = gameService.moveAndShiftTurn(gameId, move, user.id());
+        gameRegistry.broadcast(gameId, new GameEventDTO("Move_MADE", response));
         ctx.status(HttpStatus.CREATED);
         ctx.json(response);
     }

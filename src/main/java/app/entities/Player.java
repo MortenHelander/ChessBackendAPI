@@ -1,5 +1,6 @@
 package app.entities;
 
+import app.daos.PlayerDAO;
 import app.entities.enums.Color;
 import jakarta.persistence.*;
 import lombok.*;

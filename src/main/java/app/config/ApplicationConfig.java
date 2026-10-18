@@ -9,14 +9,13 @@ import app.daos.GameDAO;
 import app.daos.MoveDAO;
 import app.daos.PlayerDAO;
 import app.daos.UserDAO;
-import app.exceptions.ApiException;
-import app.gameengine.exceptions.InvalidGameActionException;
 import app.handlers.AccessHandler;
 import app.handlers.ExceptionHandler;
 import app.security.TokenService;
 import app.services.GameService;
 import app.services.UserService;
 import app.utils.Utils;
+import app.websocket.GameConnectionRegistry;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.javalin.Javalin;
 import io.javalin.apibuilder.EndpointGroup;
@@ -34,7 +33,6 @@ public class ApplicationConfig implements EndpointGroup {
     private final GameSocketController gameSocketController;
 
 
-
     public ApplicationConfig(EntityManagerFactory emf){
 
         //daos
@@ -49,18 +47,21 @@ public class ApplicationConfig implements EndpointGroup {
                 Utils.getPropertyValue("SECRET_KEY", "config.properties"));
 
         UserService userService = new UserService(userDAO);
-        GameService gameService = new GameService(userService, playerDAO, gameDAO, moveDAO);
+        GameService gameService = new GameService(userService, playerDAO, gameDAO, moveDAO, userDAO);
 
         //handlers
         this.exceptionHandler = new ExceptionHandler();
         this.accessHandler = new AccessHandler(tokenService);
 
+        //game registry
+        GameConnectionRegistry gameConnectionRegistry = new GameConnectionRegistry();
+
 
         //controllers
         this.authController = new AuthController(userService, tokenService);
         this.userController = new UserController(userService);
-        this.gameController = new GameController(gameService);
-        this.gameSocketController = new GameSocketController(tokenService);
+        this.gameController = new GameController(gameService, gameConnectionRegistry);
+        this.gameSocketController = new GameSocketController(tokenService, gameConnectionRegistry);
     }
 
     @Override
@@ -68,6 +69,7 @@ public class ApplicationConfig implements EndpointGroup {
         userController.addEndpoints();
         authController.addEndpoints();
         gameController.addEndpoints();
+        gameSocketController.addEndpoints();
     }
 
     private void configuration(JavalinConfig config){

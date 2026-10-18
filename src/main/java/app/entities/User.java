@@ -48,6 +48,13 @@ public class User {
         this.password = password;
     }
 
+    public User(Integer id, String username, String email, UserStats userStats){
+        this.id = id;
+        this.username = username;
+        this.email = email;
+        this.userStats = userStats;
+    }
+
     public void addUserStats(UserStats userStats){
         this.userStats = userStats;
         if (userStats != null){

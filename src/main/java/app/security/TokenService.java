@@ -40,6 +40,7 @@ public class TokenService {
         Instant now = Instant.now();
         return JWT.create()
                 .withIssuer(issuer)
+                .withClaim("userId", user.id())
                 .withSubject(user.username())
                 .withArrayClaim("roles", user.roles().toArray(String[]::new))
                 .withIssuedAt(now)
@@ -53,13 +54,14 @@ public class TokenService {
                     .withIssuer(issuer)
                     .build().verify(token);
 
+            Integer userId = decodedJwt.getClaim("userId").asInt();
             String username = decodedJwt.getSubject();
             List<String> roles = decodedJwt.getClaim("roles").asList(String.class);
-            if (username == null || username.isBlank() || roles == null
+            if (userId == null || userId < 0 || username == null || username.isBlank() || roles == null
                     || roles.stream().anyMatch(role -> role == null || role.isBlank())) {
-                throw new JWTVerificationException("Token must contain a username and roles");
+                throw new JWTVerificationException("Token must contain an ID, username and roles");
             }
-            return new UserVerifiedPasswordDTO(username, Set.copyOf(roles));
+            return new UserVerifiedPasswordDTO(userId, username, Set.copyOf(roles));
         } catch (JWTVerificationException e) {
             log.error("Could not verify token: {}", String.valueOf(e));
             throw new ApiException(401, "Invalid or expired token");

@@ -12,7 +12,7 @@ public class PlayerMapper {
     public static List<PlayerResponseDTO> entityToDtoAsList(Set<Player> players){
         List<PlayerResponseDTO> playerResponseDTOS = new ArrayList<>();
         for (Player player : players) {
-            PlayerResponseDTO playerDto = new PlayerResponseDTO(player.getId(), player.getColor(), player.isAi());
+            PlayerResponseDTO playerDto = new PlayerResponseDTO(player.getId(), player.getUser().getUsername(), player.getColor(), player.isAi());
             playerResponseDTOS.add(playerDto);
         }
         return playerResponseDTOS;
