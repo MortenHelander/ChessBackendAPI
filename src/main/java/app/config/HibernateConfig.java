@@ -25,9 +25,6 @@ public final class HibernateConfig {
     private static Properties buildProps() {
         Properties props = HibernateBaseProperties.createBase();
 
-        // Teaching-friendly default - change to update in production
-        props.put("hibernate.hbm2ddl.auto", "create");
-
         if (System.getenv("DEPLOYED") != null) {
             setDeployedProperties(props);
         } else {
@@ -37,6 +34,7 @@ public final class HibernateConfig {
     }
 
     private static void setDeployedProperties(Properties props) {
+        props.put("hibernate.hbm2ddl.auto", "update");
         String dbName = System.getenv("DB_NAME");
         props.setProperty("hibernate.connection.url", System.getenv("JDBC_CONNECTION_STRING") + dbName);
         props.setProperty("hibernate.connection.username", System.getenv("DB_USERNAME"));
@@ -44,6 +42,8 @@ public final class HibernateConfig {
     }
 
     private static void setDevProperties(Properties props) {
+        // Teaching-friendly default - change to update in production
+        props.put("hibernate.hbm2ddl.auto", "create");
         String dbName = Utils.getPropertyValue("DB_NAME", "config.properties");
         String username = Utils.getPropertyValue("DB_USERNAME", "config.properties");
         String password = Utils.getPropertyValue("DB_PASSWORD", "config.properties");
