@@ -13,8 +13,12 @@ import app.utils.UsernameValidator;
 import io.javalin.apibuilder.EndpointGroup;
 import io.javalin.http.Context;
 import io.javalin.http.HttpStatus;
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.List;
+
+import static io.javalin.apibuilder.ApiBuilder.get;
 import static io.javalin.apibuilder.ApiBuilder.post;
 
 public class AuthController implements EndpointGroup {
@@ -30,6 +34,7 @@ public class AuthController implements EndpointGroup {
     public void addEndpoints() {
         post("/api/v1/auth/register", this::register, AccessRoleName.ANYONE);
         post("/api/v1/auth/login", this::login, AccessRoleName.ANYONE);
+        get("/api/v1/auth/healthcheck", this::healthCheck, AccessRoleName.ANYONE);
     }
 
     public void register(Context ctx){
@@ -62,5 +67,9 @@ public class AuthController implements EndpointGroup {
         UserLoginResponseDTO response = UserMapper.fromVerifiedDtoToResponseDto(verified, token);
         ctx.status(200);
         ctx.json(response);
+    }
+
+    public void healthCheck(@NotNull Context ctx) {
+        ctx.status(200).json("{\"msg\": \"API is up and running\"}");
     }
 }
