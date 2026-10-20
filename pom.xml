@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>ChessBackend</groupId>
+    <groupId>app</groupId>
     <artifactId>ChessBackendAPI</artifactId>
     <version>1.0-SNAPSHOT</version>
 
@@ -184,7 +184,7 @@
                     <outputFile>${project.build.directory}/app.jar</outputFile>
                     <transformers>
                         <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                            <mainClass>${project.groupId}.Main</mainClass>
+                            <mainClass>app.Main</mainClass>
                         </transformer>
                     </transformers>
                     <filters>
