@@ -1,9 +1,7 @@
 package app.clients;
-
 import app.dtos.lichess.LichessDailyPuzzleDTO;
 import app.utils.Utils;
 import tools.jackson.databind.ObjectMapper;
-
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;

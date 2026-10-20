@@ -11,13 +11,11 @@ import java.util.Map;
 @Getter
 
 public class Board {
-    private TurnHelper turnHelper;
-    private MoveExecutor moveExecutor;
-    private Map<Position, Piece> allPieces = new HashMap<>();
+    private final TurnHelper turnHelper = new TurnHelper();
+    private final MoveExecutor moveExecutor = new MoveExecutor();
+    private final Map<Position, Piece> allPieces = new HashMap<>();
 
     public void initializeNewBoard() {
-        turnHelper = new TurnHelper();
-        moveExecutor = new MoveExecutor();
         char letter = 'A';
 
         //white pawns
@@ -91,6 +89,10 @@ public class Board {
         //black king
         King bKing = new King( false, "king", false);
         allPieces.put(Position.E8, bKing);
+    }
+
+    public void fromFen(String fen){
+
     }
 
 

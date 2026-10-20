@@ -11,13 +11,10 @@ public abstract class Piece {
     private final boolean isWhite;
     private final String type;
 
-
-
     public Piece(boolean isWhite, String type) {
         this.isWhite = isWhite;
         this.type = type;
     }
 
     public abstract List<Position> getPossibleMoves(Board board, Position position);
-
 }

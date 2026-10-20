@@ -27,4 +27,11 @@ public class TurnHelper {
         }
     }
 
+    public void setLastMovedPiece(Piece piece){
+        if (piece.isWhite()){
+            lastMovedPieceWhite = piece;
+        }else{
+            lastMovedPieceBlack = piece;
+        }
+    }
 }
