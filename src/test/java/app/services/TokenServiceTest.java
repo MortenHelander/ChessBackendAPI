@@ -89,6 +89,7 @@ public class TokenServiceTest {
     @Test
     void verifyTamperedPayload_throws401(){
         String token = tokenService.createToken(testUser);
+        System.out.println(token);
         String[] parts = token.split("\\.");
 
         String payload = new String(decoder.decode(parts[1]), StandardCharsets.UTF_8);
