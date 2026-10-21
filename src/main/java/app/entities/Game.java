@@ -40,7 +40,7 @@ public class Game {
 
     @Version
     @Column(name = "optlock", nullable = false)
-    private long version = 0L;
+    private long version = 0;
 
 
     public static Game newGame(GameMode gameMode, Player whitePlayer, Player blackPlayer){
