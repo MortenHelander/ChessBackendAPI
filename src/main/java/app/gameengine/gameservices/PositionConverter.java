@@ -1,6 +1,7 @@
-package app.gameengine;
+package app.gameengine.gameservices;
 
 import app.exceptions.ApiException;
+import app.gameengine.Position;
 
 public class PositionConverter {
     public static Position fromCoordinates(int x, int y){

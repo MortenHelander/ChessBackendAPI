@@ -1,6 +1,7 @@
 package app.gameengine;
 
 import app.exceptions.ApiException;
+import app.gameengine.gameservices.FenParser;
 import app.gameengine.pieces.*;
 import app.services.MoveValidator;
 import org.junit.jupiter.api.Test;
@@ -257,7 +258,7 @@ class FenParserTest {
     @Test
     void rowWithTooManyEmptySquares_throws() {
         ApiException ex = assertThrows(ApiException.class,
-                () -> FenParser.fromFen("4k3/9/8/8/8/8/8/4K3 w - - 0 1"));
+                () -> FenParser.fromFen("4k3/9/8/8/8/8/8/4K3 w - - 0 1")); //9 on rank 7
         assertThat(ex.getCode(), is(400));
         assertThat(ex.getMessage(), containsString("Rank 7"));
     }

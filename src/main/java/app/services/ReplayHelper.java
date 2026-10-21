@@ -3,11 +3,10 @@ package app.services;
 import app.entities.Move;
 import app.exceptions.GameReplayException;
 import app.gameengine.Board;
-import app.gameengine.MoveResult;
-import app.gameengine.Promotion;
+import app.gameengine.game_logic.MoveResult;
+import app.gameengine.game_logic.Promotion;
 import app.gameengine.exceptions.InvalidGameActionException;
-import app.gameengine.move_logic.PieceFinder;
-import app.gameengine.move_logic.PromotionHelper;
+import app.gameengine.game_logic.PromotionHelper;
 import app.gameengine.pieces.Piece;
 
 import java.util.List;
@@ -18,6 +17,10 @@ public class ReplayHelper {
         Board board = new Board();
         board.initializeNewBoard();
 
+        return rebuildBoard(board, moves);
+    }
+
+    public static Board rebuildBoard(Board board, List<Move> moves){
         for (Move move : moves) {
             String label = "Stored move #" + move.getMoveNumber()
                     + " (" + move.getFrom() + "->" + move.getTo() + ")";
@@ -29,6 +32,9 @@ public class ReplayHelper {
 
             try {
                 MoveResult result = board.move(piece, move.getFrom(), move.getTo());
+                if (!result.success()){
+                    throw new GameReplayException(label + " is not a valid move on this board");
+                }
                 if (result.isAwaitingPromotion()) {
                     String letter = move.getPromotionLetter();
                     if (letter == null) {

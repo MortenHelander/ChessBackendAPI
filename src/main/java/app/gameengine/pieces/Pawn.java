@@ -2,11 +2,10 @@ package app.gameengine.pieces;
 
 import app.gameengine.Board;
 import app.gameengine.Position;
-import app.gameengine.move_logic.PawnMoveHelper;
+import app.gameengine.game_logic.PawnMoveHelper;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.annotation.processing.Generated;
 import java.util.ArrayList;
 import java.util.List;
 

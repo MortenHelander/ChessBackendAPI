@@ -2,8 +2,8 @@ package app.services;
 
 import app.gameengine.Board;
 import app.gameengine.Position;
-import app.gameengine.move_logic.CastlingHelper;
-import app.gameengine.move_logic.CheckChecker;
+import app.gameengine.game_logic.CastlingHelper;
+import app.gameengine.game_logic.CheckChecker;
 import app.gameengine.pieces.King;
 import app.gameengine.pieces.Piece;
 

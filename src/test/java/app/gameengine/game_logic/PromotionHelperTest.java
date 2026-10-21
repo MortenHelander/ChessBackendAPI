@@ -1,7 +1,6 @@
-package app.gameengine.move_logic;
+package app.gameengine.game_logic;
 
 import app.gameengine.Position;
-import app.gameengine.Promotion;
 import app.gameengine.exceptions.InvalidPromotionSquareException;
 import app.gameengine.exceptions.InvalidPromotionTypeException;
 import app.gameengine.pieces.*;

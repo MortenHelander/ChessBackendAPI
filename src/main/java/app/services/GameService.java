@@ -8,7 +8,6 @@ import app.dtos.games.GameCreateDTO;
 import app.dtos.games.GameResponseDTO;
 import app.dtos.games.MoveRequestDTO;
 import app.dtos.games.MoveResponseDTO;
-import app.dtos.users.UserResponseDTO;
 import app.entities.Game;
 import app.entities.Move;
 import app.entities.Player;
@@ -18,15 +17,16 @@ import app.entities.enums.GameMode;
 import app.entities.enums.GameStatus;
 import app.exceptions.ApiException;
 import app.gameengine.*;
-import app.gameengine.move_logic.CheckChecker;
-import app.gameengine.move_logic.PieceFinder;
-import app.gameengine.move_logic.PromotionHelper;
+import app.gameengine.game_logic.CheckChecker;
+import app.gameengine.game_logic.MoveResult;
+import app.gameengine.game_logic.Promotion;
+import app.gameengine.gameservices.PieceFinder;
+import app.gameengine.game_logic.PromotionHelper;
+import app.gameengine.gameservices.PositionConverter;
 import app.gameengine.pieces.Piece;
 import app.mappers.GameMapper;
 import app.mappers.MoveMapper;
-import app.mappers.UserMapper;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class GameService {

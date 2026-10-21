@@ -120,7 +120,7 @@ public class GameDAO implements IDAO<Game, Integer>{
     }
 
     @Override
-    public boolean  delete(Integer id) {
+    public boolean delete(Integer id) {
         if (id == null){
             throw new ApiException(400, "GameID is required");
         }

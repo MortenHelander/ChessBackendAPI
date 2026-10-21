@@ -1,7 +1,8 @@
-package app.gameengine.move_logic;
+package app.gameengine.game_logic;
 
 import app.gameengine.Board;
 import app.gameengine.Position;
+import app.gameengine.gameservices.PieceFinder;
 import app.gameengine.pieces.King;
 import app.gameengine.pieces.Piece;
 import app.testutils.BoardTestUtils;

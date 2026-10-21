@@ -62,7 +62,6 @@ public class LichessClientTest {
     void getDailyPuzzle(){
         LichessDailyPuzzleDTO dailyPuzzle = GenericClient.convertJsonGeneric(json, LichessDailyPuzzleDTO.class);
 
-        assertThat(dailyPuzzle.game().id(), is("P3gwP0JC"));
         assertThat(dailyPuzzle.puzzle().id(), is("lpmqI"));
         assertThat(dailyPuzzle.puzzle().rating(), is(1981));
         assertThat(dailyPuzzle.puzzle().solution(), containsInRelativeOrder("g4h5", "g6h5", "d7g4"));

@@ -1,14 +1,16 @@
-package app.gameengine;
+package app.gameengine.game_logic;
+
+import app.gameengine.Position;
 
 public record MoveResult(boolean success, boolean isAwaitingPromotion, Position promotionSquare) {
 
-    static MoveResult completed(){
+    public static MoveResult completed(){
         return new MoveResult(true, false, null);
     }
-    static MoveResult awaitingPromotion(Position promotionSquare){
+    public static MoveResult awaitingPromotion(Position promotionSquare){
         return new MoveResult(true, true, promotionSquare);
     }
-    static MoveResult failed(){
+    public static MoveResult failed(){
         return new MoveResult(false, false, null);
     }
 }

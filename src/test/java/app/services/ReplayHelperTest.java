@@ -4,7 +4,7 @@ import app.entities.Move;
 import app.exceptions.GameReplayException;
 import app.gameengine.Board;
 import app.gameengine.Position;
-import app.gameengine.PositionConverter;
+import app.gameengine.gameservices.PositionConverter;
 import app.gameengine.exceptions.InvalidGameActionException;
 import app.gameengine.pieces.Pawn;
 import app.gameengine.pieces.Queen;
@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Stream;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;

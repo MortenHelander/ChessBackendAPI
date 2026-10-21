@@ -1,8 +1,9 @@
-package app.gameengine;
+package app.gameengine.gameservices;
 
 import app.exceptions.ApiException;
-import app.gameengine.move_logic.CastlingHelper;
-import app.gameengine.move_logic.PieceFinder;
+import app.gameengine.Board;
+import app.gameengine.FenGameState;
+import app.gameengine.Position;
 import app.gameengine.pieces.*;
 
 import java.util.HashMap;

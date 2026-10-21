@@ -1,8 +1,8 @@
-package app.gameengine;
+package app.gameengine.game_logic;
 
-import app.gameengine.move_logic.CastlingHelper;
-import app.gameengine.move_logic.PawnMoveHelper;
-import app.gameengine.move_logic.PromotionHelper;
+import app.gameengine.Board;
+import app.gameengine.MoveType;
+import app.gameengine.Position;
 import app.gameengine.pieces.Piece;
 
 public class MoveIdentifier {

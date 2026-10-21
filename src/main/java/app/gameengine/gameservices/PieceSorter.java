@@ -1,4 +1,4 @@
-package app.gameengine.move_logic;
+package app.gameengine.gameservices;
 
 import app.gameengine.Board;
 import app.gameengine.Position;

@@ -1,9 +1,10 @@
-package app.gameengine.move_logic;
+package app.gameengine.game_logic;
 
 import app.gameengine.Board;
 import app.gameengine.Position;
-import app.gameengine.PositionConverter;
-import app.gameengine.pieces.King;
+import app.gameengine.gameservices.PositionConverter;
+import app.gameengine.gameservices.PieceFinder;
+import app.gameengine.gameservices.PieceSorter;
 import app.gameengine.pieces.Pawn;
 import app.gameengine.pieces.Piece;
 

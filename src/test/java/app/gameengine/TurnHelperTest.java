@@ -1,5 +1,6 @@
 package app.gameengine;
 
+import app.gameengine.game_logic.TurnHelper;
 import app.gameengine.pieces.King;
 import app.gameengine.pieces.Pawn;
 import app.gameengine.pieces.Rook;

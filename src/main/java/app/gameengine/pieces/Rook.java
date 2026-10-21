@@ -1,9 +1,9 @@
 package app.gameengine.pieces;
 
 import app.gameengine.Board;
-import app.gameengine.move_logic.Direction;
+import app.gameengine.game_logic.Direction;
 import app.gameengine.Position;
-import app.gameengine.move_logic.SlidingMoveHelper;
+import app.gameengine.game_logic.SlidingMoveHelper;
 import lombok.Getter;
 import lombok.Setter;
 
