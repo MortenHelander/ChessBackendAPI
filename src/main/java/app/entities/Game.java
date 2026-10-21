@@ -39,8 +39,8 @@ public class Game {
     private Set<Player> players = new HashSet<>();
 
     @Version
-    @Column(name = "optlock", columnDefinition = "integer DEFAULT 0", nullable = false)
-    private long version;
+    @Column(name = "optlock", nullable = false)
+    private long version = 0L;
 
 
     public static Game newGame(GameMode gameMode, Player whitePlayer, Player blackPlayer){
