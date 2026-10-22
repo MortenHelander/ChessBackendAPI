@@ -34,7 +34,7 @@ public final class HibernateConfig {
     }
 
     private static void setDeployedProperties(Properties props) {
-        props.put("hibernate.hbm2ddl.auto", "validate");
+        props.put("hibernate.hbm2ddl.auto", "create");
         String dbName = System.getenv("DB_NAME");
         props.setProperty("hibernate.connection.url", System.getenv("JDBC_CONNECTION_STRING") + dbName);
         props.setProperty("hibernate.connection.username", System.getenv("DB_USERNAME"));
