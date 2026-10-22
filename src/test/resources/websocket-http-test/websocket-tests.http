@@ -1,0 +1,37 @@
+
+###Websocket connection for user 1
+WEBSOCKET {{wsUrl}}/api/v1/games/{{gameId}}/ws?token={{token1}}
+
+###Websocket connection for user 2
+WEBSOCKET {{wsUrl}}/api/v1/games/{{gameId}}/ws?token={{token2}}
+
+###User1 makes a move
+POST {{baseUrl}}/api/v1/games/{{gameId}}/moves
+Authorization: Bearer {{token1}}
+Content-Type: application/json
+
+{
+  "from": "e2",
+  "to": "e4"
+}
+
+###User1 moves a black piece on black's turn (expect 400 "Not your turn")
+POST {{baseUrl}}/api/v1/games/{{gameId}}/moves
+Authorization: Bearer {{token1}}
+Content-Type: application/json
+
+{ "from": "e7", "to": "e5" }
+
+###User2 moves a black piece on their turn (expect 201)
+POST {{baseUrl}}/api/v1/games/{{gameId}}/moves
+Authorization: Bearer {{token2}}
+Content-Type: application/json
+
+{ "from": "e7", "to": "e5" }
+
+###User1 moves a white piece on their turn (expect 201)
+POST {{baseUrl}}/api/v1/games/{{gameId}}/moves
+Authorization: Bearer {{token1}}
+Content-Type: application/json
+
+{ "from": "h2", "to": "h4" }
