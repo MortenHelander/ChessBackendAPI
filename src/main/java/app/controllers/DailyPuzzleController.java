@@ -18,7 +18,7 @@ public class DailyPuzzleController implements EndpointGroup {
 
     @Override
     public void addEndpoints() {
-        get("/api/v1/puzzles/daily", this::getTodaysPuzzle, AccessRoleName.ANYONE);
+        get("/api/v1/puzzles/daily", this::getTodaysPuzzle, AccessRoleName.USER, AccessRoleName.ADMIN);
     }
 
     public void getTodaysPuzzle(Context ctx){

@@ -4,11 +4,14 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.hibernate.proxy.HibernateProxy;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -20,11 +23,26 @@ public class DailyPuzzle {
     private LocalDate id;
     private String lichessPuzzleId;
     private int rating;
+
     @ElementCollection(fetch = FetchType.EAGER)
-    @OrderColumn
+    @CollectionTable(
+            name = "daily_puzzles_solutions",
+            joinColumns = @JoinColumn(name = "daily_puzzle_id"))
+    @OrderColumn(name = "move_order")
+    @Column(name = "uci_move")
     private List<String> solution;
     private String fen;
     private String lastMove;
+    @OneToMany
+    @ToString.Exclude
+    private Set<DailyPuzzleAttempt> puzzleAttempts = new HashSet<>();
+
+    public void addPuzzleAttempt(DailyPuzzleAttempt puzzleAttempt){
+        this.puzzleAttempts.add(puzzleAttempt);
+        if (puzzleAttempt != null){
+            puzzleAttempt.setDailyPuzzle(this);
+        }
+    }
 
 
 

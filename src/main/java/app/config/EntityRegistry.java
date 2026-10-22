@@ -16,5 +16,6 @@ final class EntityRegistry {
         configuration.addAnnotatedClass(UserStats.class);
         configuration.addAnnotatedClass(AccessRole.class);
         configuration.addAnnotatedClass(DailyPuzzle.class);
+        configuration.addAnnotatedClass(DailyPuzzleAttempt.class);
     }
 }

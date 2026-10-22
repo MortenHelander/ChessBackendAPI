@@ -37,6 +37,9 @@ public class User {
     private Set<Player> players = new HashSet<>();
     @ManyToMany
     private Set<AccessRole> roles = new HashSet<>();
+    @OneToMany
+    @ToString.Exclude
+    private Set<DailyPuzzleAttempt> puzzleAttempts = new HashSet<>();
 
     public User(String username, String email, String firstName, String lastName, String password) {
         //init players set if called from constructor
@@ -73,6 +76,13 @@ public class User {
         this.roles.add(role);
         if (role != null){
             role.getUsers().add(this);
+        }
+    }
+
+    public void addPuzzleAttempt(DailyPuzzleAttempt puzzleAttempt){
+        this.puzzleAttempts.add(puzzleAttempt);
+        if (puzzleAttempt != null){
+            puzzleAttempt.setUser(this);
         }
     }
 

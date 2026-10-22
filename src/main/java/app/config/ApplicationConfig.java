@@ -33,7 +33,10 @@ public class ApplicationConfig implements EndpointGroup {
 
 
     public ApplicationConfig(EntityManagerFactory emf){
+        this(emf, Clock.systemUTC(), new LichessClient());
+    }
 
+    public ApplicationConfig(EntityManagerFactory emf, Clock clock, LichessClient lichessClient){ //constructor only to be called directly when testing
         //daos
         UserDAO userDAO = new UserDAO(emf);
         GameDAO gameDAO = new GameDAO(emf);
@@ -48,7 +51,7 @@ public class ApplicationConfig implements EndpointGroup {
 
         UserService userService = new UserService(userDAO);
         GameService gameService = new GameService(userService, playerDAO, gameDAO, moveDAO, userDAO);
-        DailyPuzzleService dailyPuzzleService = new DailyPuzzleService(Clock.systemUTC(), dailyPuzzleDAO, new LichessClient());
+        DailyPuzzleService dailyPuzzleService = new DailyPuzzleService(clock, dailyPuzzleDAO, lichessClient);
 
         //handlers
         this.exceptionHandler = new ExceptionHandler();
