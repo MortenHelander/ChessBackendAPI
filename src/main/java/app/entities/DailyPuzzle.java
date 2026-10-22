@@ -37,13 +37,21 @@ public class DailyPuzzle {
     @ToString.Exclude
     private Set<DailyPuzzleAttempt> puzzleAttempts = new HashSet<>();
 
+    public DailyPuzzle(LocalDate id, String lichessPuzzleId, int rating, List<String> solution, String fen, String lastMove) {
+        this.id = id;
+        this.lichessPuzzleId = lichessPuzzleId;
+        this.rating = rating;
+        this.solution = solution;
+        this.fen = fen;
+        this.lastMove = lastMove;
+    }
+
     public void addPuzzleAttempt(DailyPuzzleAttempt puzzleAttempt){
         this.puzzleAttempts.add(puzzleAttempt);
         if (puzzleAttempt != null){
             puzzleAttempt.setDailyPuzzle(this);
         }
     }
-
 
 
     @Override

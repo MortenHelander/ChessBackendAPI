@@ -45,19 +45,19 @@ public class DailyPuzzleAttemptDAO {
         }
     }
 
-    public Optional<DailyPuzzleAttempt> getByUserIdAndPuzzleDate(Integer id, LocalDate date) {
-        if (id == null) {
+    public Optional<DailyPuzzleAttempt> getByUserIdAndPuzzleDate(Integer userId, LocalDate puzzleDate) {
+        if (userId == null) {
             throw new ApiException(400, "UserID is required");
         }
-        if (date == null) {
+        if (puzzleDate == null) {
             throw new ApiException(400, "Date is required");
         }
         try (EntityManager em = emf.createEntityManager()) {
             try {
                 TypedQuery<DailyPuzzleAttempt> query = em.createQuery("SELECT dpa FROM DailyPuzzleAttempt dpa " +
                         "JOIN dpa.user u JOIN dpa.dailyPuzzle dp WHERE u.id = :id AND dp.id = :date", DailyPuzzleAttempt.class);
-                query.setParameter("id", id);
-                query.setParameter("date", date);
+                query.setParameter("id", userId);
+                query.setParameter("date", puzzleDate);
                 return query.getResultStream().findFirst();
             } catch (PersistenceException e) {
                 throw new ApiException(500, "Get daily puzzle failed: " + e.getMessage());
