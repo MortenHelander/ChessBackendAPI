@@ -2,6 +2,7 @@ package app.mappers;
 
 import app.dtos.puzzles.DailyPuzzleResponseDTO;
 import app.dtos.lichess.LichessDailyPuzzleDTO;
+import app.dtos.puzzles.PuzzleMoveResponseDTO;
 import app.entities.DailyPuzzle;
 
 import java.time.LocalDate;

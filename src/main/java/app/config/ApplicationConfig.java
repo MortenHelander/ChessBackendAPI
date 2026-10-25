@@ -43,6 +43,7 @@ public class ApplicationConfig implements EndpointGroup {
         PlayerDAO playerDAO = new PlayerDAO(emf);
         MoveDAO moveDAO = new MoveDAO(emf);
         DailyPuzzleDAO dailyPuzzleDAO = new DailyPuzzleDAO(emf);
+        DailyPuzzleAttemptDAO puzzleAttemptDAO = new DailyPuzzleAttemptDAO(emf);
 
         //services
         TokenService tokenService = new TokenService(Utils.getPropertyValue("ISSUER", "config.properties"),
@@ -51,7 +52,7 @@ public class ApplicationConfig implements EndpointGroup {
 
         UserService userService = new UserService(userDAO);
         GameService gameService = new GameService(userService, playerDAO, gameDAO, moveDAO, userDAO);
-        DailyPuzzleService dailyPuzzleService = new DailyPuzzleService(clock, dailyPuzzleDAO, lichessClient);
+        DailyPuzzleService dailyPuzzleService = new DailyPuzzleService(clock, dailyPuzzleDAO, puzzleAttemptDAO, userDAO, lichessClient);
 
         //handlers
         this.exceptionHandler = new ExceptionHandler();
