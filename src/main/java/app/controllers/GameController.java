@@ -3,7 +3,6 @@ package app.controllers;
 import app.dtos.games.*;
 import app.dtos.users.UserVerifiedPasswordDTO;
 import app.entities.enums.GameMode;
-import app.exceptions.ApiException;
 import app.security.AccessRoleName;
 import app.services.GameService;
 import app.websocket.GameConnectionRegistry;
@@ -39,7 +38,7 @@ public class GameController implements EndpointGroup {
 
         get("/api/v1/games/{id}/moves", this::getMoves, AccessRoleName.USER);
         post("/api/v1/games/{id}/moves", this::moveAndShiftTurn, AccessRoleName.USER);
-        post("/api/v1/games/{id}/finish", this::endGame, AccessRoleName.USER);
+        post("/api/v1/games/{id}/resign", this::resign, AccessRoleName.USER);
     }
 
     public void createGame(Context ctx){
@@ -99,12 +98,20 @@ public class GameController implements EndpointGroup {
         UserVerifiedPasswordDTO user = ctx.attribute("user");
 
         MoveResponseDTO response = gameService.moveAndShiftTurn(gameId, move, user.id());
-        gameRegistry.broadcast(gameId, new GameEventDTO("Move_MADE", response));
+        gameRegistry.broadcast(gameId, new GameEventDTO("MOVE_MADE", response));
         ctx.status(HttpStatus.CREATED);
         ctx.json(response);
     }
 
-    public void endGame(Context ctx){
-        //to do for when learning about tokens
+    public void resign(Context ctx){
+        Integer gameId = ctx.pathParamAsClass("id", Integer.class)
+                .check(value -> value > 0, "ID must be positive").get();
+
+        UserVerifiedPasswordDTO user = ctx.attribute("user");
+
+        GameResponseDTO response = gameService.resign(gameId, user.id());
+        gameRegistry.broadcast(gameId, new GameEventDTO("GAME_RESIGNED", response));
+        ctx.status(HttpStatus.OK);
+        ctx.json(response);
     }
 }

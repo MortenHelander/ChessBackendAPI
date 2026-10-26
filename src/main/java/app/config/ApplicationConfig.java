@@ -51,6 +51,7 @@ public class ApplicationConfig implements EndpointGroup {
         MoveDAO moveDAO = new MoveDAO(emf);
         DailyPuzzleDAO dailyPuzzleDAO = new DailyPuzzleDAO(emf);
         DailyPuzzleAttemptDAO puzzleAttemptDAO = new DailyPuzzleAttemptDAO(emf);
+        UserStatsDAO userStatsDAO = new UserStatsDAO(emf);
 
         //services
         TokenService tokenService = new TokenService(Utils.getPropertyValue("ISSUER", "config.properties"),
@@ -58,7 +59,7 @@ public class ApplicationConfig implements EndpointGroup {
                 Utils.getPropertyValue("SECRET_KEY", "config.properties"));
 
         UserService userService = new UserService(userDAO);
-        GameService gameService = new GameService(userService, playerDAO, gameDAO, moveDAO, userDAO);
+        GameService gameService = new GameService(userService, playerDAO, gameDAO, moveDAO, userDAO, userStatsDAO);
         dailyPuzzleService = new DailyPuzzleService(clock, dailyPuzzleDAO, puzzleAttemptDAO, userDAO, lichessClient);
 
         //handlers

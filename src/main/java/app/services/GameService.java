@@ -1,20 +1,15 @@
 package app.services;
 
-import app.daos.GameDAO;
-import app.daos.MoveDAO;
-import app.daos.PlayerDAO;
-import app.daos.UserDAO;
+import app.daos.*;
 import app.dtos.games.GameCreateDTO;
 import app.dtos.games.GameResponseDTO;
 import app.dtos.games.MoveRequestDTO;
 import app.dtos.games.MoveResponseDTO;
-import app.entities.Game;
-import app.entities.Move;
-import app.entities.Player;
-import app.entities.User;
+import app.entities.*;
 import app.entities.enums.Color;
 import app.entities.enums.GameMode;
 import app.entities.enums.GameStatus;
+import app.entities.enums.Result;
 import app.exceptions.ApiException;
 import app.gameengine.*;
 import app.gameengine.game_logic.CheckChecker;
@@ -35,13 +30,15 @@ public class GameService {
     private final GameDAO gameDAO;
     private final MoveDAO moveDAO;
     private final UserDAO userDAO;
+    private final UserStatsDAO userStatsDao;
 
-    public GameService(UserService userService, PlayerDAO playerDAO, GameDAO gameDAO, MoveDAO moveDAO, UserDAO userDAO) {
+    public GameService(UserService userService, PlayerDAO playerDAO, GameDAO gameDAO, MoveDAO moveDAO, UserDAO userDAO, UserStatsDAO userStatsDao) {
         this.userService = userService;
         this.playerDAO = playerDAO;
         this.gameDAO = gameDAO;
         this.moveDAO = moveDAO;
         this.userDAO = userDAO;
+        this.userStatsDao = userStatsDao;
     }
 
     public GameResponseDTO createGame(GameCreateDTO gameCreateDTO) {
@@ -128,7 +125,45 @@ public class GameService {
         Move move = new Move(from, to, letter);
         game.addMoveAndShiftTurn(move);
         Game persistedGame = gameDAO.update(game);
+        if (persistedGame.getGameStatus() != GameStatus.IN_PROGRESS){
+            recordResult(persistedGame);
+        }
+
         Move persistedMove = persistedGame.getMoves().getLast();
         return MoveMapper.toDto(persistedMove);
+    }
+
+    public GameResponseDTO resign(Integer gameId, Integer userId){
+        Game game = gameDAO.getById(gameId);
+        if (game.getGameStatus() != GameStatus.IN_PROGRESS) {
+            throw new ApiException(400, "Game is finished");
+        }
+
+        Player foundPlayer = game.getPlayers().stream()
+                .filter(p -> p.getUser() != null && p.getUser().getId().equals(userId)).findFirst()
+                .orElseThrow(() -> new ApiException(403, "You are not a player in this game"));
+
+       game.resign(foundPlayer.getColor());
+       Game updated = gameDAO.update(game);
+       recordResult(updated);
+       return GameMapper.toDTO(updated);
+    }
+
+    private void recordResult(Game game){
+        for (Player player : game.getPlayers()) {
+            //if player is ai
+            if (player.getUser() == null){
+                break;
+            }
+            Result result;
+            if (game.getWinnerColor() == Color.NO_COLOR){
+                result = Result.DRAW;
+            }else if (player.getColor() == game.getWinnerColor()){
+                result = Result.WIN;
+            }else{
+                result = Result.LOSS;
+            }
+            userStatsDao.recordResult(player.getUser().getId(), result);
+        }
     }
 }

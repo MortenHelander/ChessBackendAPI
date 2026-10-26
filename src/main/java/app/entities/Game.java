@@ -88,6 +88,18 @@ public class Game {
         }
     }
 
+    public void resign(Color resigningColor){
+        if (this.gameStatus != GameStatus.IN_PROGRESS){
+            throw new ApiException(400, "Game is already finished");
+        }
+        this.gameStatus = GameStatus.RESIGNED;
+        for (Player player : players) {
+            if (!player.getColor().equals(resigningColor)){
+                winnerColor = player.getColor();
+            }
+        }
+    }
+
 
     private void addPlayer(Player player){
         this.players.add(player);
