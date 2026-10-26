@@ -62,7 +62,6 @@ public class Game {
         this.moves.add(move);
         isWhitesTurn = !isWhitesTurn;
         if (move != null){
-            move.setGivesCheck();
             move.setGame(this);
             move.setMoveNumber(moves.size());
             //java default is nanosecond (9 decimals) while postgres stores with only 6 decimals, so cutting off for similarity and testing
