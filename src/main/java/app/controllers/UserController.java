@@ -1,6 +1,7 @@
 package app.controllers;
 
 import app.dtos.users.UserResponseDTO;
+import app.dtos.users.UserStatsDTO;
 import app.dtos.users.UserUpdateDTO;
 import app.dtos.users.UserVerifiedPasswordDTO;
 import app.exceptions.ApiException;
@@ -37,6 +38,7 @@ public class UserController implements EndpointGroup {
         get("/api/v1/users", this::getAllUsers, AccessRoleName.ANYONE);
         get("/api/v1/users/{id}", this::getUserById, AccessRoleName.ANYONE);
         get("/api/v1/users/username/{username}", this::getUserByUsername, AccessRoleName.ANYONE);
+        get("/api/v1/users/{id}/stats", this::getUserStatsById, AccessRoleName.USER);
         put("/api/v1/users/{id}", this::updateUser, AccessRoleName.USER, AccessRoleName.ADMIN);
         delete("/api/v1/users/{id}", this::deleteUser, AccessRoleName.ADMIN);
     }
@@ -61,6 +63,15 @@ public class UserController implements EndpointGroup {
         UserResponseDTO userResponseDTO = userService.getUserByUsername(username);
         ctx.status(HttpStatus.OK);
         ctx.json(userResponseDTO);
+    }
+
+    public void getUserStatsById(Context ctx){
+        int id = ctx.pathParamAsClass("id", Integer.class)
+                .check(value -> value > 0, "ID must be positive").get();
+
+        UserStatsDTO response = userService.getUserStatsById(id);
+        ctx.status(HttpStatus.OK);
+        ctx.json(response);
     }
 
     public void updateUser(Context ctx){

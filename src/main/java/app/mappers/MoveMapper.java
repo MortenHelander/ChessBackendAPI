@@ -9,8 +9,8 @@ import java.util.List;
 
 public class MoveMapper {
 
-    public static MoveResponseDTO toDto (Move move){
-        return new MoveResponseDTO(move.getId(), move.getMoveNumber(), move.getUci(), move.getPlayedAt(), move.getFrom().name(), move.getTo().name());
+    public static MoveResponseDTO toDto (Move move, boolean inCheck){
+        return new MoveResponseDTO(move.getId(), move.getMoveNumber(), move.getUci(), move.getPlayedAt(), move.getFrom().name(), move.getTo().name(), inCheck);
     }
 
     public static List<MoveResponseDTO> toDtosFromList (List<Move> moves){

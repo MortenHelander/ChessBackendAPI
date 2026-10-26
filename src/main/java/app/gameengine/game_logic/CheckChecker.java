@@ -105,7 +105,7 @@ public class CheckChecker {
         return possiblePositions.isEmpty();
     }
 
-    private static boolean isSideInCheck(Board board, boolean isWhitesTurn){
+    public static boolean isSideInCheck(Board board, boolean isWhitesTurn){
         Map<Position, Piece> allyPieces;
 
         if (isWhitesTurn){

@@ -1,10 +1,12 @@
 package app.services;
 
 import app.daos.UserDAO;
+import app.daos.UserStatsDAO;
 import app.dtos.users.*;
 import app.entities.User;
 import app.exceptions.ApiException;
 import app.mappers.UserMapper;
+import app.mappers.UserStatsMapper;
 import app.utils.PasswordHasher;
 import lombok.extern.slf4j.Slf4j;
 
@@ -14,9 +16,11 @@ import java.util.List;
 @Slf4j
 public class UserService {
     private final UserDAO userDAO;
+    private final UserStatsDAO userStatsDAO;
 
-    public UserService(UserDAO userDAO) {
+    public UserService(UserDAO userDAO, UserStatsDAO userStatsDAO) {
         this.userDAO = userDAO;
+        this.userStatsDAO = userStatsDAO;
     }
 
     public UserResponseDTO createUser(UserRegisterDTO registerDTO) {
@@ -37,6 +41,10 @@ public class UserService {
 
     public UserResponseDTO getUserById(Integer id) {
         return UserMapper.responseDTOFromEntity(userDAO.getById(id));
+    }
+
+    public UserStatsDTO getUserStatsById(Integer id) {
+        return UserStatsMapper.fromEntity(userStatsDAO.getById(id));
     }
 
     public UserResponseDTO getUserByUsername(String username) {

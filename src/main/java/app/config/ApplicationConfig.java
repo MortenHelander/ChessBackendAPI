@@ -58,7 +58,7 @@ public class ApplicationConfig implements EndpointGroup {
                 Long.parseLong(Utils.getPropertyValue("TOKEN_EXPIRE_TIME", "config.properties")),
                 Utils.getPropertyValue("SECRET_KEY", "config.properties"));
 
-        UserService userService = new UserService(userDAO);
+        UserService userService = new UserService(userDAO, userStatsDAO);
         GameService gameService = new GameService(userService, playerDAO, gameDAO, moveDAO, userDAO, userStatsDAO);
         dailyPuzzleService = new DailyPuzzleService(clock, dailyPuzzleDAO, puzzleAttemptDAO, userDAO, lichessClient);
 

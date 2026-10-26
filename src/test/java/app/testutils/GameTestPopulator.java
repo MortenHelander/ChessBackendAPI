@@ -23,8 +23,20 @@ public class GameTestPopulator {
                     .executeUpdate();
 
             User user1 = new User("Sheriff", "morten@hotmail.com", "Morten", "Helander", "password123");
+            user1.addUserStats(UserStats.builder()
+                    .gamesPlayed(0)
+                    .wins(0)
+                    .losses(0)
+                    .mmr(1000)
+                    .build());
             em.persist(user1);
             User user2 = new User("svg-man", "theis@hotmail.com", "Theis", "Rudkjær", "anotherpassword1441");
+            user2.addUserStats(UserStats.builder()
+                    .gamesPlayed(25)
+                    .wins(12)
+                    .losses(13)
+                    .mmr(900)
+                    .build());
             em.persist(user2);
 
             Player p1 = new Player(Color.WHITE, false);

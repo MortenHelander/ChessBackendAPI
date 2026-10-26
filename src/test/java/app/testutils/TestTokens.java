@@ -28,6 +28,10 @@ public final class TestTokens {
         return TOKEN_SERVICE.createToken(new UserVerifiedPasswordDTO(6, "testadminanduser", Set.of("USER", "ADMIN")));
     }
 
+    public static String userWithStatsToken() {
+        return TOKEN_SERVICE.createToken(new UserVerifiedPasswordDTO(2, "svg-man", Set.of("USER")));
+    }
+
     public static String tokenFor(Integer id, String username) {
         return TOKEN_SERVICE.createToken(new UserVerifiedPasswordDTO(id, username, Set.of("USER")));
     }

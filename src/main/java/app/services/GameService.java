@@ -114,15 +114,16 @@ public class GameService {
             }
         }
 
-        boolean opponentIsWhite = !game.isWhitesTurn();
-        if (CheckChecker.isCheckMate(board, opponentIsWhite)) {
+        boolean isOpponentWhite = !game.isWhitesTurn();
+        if (CheckChecker.isCheckMate(board, isOpponentWhite)) {
             game.finishGame(GameStatus.CHECKMATE, game.isWhitesTurn() ? Color.WHITE : Color.BLACK);
-        } else if (CheckChecker.isStaleMate(board, opponentIsWhite)) {
+        } else if (CheckChecker.isStaleMate(board, isOpponentWhite)) {
             game.finishGame(GameStatus.DRAW, null);
         }
 
         String letter = result.isAwaitingPromotion() ? moveRequest.promotionLetter() : null;
         Move move = new Move(from, to, letter);
+        boolean inCheck = CheckChecker.isSideInCheck(board, isOpponentWhite);
         game.addMoveAndShiftTurn(move);
         Game persistedGame = gameDAO.update(game);
         if (persistedGame.getGameStatus() != GameStatus.IN_PROGRESS){
@@ -130,7 +131,7 @@ public class GameService {
         }
 
         Move persistedMove = persistedGame.getMoves().getLast();
-        return MoveMapper.toDto(persistedMove);
+        return MoveMapper.toDto(persistedMove, inCheck);
     }
 
     public GameResponseDTO resign(Integer gameId, Integer userId){

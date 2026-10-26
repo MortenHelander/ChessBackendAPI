@@ -3,6 +3,7 @@ package app.endpoints;
 import app.config.ApplicationConfig;
 import app.config.HibernateTestConfig;
 import app.entities.Game;
+import app.entities.Player;
 import app.entities.User;
 import app.entities.enums.Color;
 import app.testutils.GameTestPopulator;
@@ -15,7 +16,9 @@ import jakarta.persistence.EntityManagerFactory;
 import org.junit.jupiter.api.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static app.testutils.TestTokens.*;
 import static io.restassured.RestAssured.given;
@@ -59,7 +62,7 @@ public class GameEndpointsTest {
     }
 
     @AfterEach
-    void tearDown(){
+    void tearDown() {
         seed.clear();
     }
 
@@ -103,11 +106,11 @@ public class GameEndpointsTest {
                 .when()
                 .get("/api/v1/games/{id}", id)
                 .then().statusCode(404)
-                .body("error", is("Game with id "+ id + " not found"));
+                .body("error", is("Game with id " + id + " not found"));
     }
 
     @Test
-    void getGame_illegalId_returns400(){
+    void getGame_illegalId_returns400() {
         Integer id = -5;
 
         given()
@@ -124,7 +127,7 @@ public class GameEndpointsTest {
 
 
     @Test
-    void deleteGame_existing_returns204(){
+    void deleteGame_existing_returns204() {
         Integer id = seed.get("game1").getId();
 
         given()
@@ -138,7 +141,7 @@ public class GameEndpointsTest {
     }
 
     @Test
-    void deleteGame_notExisting_returns404(){
+    void deleteGame_notExisting_returns404() {
         Integer id = 9999;
 
         given()
@@ -148,7 +151,7 @@ public class GameEndpointsTest {
                 .when()
                 .delete("/api/v1/games/{id}", id)
                 .then().statusCode(404)
-                .body("error", is("Game with id "+ id + " not found"));
+                .body("error", is("Game with id " + id + " not found"));
     }
 
     @Test
@@ -177,23 +180,23 @@ public class GameEndpointsTest {
                 .when()
                 .get("/api/v1/games/{id}/moves", id)
                 .then().log().all().statusCode(404)
-                .body("error", is("Game with id "+ id + " not found"));
+                .body("error", is("Game with id " + id + " not found"));
     }
 
     @Test
-    void moveAndShiftTurn_fromPositionNull_returns400(){
+    void moveAndShiftTurn_fromPositionNull_returns400() {
         Integer id = seed.get("game3").getId();
 
-        move(whiteToken, id, null ,"e3", null)
+        move(whiteToken, id, null, "e3", null)
                 .statusCode(400)
                 .body("error", is("From position is required"));
     }
 
     @Test
-    void moveAndShiftTurn_toPositionNull_returns400(){
+    void moveAndShiftTurn_toPositionNull_returns400() {
         Integer id = seed.get("game3").getId();
 
-        move(whiteToken, id, "e3" ,null, null)
+        move(whiteToken, id, "e3", null, null)
                 .statusCode(400)
                 .body("error", is("To position is required"));
     }
@@ -254,7 +257,7 @@ public class GameEndpointsTest {
     // -----------------------------------------------
 
     @Test
-    void moveAndShiftTurn_illegalMove_returns400(){
+    void moveAndShiftTurn_illegalMove_returns400() {
         Integer id = seed.get("game3").getId();
 
         move(whiteToken, id, "e2", "e7", null)
@@ -264,10 +267,11 @@ public class GameEndpointsTest {
 
     @Test
     void moveAndShiftTurn_foolsMate_blackWins() {
+        String userWithStatsToken = TestTokens.userWithStatsToken();
         Integer id = seed.get("game3").getId();
         playAll(id, true, "f2f3", "e7e5", "g2g4", "d8h4");
 
-        given().header("Authorization", bearer(userToken))
+        given().header("Authorization", bearer(userWithStatsToken))
                 .when().get("/api/v1/games/{id}", id)
                 .then().log().all().statusCode(200)
                 .body("gameStatus", is("CHECKMATE"))
@@ -279,7 +283,7 @@ public class GameEndpointsTest {
     }
 
     @Test
-    void moveAndShiftTurn_promotionAllConditionsMet_returns201(){
+    void moveAndShiftTurn_promotionAllConditionsMet_returns201() {
         Integer id = seed.get("game3").getId();
 
         playUpToPromotion(id);
@@ -297,7 +301,7 @@ public class GameEndpointsTest {
     }
 
     @Test
-    void moveAndShiftTurn_noSelectedPromotionPiece_returns400(){
+    void moveAndShiftTurn_noSelectedPromotionPiece_returns400() {
         Integer id = seed.get("game3").getId();
 
         playUpToPromotion(id);
@@ -327,6 +331,69 @@ public class GameEndpointsTest {
         move(whiteToken, id, "a7", "a8", "q")
                 .statusCode(400)
                 .body("error", is("Illegal move"));
+    }
+
+    @Test
+    void whitePlayerResigns_bothPlayersStatsChange() {
+
+        Game game = seed.get("game3");
+        Integer id = game.getId();
+
+        User wPlayer = game.getPlayers().stream()
+                .filter(p -> p.getColor() == Color.WHITE)
+                .findFirst()
+                .orElseThrow()
+                .getUser();
+
+        User bPlayer = game.getPlayers().stream()
+                .filter(p -> p.getColor() == Color.BLACK)
+                .findFirst()
+                .orElseThrow()
+                .getUser();
+
+        //wPlayer has zero stats so far
+        given().header("Authorization", bearer(whiteToken))
+                .when().get("/api/v1/users/{id}/stats", wPlayer.getId())
+                .then().log().all()
+                .statusCode(200)
+                .body("wins", is(0))
+                .body("losses", is(0))
+                .body("gamesPlayed", is(0));
+
+        //bPlayer has some stats already
+        given().header("Authorization", bearer(blackToken))
+                .when().get("/api/v1/users/{id}/stats", bPlayer.getId())
+                .then().log().all()
+                .statusCode(200)
+                .body("wins", is(12))
+                .body("losses", is(13))
+                .body("gamesPlayed", is(25));
+
+        //white player resigns game
+        given().header("Authorization", bearer(whiteToken))
+                .when().post("/api/v1/games/{id}/resign", id)
+                .then().log().all()
+                .statusCode(200)
+                .body("gameStatus", is("RESIGNED"))
+                .body("winnerColor", is("BLACK"));
+
+        //wplayers losses and gameplayed should increment by 1
+        given().header("Authorization", bearer(whiteToken))
+                .when().get("/api/v1/users/{id}/stats", wPlayer.getId())
+                .then().log().all()
+                .statusCode(200)
+                .body("wins", is(0))
+                .body("losses", is(1))
+                .body("gamesPlayed", is(1));
+
+        //bplayers losses and gameplayed should increment by 1
+        given().header("Authorization", bearer(blackToken))
+                .when().get("/api/v1/users/{id}/stats", bPlayer.getId())
+                .then().log().all()
+                .statusCode(200)
+                .body("wins", is(13))
+                .body("losses", is(13))
+                .body("gamesPlayed", is(26));
     }
 
     // ---------- Helpers ----------
