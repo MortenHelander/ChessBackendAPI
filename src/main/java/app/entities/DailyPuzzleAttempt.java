@@ -46,8 +46,8 @@ public class DailyPuzzleAttempt {
         attempt.attemptsLeft = MAX_TRIES;
         attempt.status = PuzzleStatus.IN_PROGRESS;
         attempt.startedAt = LocalDateTime.now();
-        user.addPuzzleAttempt(attempt);
-        dailyPuzzle.addPuzzleAttempt(attempt);
+        attempt.dailyPuzzle = dailyPuzzle;
+        attempt.user = user;
         return attempt;
     }
 

@@ -25,8 +25,8 @@ public class UciParser {
 
     public static List<Move> toMoves(List<String> solution){
         List<Move> moves = new ArrayList<>();
-        for (int i = 1; i<solution.size(); i++){
-            Move move = toMove(solution.get(i), i);
+        for (int i = 0; i<solution.size(); i++){
+            moves.add(toMove(solution.get(i), i));
         }
         return moves;
     }

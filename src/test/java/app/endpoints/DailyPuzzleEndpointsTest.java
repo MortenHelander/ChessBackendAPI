@@ -11,6 +11,16 @@ import app.entities.DailyPuzzleAttempt;
 import app.entities.User;
 import app.entities.enums.PuzzleStatus;
 import app.exceptions.ApiException;
+import app.gameengine.Board;
+import app.gameengine.FenGameState;
+import app.gameengine.Position;
+import app.gameengine.gameservices.FenParser;
+import app.gameengine.gameservices.PieceFinder;
+import app.gameengine.gameservices.UciParser;
+import app.gameengine.pieces.Bishop;
+import app.gameengine.pieces.Piece;
+import app.gameengine.pieces.Rook;
+import app.services.ReplayHelper;
 import app.testutils.DailyPuzzleAttemptTestPopulator;
 import app.testutils.DailyPuzzleTestPopulator;
 import app.testutils.FakeLichessClient;
@@ -104,6 +114,18 @@ public class DailyPuzzleEndpointsTest {
 
         fakeLichessClient.reset();
         fakeLichessClient.setPuzzleToReturn(validLichessPuzzle());
+    }
+
+    @Test
+    void tempCheck(){
+        FenGameState state = FenParser.fromFen(VALID_FEN);
+        Board board = ReplayHelper.rebuildBoard(state.board(), UciParser.toMoves(List.of("c8c1", "d3f1")));
+        Piece bRook = PieceFinder.findPiece(board, Position.C1);
+        Piece wBishop = PieceFinder.findPiece(board, Position.F1);
+        assertThat(bRook, is(instanceOf(Rook.class)));
+        assertThat(bRook.isWhite(), is(false));
+        assertThat(wBishop, is(instanceOf(Bishop.class)));
+        assertThat(wBishop.isWhite(), is(true));
     }
 
 
@@ -304,7 +326,7 @@ public class DailyPuzzleEndpointsTest {
 
         postMove(user3Token, "c8", "c1")
                 .statusCode(201)
-                .body("correct", is(true))
+                .body("isCorrect", is(true))
                 .body("opponentMove", is("d3f1"))
                 .body("status", is("IN_PROGRESS"))
                 .body("attemptsLeft", is(10))
@@ -326,7 +348,7 @@ public class DailyPuzzleEndpointsTest {
         // last move: no reply, puzzle solved
         postMove(user3Token, "e5", "e1")
                 .statusCode(201)
-                .body("correct", is(true))
+                .body("isCorrect", is(true))
                 .body("opponentMove", nullValue())
                 .body("status", is("SOLVED"))
                 .body("movesLeft", is(0));
@@ -342,7 +364,7 @@ public class DailyPuzzleEndpointsTest {
 
         postMove(user3Token, "g4", "h5")
                 .statusCode(201)
-                .body("correct", is(true))
+                .body("isCorrect", is(true))
                 .body("opponentMove", is("g6h5"));
 
         postMove(user3Token, "d7", "g4")
@@ -357,7 +379,7 @@ public class DailyPuzzleEndpointsTest {
 
         postMove(user3Token, "e1", "e8")
                 .statusCode(201)
-                .body("correct", is(true))
+                .body("isCorrect", is(true))
                 .body("status", is("SOLVED"))
                 .body("attemptsLeft", is(10));
     }
@@ -371,7 +393,7 @@ public class DailyPuzzleEndpointsTest {
 
         postMove(user3Token, "a6", "a5")
                 .statusCode(201)
-                .body("correct", is(false))
+                .body("isCorrect", is(false))
                 .body("opponentMove", nullValue())
                 .body("status", is("IN_PROGRESS"))
                 .body("attemptsLeft", is(9))
@@ -379,15 +401,15 @@ public class DailyPuzzleEndpointsTest {
     }
 
     @Test
-    void playMove_afterWrongMove_correctMoveIsStillAccepted() {
+    void playMove_afterWrongMove_isCorrectMoveIsStillAccepted() {
         seedTodaysPuzzle(VALID_FEN, VALID_SOLUTION);
 
-        postMove(user3Token, "a6", "a5").statusCode(201).body("correct", is(false));
+        postMove(user3Token, "a6", "a5").statusCode(201).body("isCorrect", is(false));
 
         // the wrong move is not kept on the board, the user is still at the first move
         postMove(user3Token, "c8", "c1")
                 .statusCode(201)
-                .body("correct", is(true))
+                .body("isCorrect", is(true))
                 .body("opponentMove", is("d3f1"))
                 .body("attemptsLeft", is(9));
     }
@@ -402,7 +424,7 @@ public class DailyPuzzleEndpointsTest {
 
         postMove(user3Token, "a6", "a5")
                 .statusCode(201)
-                .body("correct", is(false))
+                .body("isCorrect", is(false))
                 .body("status", is("FAILED"))
                 .body("attemptsLeft", is(0));
 
@@ -522,12 +544,12 @@ public class DailyPuzzleEndpointsTest {
         seedTodaysPuzzle(VALID_FEN, VALID_SOLUTION);
 
         // user3 gets one move further
-        postMove(user3Token, "c8", "c1").statusCode(201).body("correct", is(true));
+        postMove(user3Token, "c8", "c1").statusCode(201).body("isCorrect", is(true));
 
-        // user2 still starts at the first move, so the same move is correct for them too
+        // user2 still starts at the first move, so the same move isCorrect for them too
         postMove(user2Token, "c8", "c1")
                 .statusCode(201)
-                .body("correct", is(true))
+                .body("isCorrect", is(true))
                 .body("opponentMove", is("d3f1"));
 
         assertThat(attemptDAO.getByUserIdAndPuzzleDate(user3.getId(), TODAY).get().getMoveIndex(), is(2));

@@ -13,7 +13,8 @@ public class Main {
 
         EntityManagerFactory emf = HibernateConfig.getEntityManagerFactory();
         ApplicationConfig applicationConfig = new ApplicationConfig(emf);
-
         Javalin app = applicationConfig.createApp(7070);
+        applicationConfig.startPuzzleScheduler();
+        Runtime.getRuntime().addShutdownHook(new Thread(applicationConfig::stopPuzzleScheduler));
     }
 }
