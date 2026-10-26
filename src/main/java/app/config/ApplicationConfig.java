@@ -69,10 +69,6 @@ public class ApplicationConfig implements EndpointGroup {
         //game registry
         GameConnectionRegistry gameConnectionRegistry = new GameConnectionRegistry();
 
-        //schedulers
-        this.puzzleScheduler = new DailyPuzzleScheduler(dailyPuzzleService, clock);
-
-
         //controllers
         this.authController = new AuthController(userService, tokenService);
         this.userController = new UserController(userService);

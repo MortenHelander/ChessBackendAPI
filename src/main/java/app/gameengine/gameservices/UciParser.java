@@ -17,7 +17,7 @@ public class UciParser {
         Position from = PositionConverter.fromString(uci.substring(0,2));
         Position to = PositionConverter.fromString(uci.substring(2,4));
         String promotion = uci.length() == 5 ? uci.substring(4):null;
-        Move move = new Move(from, to, promotion);
+        Move move = new Move(from, to, promotion, false); // only used for replay; givesCheck is never read there
         move.setUci(uci);
         move.setMoveNumber(moveNumber);
         return move;
@@ -26,7 +26,7 @@ public class UciParser {
     public static List<Move> toMoves(List<String> solution){
         List<Move> moves = new ArrayList<>();
         for (int i = 0; i<solution.size(); i++){
-            moves.add(toMove(solution.get(i), i));
+            moves.add(toMove(solution.get(i), i+1));
         }
         return moves;
     }
