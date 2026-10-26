@@ -5,6 +5,7 @@ import app.controllers.*;
 import app.daos.*;
 import app.handlers.AccessHandler;
 import app.handlers.ExceptionHandler;
+import app.schedulers.DailyPuzzleScheduler;
 import app.security.TokenService;
 import app.services.DailyPuzzleService;
 import app.services.GameService;
@@ -30,6 +31,9 @@ public class ApplicationConfig implements EndpointGroup {
     private final DailyPuzzleController dailyPuzzleController;
     private final AuthController authController;
     private final GameSocketController gameSocketController;
+    private final DailyPuzzleService dailyPuzzleService;
+    private DailyPuzzleScheduler puzzleScheduler;
+    private final Clock clock;
 
 
     public ApplicationConfig(EntityManagerFactory emf){
@@ -37,6 +41,9 @@ public class ApplicationConfig implements EndpointGroup {
     }
 
     public ApplicationConfig(EntityManagerFactory emf, Clock clock, LichessClient lichessClient){ //constructor only to be called directly when testing
+        //time
+        this.clock = clock;
+
         //daos
         UserDAO userDAO = new UserDAO(emf);
         GameDAO gameDAO = new GameDAO(emf);
@@ -52,7 +59,7 @@ public class ApplicationConfig implements EndpointGroup {
 
         UserService userService = new UserService(userDAO);
         GameService gameService = new GameService(userService, playerDAO, gameDAO, moveDAO, userDAO);
-        DailyPuzzleService dailyPuzzleService = new DailyPuzzleService(clock, dailyPuzzleDAO, puzzleAttemptDAO, userDAO, lichessClient);
+        dailyPuzzleService = new DailyPuzzleService(clock, dailyPuzzleDAO, puzzleAttemptDAO, userDAO, lichessClient);
 
         //handlers
         this.exceptionHandler = new ExceptionHandler();
@@ -60,6 +67,9 @@ public class ApplicationConfig implements EndpointGroup {
 
         //game registry
         GameConnectionRegistry gameConnectionRegistry = new GameConnectionRegistry();
+
+        //schedulers
+        this.puzzleScheduler = new DailyPuzzleScheduler(dailyPuzzleService, clock);
 
 
         //controllers
@@ -94,5 +104,16 @@ public class ApplicationConfig implements EndpointGroup {
         Javalin app = Javalin.create(this::configuration);
         app.start(port);
         return app;
+    }
+
+    public void startPuzzleScheduler(){
+        this.puzzleScheduler = new DailyPuzzleScheduler(dailyPuzzleService, clock);
+        puzzleScheduler.start();
+    }
+
+    public void stopPuzzleScheduler(){
+        if (puzzleScheduler != null){
+            puzzleScheduler.stop();
+        }
     }
 }
