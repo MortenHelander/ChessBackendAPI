@@ -1,0 +1,5 @@
+package app.entities.enums;
+
+public enum EndReason {
+    CHECKMATE, STALEMATE, RESIGNATION, INSUFFICIENT_MATERIAL, FIFTY_MOVE_RULE, THREEFOLD_REPETITION
+}

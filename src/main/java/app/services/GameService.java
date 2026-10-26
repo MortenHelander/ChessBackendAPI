@@ -6,17 +6,11 @@ import app.dtos.games.GameResponseDTO;
 import app.dtos.games.MoveRequestDTO;
 import app.dtos.games.MoveResponseDTO;
 import app.entities.*;
-import app.entities.enums.Color;
-import app.entities.enums.GameMode;
-import app.entities.enums.GameStatus;
-import app.entities.enums.Result;
+import app.entities.enums.*;
 import app.exceptions.ApiException;
 import app.gameengine.*;
-import app.gameengine.game_logic.CheckChecker;
-import app.gameengine.game_logic.MoveResult;
-import app.gameengine.game_logic.Promotion;
+import app.gameengine.game_logic.*;
 import app.gameengine.gameservices.PieceFinder;
-import app.gameengine.game_logic.PromotionHelper;
 import app.gameengine.gameservices.PositionConverter;
 import app.gameengine.pieces.Piece;
 import app.mappers.GameMapper;
@@ -116,9 +110,11 @@ public class GameService {
 
         boolean isOpponentWhite = !game.isWhitesTurn();
         if (CheckChecker.isCheckMate(board, isOpponentWhite)) {
-            game.finishGame(GameStatus.CHECKMATE, game.isWhitesTurn() ? Color.WHITE : Color.BLACK);
+            game.finishGame(GameStatus.CHECKMATE, game.isWhitesTurn() ? Color.WHITE : Color.BLACK, EndReason.CHECKMATE);
         } else if (CheckChecker.isStaleMate(board, isOpponentWhite)) {
-            game.finishGame(GameStatus.DRAW, null);
+            game.finishGame(GameStatus.DRAW, null, EndReason.STALEMATE);
+        } else if (DrawChecker.isInsufficientMaterial(board)){
+            game.finishGame(GameStatus.DRAW, null, EndReason.INSUFFICIENT_MATERIAL);
         }
 
         String letter = result.isAwaitingPromotion() ? moveRequest.promotionLetter() : null;

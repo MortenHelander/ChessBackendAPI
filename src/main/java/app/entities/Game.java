@@ -1,6 +1,7 @@
 package app.entities;
 
 import app.entities.enums.Color;
+import app.entities.enums.EndReason;
 import app.entities.enums.GameMode;
 import app.entities.enums.GameStatus;
 import app.exceptions.ApiException;
@@ -28,6 +29,8 @@ public class Game {
     private GameStatus gameStatus;
     @Enumerated(value = EnumType.STRING)
     private Color winnerColor;
+    @Enumerated(value = EnumType.STRING)
+    private EndReason endReason;
     private boolean isWhitesTurn;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "game", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -76,7 +79,7 @@ public class Game {
         }
     }
 
-    public void finishGame(GameStatus status, Color winnerColor){
+    public void finishGame(GameStatus status, Color winnerColor, EndReason endReason){
         if (this.gameStatus != GameStatus.IN_PROGRESS){
             throw new ApiException(400, "Game is already finished");
         }
@@ -93,6 +96,7 @@ public class Game {
             throw new ApiException(400, "Game is already finished");
         }
         this.gameStatus = GameStatus.RESIGNED;
+        this.endReason = EndReason.RESIGNATION;
         for (Player player : players) {
             if (!player.getColor().equals(resigningColor)){
                 winnerColor = player.getColor();

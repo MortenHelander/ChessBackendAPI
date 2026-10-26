@@ -76,7 +76,7 @@ public class ReplayHelperTest {
         Position from = PositionConverter.fromString(fromText);
         Position to = PositionConverter.fromString(toText);
 
-        Move move = new Move(from, to, promotionLetter);
+        Move move = new Move(from, to, promotionLetter, false); //only replays so gives check is not nescesary here
         move.setMoveNumber(moveNumber);
         return move;
     }
