@@ -33,6 +33,7 @@ public class Move {
     private Position to;
     @Nullable
     private String promotionLetter;
+    private boolean givesCheck;
     @ManyToOne
     @ToString.Exclude
     @Setter
@@ -43,10 +44,11 @@ public class Move {
         this.to = to;
     }
 
-    public Move(Position from, Position to, @Nullable String promotionLetter){
+    public Move(Position from, Position to, @Nullable String promotionLetter, boolean givesCheck){
         this.from = from;
         this.to = to;
         this.promotionLetter = promotionLetter;
+        this.givesCheck = givesCheck;
     }
 
     @Override

@@ -122,8 +122,8 @@ public class GameService {
         }
 
         String letter = result.isAwaitingPromotion() ? moveRequest.promotionLetter() : null;
-        Move move = new Move(from, to, letter);
-        boolean inCheck = CheckChecker.isSideInCheck(board, isOpponentWhite);
+        boolean givesCheck = CheckChecker.isSideInCheck(board, isOpponentWhite);
+        Move move = new Move(from, to, letter, givesCheck);
         game.addMoveAndShiftTurn(move);
         Game persistedGame = gameDAO.update(game);
         if (persistedGame.getGameStatus() != GameStatus.IN_PROGRESS){
@@ -131,7 +131,7 @@ public class GameService {
         }
 
         Move persistedMove = persistedGame.getMoves().getLast();
-        return MoveMapper.toDto(persistedMove, inCheck);
+        return MoveMapper.toDto(persistedMove);
     }
 
     public GameResponseDTO resign(Integer gameId, Integer userId){
