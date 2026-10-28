@@ -81,11 +81,7 @@ public class CheckChecker {
         return hasNoLegalMoves(board, isWhitesTurn) && isSideInCheck(board, isWhitesTurn);
     }
 
-    public static boolean isStaleMate(Board board, boolean isWhitesTurn){
-        return hasNoLegalMoves(board, isWhitesTurn) && !isSideInCheck(board, isWhitesTurn);
-    }
-
-    private static boolean hasNoLegalMoves(Board board, boolean isWhitesTurn){
+    public static boolean hasNoLegalMoves(Board board, boolean isWhitesTurn){
 
         Map<Position, Piece> allyPieces;
         List<Position> possiblePositions = new ArrayList<>();

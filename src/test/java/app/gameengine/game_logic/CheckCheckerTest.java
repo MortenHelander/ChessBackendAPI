@@ -161,7 +161,7 @@ class CheckCheckerTest {
         //white king is currently checked and have no possible escape so a true checkmate
         assertThat(CheckChecker.isKingChecked(board, whiteKing), is(true));
         assertThat(CheckChecker.isCheckMate(board, true), is(true));
-        assertThat(CheckChecker.isStaleMate(board, true), is(false));
+        assertThat(DrawChecker.isStaleMate(board, true), is(false));
     }
 
     @Test
@@ -174,6 +174,6 @@ class CheckCheckerTest {
         //king cannot move anywhere without being checked but is not currently in check so a stalemate is true
         assertThat(CheckChecker.isKingChecked(board, whiteKing), is(false));
         assertThat(CheckChecker.isCheckMate(board, true), is(false));
-        assertThat(CheckChecker.isStaleMate(board, true), is(true));
+        assertThat(DrawChecker.isStaleMate(board, true), is(true));
     }
 }

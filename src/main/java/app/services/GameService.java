@@ -79,7 +79,7 @@ public class GameService {
                 .orElseThrow(() -> new ApiException(403, "You are not a player in this game"));
 
         boolean playerIsWhite = (foundPlayer.getColor() == Color.WHITE); //convert color enum to boolean
-        if (playerIsWhite != game.isWhitesTurn()){
+        if (playerIsWhite != game.isWhitesTurn()) {
             throw new ApiException(400, "Not your turn");
         }
 
@@ -111,9 +111,9 @@ public class GameService {
         boolean isOpponentWhite = !game.isWhitesTurn();
         if (CheckChecker.isCheckMate(board, isOpponentWhite)) {
             game.finishGame(GameStatus.CHECKMATE, game.isWhitesTurn() ? Color.WHITE : Color.BLACK, EndReason.CHECKMATE);
-        } else if (CheckChecker.isStaleMate(board, isOpponentWhite)) {
+        } else if (DrawChecker.isStaleMate(board, isOpponentWhite)) {
             game.finishGame(GameStatus.DRAW, null, EndReason.STALEMATE);
-        } else if (DrawChecker.isInsufficientMaterial(board)){
+        } else if (DrawChecker.isInsufficientMaterial(board)) {
             game.finishGame(GameStatus.DRAW, null, EndReason.INSUFFICIENT_MATERIAL);
         }
 
@@ -121,8 +121,14 @@ public class GameService {
         boolean givesCheck = CheckChecker.isSideInCheck(board, isOpponentWhite);
         Move move = new Move(from, to, letter, givesCheck);
         game.addMoveAndShiftTurn(move);
+        if (game.getGameStatus() == GameStatus.IN_PROGRESS && DrawChecker.isFiftyMoveRule(game.getMoves())) {
+            game.finishGame(GameStatus.DRAW, null, EndReason.FIFTY_MOVE_RULE);
+        }
+        if (game.getGameStatus() == GameStatus.IN_PROGRESS && DrawChecker.isThreefoldRepetition(game.getMoves())) {
+            game.finishGame(GameStatus.DRAW, null, EndReason.THREEFOLD_REPETITION);
+        }
         Game persistedGame = gameDAO.update(game);
-        if (persistedGame.getGameStatus() != GameStatus.IN_PROGRESS){
+        if (persistedGame.getGameStatus() != GameStatus.IN_PROGRESS) {
             recordResult(persistedGame);
         }
 
@@ -130,7 +136,7 @@ public class GameService {
         return MoveMapper.toDto(persistedMove);
     }
 
-    public GameResponseDTO resign(Integer gameId, Integer userId){
+    public GameResponseDTO resign(Integer gameId, Integer userId) {
         Game game = gameDAO.getById(gameId);
         if (game.getGameStatus() != GameStatus.IN_PROGRESS) {
             throw new ApiException(400, "Game is finished");
@@ -140,24 +146,24 @@ public class GameService {
                 .filter(p -> p.getUser() != null && p.getUser().getId().equals(userId)).findFirst()
                 .orElseThrow(() -> new ApiException(403, "You are not a player in this game"));
 
-       game.resign(foundPlayer.getColor());
-       Game updated = gameDAO.update(game);
-       recordResult(updated);
-       return GameMapper.toDTO(updated);
+        game.resign(foundPlayer.getColor());
+        Game updated = gameDAO.update(game);
+        recordResult(updated);
+        return GameMapper.toDTO(updated);
     }
 
-    private void recordResult(Game game){
+    private void recordResult(Game game) {
         for (Player player : game.getPlayers()) {
             //if player is ai
-            if (player.getUser() == null){
+            if (player.getUser() == null) {
                 break;
             }
             Result result;
-            if (game.getWinnerColor() == Color.NO_COLOR){
+            if (game.getWinnerColor() == Color.NO_COLOR) {
                 result = Result.DRAW;
-            }else if (player.getColor() == game.getWinnerColor()){
+            } else if (player.getColor() == game.getWinnerColor()) {
                 result = Result.WIN;
-            }else{
+            } else {
                 result = Result.LOSS;
             }
             userStatsDao.recordResult(player.getUser().getId(), result);

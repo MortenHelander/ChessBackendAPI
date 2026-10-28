@@ -15,7 +15,7 @@ public class GameMapper {
 
         List<PlayerResponseDTO> players = PlayerMapper.entityToDtoAsList(game.getPlayers());
 
-        return new GameResponseDTO(game.getId(), game.getStartedAt(), game.getGameMode().name(), game.getGameStatus().name(), game.getWinnerColor().name(), game.isWhitesTurn(), players);
+        return new GameResponseDTO(game.getId(), game.getStartedAt(), game.getGameMode().name(), game.getGameStatus().name(), game.getWinnerColor().name(), game.getEndReason().name(), game.isWhitesTurn(), players);
     }
 
 
