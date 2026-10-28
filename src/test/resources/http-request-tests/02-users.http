@@ -1,0 +1,56 @@
+### USER ENDPOINTS
+
+### Get all users (public, expect 200 and a list)
+GET {{baseUrl}}/api/v1/users
+
+### Get one user by id (public, expect 200)
+GET {{baseUrl}}/api/v1/users/{{user1Id}}
+
+
+### Get one user by username (public, expect 200)
+GET {{baseUrl}}/api/v1/users/username/anderson
+
+
+### Get a user that doesn't exist (expect 404)
+GET {{baseUrl}}/api/v1/users/99999
+
+
+### Get a user with a negative id (expect 400)
+GET {{baseUrl}}/api/v1/users/-1
+
+
+### Get my stats (logged in, expect 200)
+GET {{baseUrl}}/api/v1/users/{{user1Id}}/stats
+Authorization: Bearer {{token1}}
+
+
+### Get stats without a token (expect 401)
+GET {{baseUrl}}/api/v1/users/{{user1Id}}/stats
+
+### Update my own profile (expect 200) - username is kept the same so the token stays valid
+PUT {{baseUrl}}/api/v1/users/{{user1Id}}
+Authorization: Bearer {{token1}}
+Content-Type: application/json
+
+{
+  "username": "mohel",
+  "firstName": "Morten",
+  "lastName": "Helander",
+  "email": "morten.updated@example.com"
+}
+
+### Update ANOTHER user's profile (expect 403 - only yourself or an admin)
+PUT {{baseUrl}}/api/v1/users/{{user2Id}}
+Authorization: Bearer {{token1}}
+Content-Type: application/json
+
+{
+  "username": "anderson",
+  "firstName": "Hacked",
+  "lastName": "Name",
+  "email": "hacked@example.com"
+}
+
+### Delete a user as a normal user (expect 403 - admin only)
+DELETE {{baseUrl}}/api/v1/users/{{user3Id}}
+Authorization: Bearer {{token1}}

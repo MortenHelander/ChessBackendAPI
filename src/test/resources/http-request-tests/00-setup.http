@@ -1,0 +1,84 @@
+### Registers three users, logs them in and saves their ids and tokens as global variables.
+### The other files use {{token1}}, {{token2}}, {{token3}}, {{user1Id}}, {{user2Id}}, {{user3Id}}.
+### Registering again later gives 409 (already exists) - that's fine, the logins still work.
+
+### Register user 1 (will play white)
+POST {{baseUrl}}/api/v1/auth/register
+Content-Type: application/json
+
+{
+  "username": "mohel",
+  "firstName": "Morten",
+  "lastName": "Helander",
+  "email": "morten@example.com",
+  "password": "Str0ng!Passw0rd",
+  "passwordCheck": "Str0ng!Passw0rd"
+}
+
+### Register user 2 (will play black)
+POST {{baseUrl}}/api/v1/auth/register
+Content-Type: application/json
+
+{
+  "username": "anderson",
+  "firstName": "Andreas",
+  "lastName": "Jensen",
+  "email": "andreas@example.com",
+  "password": "Str0ng!Passw0rd",
+  "passwordCheck": "Str0ng!Passw0rd"
+}
+
+### Register user 3 (an outsider, not part of the games)
+POST {{baseUrl}}/api/v1/auth/register
+Content-Type: application/json
+
+{
+  "username": "theiss",
+  "firstName": "Theis",
+  "lastName": "Rudkjaer",
+  "email": "theis@example.com",
+  "password": "Str0ng!Passw0rd",
+  "passwordCheck": "Str0ng!Passw0rd"
+}
+
+### Log in user 1 and save id + token
+POST {{baseUrl}}/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "username": "mohel",
+  "password": "Str0ng!Passw0rd"
+}
+
+> {%
+    client.global.set("token1", response.body.token);
+    client.global.set("user1Id", response.body.id);
+%}
+
+### Log in user 2 and save id + token
+POST {{baseUrl}}/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "username": "anderson",
+  "password": "Str0ng!Passw0rd"
+}
+
+> {%
+    client.global.set("token2", response.body.token);
+    client.global.set("user2Id", response.body.id);
+%}
+
+### Log in user 3 and save id + token
+POST {{baseUrl}}/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "username": "theiss",
+  "password": "Str0ng!Passw0rd"
+}
+
+> {%
+    client.global.set("token3", response.body.token);
+    client.global.set("user3Id", response.body.id);
+%}

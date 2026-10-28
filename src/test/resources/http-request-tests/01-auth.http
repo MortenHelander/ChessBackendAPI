@@ -1,0 +1,56 @@
+### AUTH ENDPOINTS - no setup needed
+
+### Health check (expect 200)
+GET {{baseUrl}}/api/v1/auth/healthcheck
+
+### Register with invalid data: bad email, short password, passwords don't match (expect 400)
+POST {{baseUrl}}/api/v1/auth/register
+Content-Type: application/json
+
+{
+  "username": "x",
+  "firstName": "Test",
+  "lastName": "Person",
+  "email": "not-an-email",
+  "password": "short",
+  "passwordCheck": "different"
+}
+
+### Register a username that already exists (expect 409)
+POST {{baseUrl}}/api/v1/auth/register
+Content-Type: application/json
+
+{
+  "username": "mohel",
+  "firstName": "Morten",
+  "lastName": "Helander",
+  "email": "morten@example.com",
+  "password": "Str0ng!Passw0rd",
+  "passwordCheck": "Str0ng!Passw0rd"
+}
+
+### Log in with correct credentials (expect 200 with token and roles)
+POST {{baseUrl}}/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "username": "mohel",
+  "password": "Str0ng!Passw0rd"
+}
+
+### Log in with wrong password (expect 401)
+POST {{baseUrl}}/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "username": "mohel",
+  "password": "WrongPassword1!"
+}
+
+### Log in without a password (expect 400)
+POST {{baseUrl}}/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "username": "mohel"
+}

@@ -1,0 +1,77 @@
+### DAILY PUZZLE ENDPOINTS
+### The puzzle changes every day, so the solution isn't known in advance.
+
+### Get today's puzzle (expect 200 - the solution is never included)
+GET {{baseUrl}}/api/v1/puzzles/daily
+Authorization: Bearer {{token1}}
+
+> {%
+    client.test("Puzzle returned without solution", function () {
+        client.assert(response.status === 200, "Expected 200 but got " + response.status);
+        client.assert(response.body.fen, "Expected a FEN");
+        client.assert(response.body.solution === undefined, "The solution must never be sent");
+    });
+%}
+
+### Get today's puzzle again - second call is served from the database, so it's much faster
+GET {{baseUrl}}/api/v1/puzzles/daily
+Authorization: Bearer {{token1}}
+
+### Get today's puzzle without a token (expect 401)
+GET {{baseUrl}}/api/v1/puzzles/daily
+
+> {%
+    client.test("Puzzle needs a token", function () {
+        client.assert(response.status === 401, "Expected 401 but got " + response.status);
+    });
+%}
+
+### Play a move from an empty square (expect 400 "No piece on selected square")
+### e4 is empty in almost every puzzle position - change it if today's puzzle has a piece there
+POST {{baseUrl}}/api/v1/puzzles/daily/moves
+Authorization: Bearer {{token1}}
+Content-Type: application/json
+
+{ "from": "e4", "to": "e5" }
+
+### Play a move with a square that doesn't exist (expect 400)
+POST {{baseUrl}}/api/v1/puzzles/daily/moves
+Authorization: Bearer {{token1}}
+Content-Type: application/json
+
+{ "from": "z9", "to": "e5" }
+
+> {%
+    client.test("Invalid square is rejected", function () {
+        client.assert(response.status === 400, "Expected 400 but got " + response.status);
+    });
+%}
+
+### Play a move without "from" (expect 400 "From position is required")
+POST {{baseUrl}}/api/v1/puzzles/daily/moves
+Authorization: Bearer {{token1}}
+Content-Type: application/json
+
+{ "to": "e5" }
+
+> {%
+    client.test("Missing from is rejected", function () {
+        client.assert(response.status === 400, "Expected 400 but got " + response.status);
+    });
+%}
+
+### Play a real move - REPLACE from/to with a legal move from today's puzzle
+### A correct move returns the opponent's reply in "opponentMove";
+### a legal but wrong move returns correct=false and costs one of the 10 tries.
+POST {{baseUrl}}/api/v1/puzzles/daily/moves
+Authorization: Bearer {{token1}}
+Content-Type: application/json
+
+{ "from": "e2", "to": "e4" }
+
+### Play a move without a token (expect 401)
+POST {{baseUrl}}/api/v1/puzzles/daily/moves
+Content-Type: application/json
+
+{ "from": "e2", "to": "e4" }
+

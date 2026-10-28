@@ -1,0 +1,282 @@
+### GAME ENDPOINTS
+### Runs top to bottom: creates a game, plays and checks moves, resigns,
+### then plays Fool's Mate (checkmate) and a threefold repetition (draw) in two new games.
+
+### ---------- create and read games ----------
+
+### Create a game: user 1 white, user 2 black (expect 201)
+POST {{baseUrl}}/api/v1/games
+Authorization: Bearer {{token1}}
+Content-Type: application/json
+
+{
+  "whiteUserId": {{user1Id}},
+  "blackUserId": {{user2Id}},
+  "gameMode": "CLASSIC"
+}
+
+> {%
+    client.global.set("gameId", response.body.id);
+%}
+
+### Create a game against yourself (expect 400)
+POST {{baseUrl}}/api/v1/games
+Authorization: Bearer {{token1}}
+Content-Type: application/json
+
+{
+  "whiteUserId": {{user1Id}},
+  "blackUserId": {{user1Id}},
+  "gameMode": "CLASSIC"
+}
+
+
+### Create a game with an unknown game mode (expect 400)
+POST {{baseUrl}}/api/v1/games
+Authorization: Bearer {{token1}}
+Content-Type: application/json
+
+{
+  "whiteUserId": {{user1Id}},
+  "blackUserId": {{user2Id}},
+  "gameMode": "SPEED"
+}
+
+
+### Create a game without a token (expect 401)
+POST {{baseUrl}}/api/v1/games
+Content-Type: application/json
+
+{
+  "whiteUserId": {{user1Id}},
+  "blackUserId": {{user2Id}},
+  "gameMode": "CLASSIC"
+}
+
+
+### Get all games (expect 200)
+GET {{baseUrl}}/api/v1/games
+Authorization: Bearer {{token1}}
+
+
+### Get the new game (expect 200)
+GET {{baseUrl}}/api/v1/games/{{gameId}}
+Authorization: Bearer {{token1}}
+
+
+### Get a game that doesn't exist (expect 404)
+GET {{baseUrl}}/api/v1/games/99999
+Authorization: Bearer {{token1}}
+
+### ---------- moves ----------
+
+### White plays e2-e4 (expect 201)
+POST {{baseUrl}}/api/v1/games/{{gameId}}/moves
+Authorization: Bearer {{token1}}
+Content-Type: application/json
+
+{ "from": "e2", "to": "e4" }
+
+
+### White tries to move again on black's turn (expect 400 "Not your turn")
+POST {{baseUrl}}/api/v1/games/{{gameId}}/moves
+Authorization: Bearer {{token1}}
+Content-Type: application/json
+
+{ "from": "d2", "to": "d4" }
+
+
+### Black tries an illegal move: pawn three squares (expect 400 "Illegal move")
+POST {{baseUrl}}/api/v1/games/{{gameId}}/moves
+Authorization: Bearer {{token2}}
+Content-Type: application/json
+
+{ "from": "e7", "to": "e4" }
+
+
+### Black tries to move a white piece (expect 400)
+POST {{baseUrl}}/api/v1/games/{{gameId}}/moves
+Authorization: Bearer {{token2}}
+Content-Type: application/json
+
+{ "from": "d2", "to": "d4" }
+
+
+### An outsider tries to move (expect 403)
+POST {{baseUrl}}/api/v1/games/{{gameId}}/moves
+Authorization: Bearer {{token3}}
+Content-Type: application/json
+
+{ "from": "e7", "to": "e5" }
+
+
+### Black plays e7-e5 (expect 201)
+POST {{baseUrl}}/api/v1/games/{{gameId}}/moves
+Authorization: Bearer {{token2}}
+Content-Type: application/json
+
+{ "from": "e7", "to": "e5" }
+
+
+### Get the move history (expect 200 with 2 moves in order)
+GET {{baseUrl}}/api/v1/games/{{gameId}}/moves
+Authorization: Bearer {{token1}}
+
+### ---------- resign ----------
+
+### An outsider tries to resign (expect 403)
+POST {{baseUrl}}/api/v1/games/{{gameId}}/resign
+Authorization: Bearer {{token3}}
+
+
+### White resigns (expect 200, black wins)
+POST {{baseUrl}}/api/v1/games/{{gameId}}/resign
+Authorization: Bearer {{token1}}
+
+### Resign again (expect 400, the game is already finished)
+POST {{baseUrl}}/api/v1/games/{{gameId}}/resign
+Authorization: Bearer {{token1}}
+
+### Move after the game is over (expect 400 "Game is finished")
+POST {{baseUrl}}/api/v1/games/{{gameId}}/moves
+Authorization: Bearer {{token2}}
+Content-Type: application/json
+
+{ "from": "d7", "to": "d5" }
+
+### ---------- Fool's Mate: the fastest checkmate (black wins in 2 moves) ----------
+
+### New game for Fool's Mate (expect 201)
+POST {{baseUrl}}/api/v1/games
+Authorization: Bearer {{token1}}
+Content-Type: application/json
+
+{
+  "whiteUserId": {{user1Id}},
+  "blackUserId": {{user2Id}},
+  "gameMode": "CLASSIC"
+}
+
+> {%
+    client.global.set("mateGameId", response.body.id);
+%}
+
+### 1. f2-f3
+POST {{baseUrl}}/api/v1/games/{{mateGameId}}/moves
+Authorization: Bearer {{token1}}
+Content-Type: application/json
+
+{ "from": "f2", "to": "f3" }
+
+### 1... e7-e5
+POST {{baseUrl}}/api/v1/games/{{mateGameId}}/moves
+Authorization: Bearer {{token2}}
+Content-Type: application/json
+
+{ "from": "e7", "to": "e5" }
+
+### 2. g2-g4
+POST {{baseUrl}}/api/v1/games/{{mateGameId}}/moves
+Authorization: Bearer {{token1}}
+Content-Type: application/json
+
+{ "from": "g2", "to": "g4" }
+
+### 2... Qd8-h4 checkmate (expect 201, and the move gives check)
+POST {{baseUrl}}/api/v1/games/{{mateGameId}}/moves
+Authorization: Bearer {{token2}}
+Content-Type: application/json
+
+{ "from": "d8", "to": "h4" }
+
+### The game is now CHECKMATE with black as winner
+GET {{baseUrl}}/api/v1/games/{{mateGameId}}
+Authorization: Bearer {{token1}}
+
+### Black's stats now include the win (check wins/gamesPlayed in the response)
+GET {{baseUrl}}/api/v1/users/{{user2Id}}/stats
+Authorization: Bearer {{token2}}
+
+### ---------- threefold repetition: both knights jump out and back twice ----------
+
+### New game for the repetition draw (expect 201)
+POST {{baseUrl}}/api/v1/games
+Authorization: Bearer {{token1}}
+Content-Type: application/json
+
+{
+  "whiteUserId": {{user1Id}},
+  "blackUserId": {{user2Id}},
+  "gameMode": "CLASSIC"
+}
+
+> {%
+    client.global.set("drawGameId", response.body.id);
+%}
+
+### Ng1-f3
+POST {{baseUrl}}/api/v1/games/{{drawGameId}}/moves
+Authorization: Bearer {{token1}}
+Content-Type: application/json
+
+{ "from": "g1", "to": "f3" }
+
+### Ng8-f6
+POST {{baseUrl}}/api/v1/games/{{drawGameId}}/moves
+Authorization: Bearer {{token2}}
+Content-Type: application/json
+
+{ "from": "g8", "to": "f6" }
+
+### Nf3-g1
+POST {{baseUrl}}/api/v1/games/{{drawGameId}}/moves
+Authorization: Bearer {{token1}}
+Content-Type: application/json
+
+{ "from": "f3", "to": "g1" }
+
+### Nf6-g8 (start position for the 2nd time)
+POST {{baseUrl}}/api/v1/games/{{drawGameId}}/moves
+Authorization: Bearer {{token2}}
+Content-Type: application/json
+
+{ "from": "f6", "to": "g8" }
+
+### Ng1-f3
+POST {{baseUrl}}/api/v1/games/{{drawGameId}}/moves
+Authorization: Bearer {{token1}}
+Content-Type: application/json
+
+{ "from": "g1", "to": "f3" }
+
+### Ng8-f6
+POST {{baseUrl}}/api/v1/games/{{drawGameId}}/moves
+Authorization: Bearer {{token2}}
+Content-Type: application/json
+
+{ "from": "g8", "to": "f6" }
+
+### Nf3-g1
+POST {{baseUrl}}/api/v1/games/{{drawGameId}}/moves
+Authorization: Bearer {{token1}}
+Content-Type: application/json
+
+{ "from": "f3", "to": "g1" }
+
+### Nf6-g8 (start position for the 3rd time -> draw)
+POST {{baseUrl}}/api/v1/games/{{drawGameId}}/moves
+Authorization: Bearer {{token2}}
+Content-Type: application/json
+
+{ "from": "f6", "to": "g8" }
+
+### The game is now a DRAW with no winner
+GET {{baseUrl}}/api/v1/games/{{drawGameId}}
+Authorization: Bearer {{token1}}
+
+### ---------- admin only ----------
+
+### Delete a game as a normal user (expect 403 - admin only)
+DELETE {{baseUrl}}/api/v1/games/{{gameId}}
+Authorization: Bearer {{token1}}
+
