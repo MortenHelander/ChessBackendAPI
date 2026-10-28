@@ -156,7 +156,7 @@ public class GameService {
         for (Player player : game.getPlayers()) {
             //if player is ai
             if (player.getUser() == null) {
-                break;
+                continue;
             }
             Result result;
             if (game.getWinnerColor() == Color.NO_COLOR) {

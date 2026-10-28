@@ -83,6 +83,7 @@ public class Game {
         if (this.gameStatus != GameStatus.IN_PROGRESS){
             throw new ApiException(400, "Game is already finished");
         }
+        this.endReason = endReason;
         this.gameStatus = status;
         if (status == GameStatus.CHECKMATE) {
             this.winnerColor = winnerColor;

@@ -20,10 +20,12 @@ public class ExceptionHandler {
         config.routes.exception(ApiException.class, (e, ctx) -> {
             if (e.getCode() >= 500) {
                 log.error("Server error: {}", e.getMessage());
+                ctx.status(e.getCode()).json(Map.of("error", "Internal server error"));
             } else {
                 log.warn("Client error ({}): {}", e.getCode(), e.getMessage());
+                ctx.status(e.getCode()).json(Map.of("error", e.getMessage()));
             }
-            ctx.status(e.getCode()).json(Map.of("error", e.getMessage()));
+
         });
 
         config.routes.exception(ValidationException.class, (e, ctx) -> {
