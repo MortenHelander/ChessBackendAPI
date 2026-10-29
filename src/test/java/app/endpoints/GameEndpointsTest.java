@@ -67,6 +67,106 @@ public class GameEndpointsTest {
     }
 
     @Test
+    void createGame_validRequest_returns201() {
+        Integer whiteId = userIdOf(seed.get("game3"), Color.WHITE);
+        Integer blackId = userIdOf(seed.get("game3"), Color.BLACK);
+
+        given()
+                .header("Authorization", bearer(whiteToken))
+                .contentType(ContentType.JSON)
+                .body(Map.of("whiteUserId", whiteId, "blackUserId", blackId, "gameMode", "CLASSIC"))
+                .when()
+                .post("/api/v1/games")
+                .then().statusCode(201)
+                .body("id", notNullValue())
+                .body("gameMode", is("CLASSIC"))
+                .body("gameStatus", is("IN_PROGRESS"))
+                .body("isWhitesTurn", is(true))
+                .body("winnerColor", is("NO_COLOR"))
+                .body("endReason", nullValue())
+                .body("players", hasSize(2))
+                .body("players.color", containsInAnyOrder("WHITE", "BLACK"));
+
+        // the new game is saved: 3 seeded + 1 new
+        given()
+                .header("Authorization", bearer(userToken))
+                .when()
+                .get("/api/v1/games")
+                .then().statusCode(200)
+                .body("size()", is(4));
+    }
+
+    @Test
+    void createGame_samePlayerTwice_returns400() {
+        Integer whiteId = userIdOf(seed.get("game3"), Color.WHITE);
+
+        given()
+                .header("Authorization", bearer(whiteToken))
+                .contentType(ContentType.JSON)
+                .body(Map.of("whiteUserId", whiteId, "blackUserId", whiteId, "gameMode", "CLASSIC"))
+                .when()
+                .post("/api/v1/games")
+                .then().statusCode(400)
+                .body("error", is("Player 1 and player 2 cannot be the same"));
+    }
+
+    @Test
+    void createGame_missingWhitePlayer_returns400() {
+        Integer blackId = userIdOf(seed.get("game3"), Color.BLACK);
+
+        given()
+                .header("Authorization", bearer(whiteToken))
+                .contentType(ContentType.JSON)
+                .body(Map.of("blackUserId", blackId, "gameMode", "CLASSIC"))
+                .when()
+                .post("/api/v1/games")
+                .then().statusCode(400)
+                .body("error", is("No player 1 connected"));
+    }
+
+    @Test
+    void createGame_unknownGameMode_returns400() {
+        Integer whiteId = userIdOf(seed.get("game3"), Color.WHITE);
+        Integer blackId = userIdOf(seed.get("game3"), Color.BLACK);
+
+        given()
+                .header("Authorization", bearer(whiteToken))
+                .contentType(ContentType.JSON)
+                .body(Map.of("whiteUserId", whiteId, "blackUserId", blackId, "gameMode", "SPEED"))
+                .when()
+                .post("/api/v1/games")
+                .then().statusCode(400)
+                .body("error", is("No valid game mode chosen"));
+    }
+
+    @Test
+    void createGame_unknownUser_returns404() {
+        Integer blackId = userIdOf(seed.get("game3"), Color.BLACK);
+
+        given()
+                .header("Authorization", bearer(whiteToken))
+                .contentType(ContentType.JSON)
+                .body(Map.of("whiteUserId", 99999, "blackUserId", blackId, "gameMode", "CLASSIC"))
+                .when()
+                .post("/api/v1/games")
+                .then().statusCode(404)
+                .body("error", is("User with id 99999 not found"));
+    }
+
+    @Test
+    void createGame_noToken_returns401() {
+        Integer whiteId = userIdOf(seed.get("game3"), Color.WHITE);
+        Integer blackId = userIdOf(seed.get("game3"), Color.BLACK);
+
+        given()
+                .contentType(ContentType.JSON)
+                .body(Map.of("whiteUserId", whiteId, "blackUserId", blackId, "gameMode", "CLASSIC"))
+                .when()
+                .post("/api/v1/games")
+                .then().statusCode(401);
+    }
+
+    @Test
     void getGames_hasSize3_returns200() {
 
         given()
@@ -418,6 +518,15 @@ public class GameEndpointsTest {
                     .statusCode(201);
             whitesTurn = !whitesTurn;
         }
+    }
+
+    private Integer userIdOf(Game game, Color color) {
+        return game.getPlayers().stream()
+                .filter(p -> p.getColor() == color)
+                .findFirst()
+                .orElseThrow()
+                .getUser()
+                .getId();
     }
 
     private void playUpToPromotion(int id) {

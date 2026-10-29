@@ -10,16 +10,11 @@ Two registered players can play a full game of classic chess against each other 
 ## Links
 
 Portfolio website:
-<LINK>
+https://mortenhelander.github.io/Portfolio/
 
-Project overview video (max 5 min):
-<LINK>
 
-Deployed application (optional):
-<LINK>
-
-Source code repository:
-<LINK>
+Deployed application (no frontend, so only get requests works in browser):
+https://cheaoss.mortenhelander.dk
 
 ---
 
@@ -32,8 +27,8 @@ The project is built as a layered backend architecture:
 - **Controller layer** – Javalin endpoint groups (`GameController`, `DailyPuzzleController`, `UserController`, `AuthController`, `GameSocketController`). They validate input, read the logged-in user from the token, and return DTOs as JSON.
 - **Service layer** – business logic (`GameService`, `DailyPuzzleService`, `UserService`, `TokenService`). Services rebuild boards, validate moves, decide game results and update statistics.
 - **DAO layer** – database access with JPA/Hibernate (`GameDAO`, `DailyPuzzleDAO`, `DailyPuzzleAttemptDAO`, `UserStatsDAO`, …).
-- **Game engine** – plain Java, no framework dependencies: board, pieces, move generation, check/checkmate/stalemate detection, castling, en passant, promotion and a FEN parser.
-- **Clients** – HTTP clients for external APIs (Lichess, Chess.com).
+- **Game engine** – plain Java, no framework dependencies: board, pieces, move generation, check/checkmate/draw detection, castling, en passant, promotion and a FEN parser.
+- **Clients** – HTTP clients for external APIs (Lichess).
 - **Scheduler** – a background job that fetches the Lichess daily puzzle once a day.
 
 Technologies used:
@@ -115,7 +110,6 @@ erDiagram
     USERS ||--o{ PLAYERS : "plays as"
     GAMES ||--|{ PLAYERS : has
     GAMES ||--o{ MOVES : contains
-    PLAYERS ||--o{ PLAYER_POWER_UPS : holds
     USERS ||--o{ PUZZLE_ATTEMPTS : makes
     DAILY_PUZZLES ||--o{ PUZZLE_ATTEMPTS : "attempted in"
     DAILY_PUZZLES ||--|{ DAILY_PUZZLES_SOLUTIONS : "solution moves"
@@ -165,12 +159,6 @@ erDiagram
         string promotionLetter
         boolean givesCheck
         int game_id FK
-    }
-    PLAYER_POWER_UPS {
-        int id PK
-        string type
-        string status
-        int player_id FK
     }
     DAILY_PUZZLES {
         date id PK
@@ -248,6 +236,7 @@ Fields: id, user, dailyPuzzle, moveIndex, attemptsLeft, status (`IN_PROGRESS`, `
 # API Documentation
 
 All endpoints are under `/api/v1`. Protected endpoints need the header `Authorization: Bearer <token>`. Errors are returned as `{"error": "message"}`.
+Below is a list of all endpoints, further documentation and error codes of each endpoint can be found here: [API_DOCUMENTATION.md](docs/API_DOCUMENTATION.md)
 
 
 ## Authentication
@@ -442,7 +431,9 @@ Messages from the server have the form `{"type": "...", "payload": ...}`. Curren
 
 # User Stories
 
-The full list, with acceptance criteria, priorities and status, is kept in the project's user story document. The most important ones:
+The full list, with acceptance criteria, priorities and status, is in [USER_STORIES.md](docs/USER_STORIES.md).
+
+The most important ones:
 
 **Classic chess rules**
 
@@ -480,7 +471,7 @@ The full list, with acceptance criteria, priorities and status, is kept in the p
 
 # Development Notes
 
-**Rethinking the project.** The project started as a chess engine. To meet the course requirements (a REST API with concurrency and data integration) it was rebuilt around the engine as a layered Javalin API, with the engine kept free of framework code.
+**Rethinking the project.** The project started as a simple untested chess engine I build during the summer. To meet the course requirements (a REST API with concurrency and data integration) it was rebuilt around the engine as a layered Javalin API, with the engine kept free of framework code.
 
 **Parsing FEN.** FEN describes a position but not its history, so information the engine depends on – whether a pawn, king or rook has moved – had to be derived from the position and the castling and en passant fields. The parser validates every part and returns 400 with a clear message for invalid input. A round of unit tests covers the start position, real puzzle positions, en passant and invalid input.
 
