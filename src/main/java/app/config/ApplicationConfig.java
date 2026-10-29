@@ -19,9 +19,7 @@ import io.javalin.apibuilder.EndpointGroup;
 import io.javalin.config.JavalinConfig;
 import io.javalin.json.JavalinJackson;
 import jakarta.persistence.EntityManagerFactory;
-
 import java.time.Clock;
-
 
 public class ApplicationConfig implements EndpointGroup {
     private final AccessHandler accessHandler;
@@ -34,7 +32,6 @@ public class ApplicationConfig implements EndpointGroup {
     private final DailyPuzzleService dailyPuzzleService;
     private DailyPuzzleScheduler puzzleScheduler;
     private final Clock clock;
-
 
     public ApplicationConfig(EntityManagerFactory emf){
         this(emf, Clock.systemUTC(), new LichessClient());

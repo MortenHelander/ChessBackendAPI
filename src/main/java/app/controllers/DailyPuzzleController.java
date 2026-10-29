@@ -9,10 +9,6 @@ import app.services.DailyPuzzleService;
 import io.javalin.apibuilder.EndpointGroup;
 import io.javalin.http.Context;
 import io.javalin.http.HttpStatus;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-
 import static io.javalin.apibuilder.ApiBuilder.get;
 import static io.javalin.apibuilder.ApiBuilder.post;
 
