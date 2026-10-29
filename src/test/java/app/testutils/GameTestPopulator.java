@@ -40,13 +40,6 @@ public class GameTestPopulator {
             em.persist(user2);
 
             Player p1 = new Player(Color.WHITE, false);
-            PlayerPowerUp player1PowerUp1 = new PlayerPowerUp(PowerUpType.GOOD_AI, PowerUpStatus.AUTOMATICALLY_APPLIED);
-            PlayerPowerUp player1PowerUp2 = new PlayerPowerUp(PowerUpType.GAIN_RANDOM_PIECE, PowerUpStatus.HELD);
-            PlayerPowerUp player1PowerUp3 = new PlayerPowerUp(PowerUpType.KILL_RANDOM_PIECE, PowerUpStatus.HELD);
-            p1.addPowerUp(player1PowerUp1);
-            p1.addPowerUp(player1PowerUp2);
-            p1.addPowerUp(player1PowerUp3);
-
             user1.addPlayer(p1);
             Player p2 = new Player(Color.BLACK, false);
             user2.addPlayer(p2);

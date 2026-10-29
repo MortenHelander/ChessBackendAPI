@@ -12,7 +12,6 @@ final class EntityRegistry {
         configuration.addAnnotatedClass(Player.class);
         configuration.addAnnotatedClass(Game.class);
         configuration.addAnnotatedClass(Move.class);
-        configuration.addAnnotatedClass(PlayerPowerUp.class);
         configuration.addAnnotatedClass(UserStats.class);
         configuration.addAnnotatedClass(AccessRole.class);
         configuration.addAnnotatedClass(DailyPuzzle.class);

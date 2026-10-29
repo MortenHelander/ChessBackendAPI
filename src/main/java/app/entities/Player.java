@@ -1,14 +1,10 @@
 package app.entities;
 
-import app.daos.PlayerDAO;
 import app.entities.enums.Color;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.proxy.HibernateProxy;
-
-import java.util.HashSet;
 import java.util.Objects;
-import java.util.Set;
 
 @Entity
 @Table(name = "players")
@@ -31,21 +27,11 @@ public class Player {
     @ManyToOne
     @Setter
     private Game game;
-    @OneToMany(mappedBy = "player", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Builder.Default
-    private Set<PlayerPowerUp> playerPowerUps = new HashSet<>();
 
     public Player(Color color, boolean isAi) {
         this();
         this.color = color;
         this.isAi = isAi;
-    }
-
-    public void addPowerUp(PlayerPowerUp playerPowerUp){
-        this.playerPowerUps.add(playerPowerUp);
-        if (playerPowerUp != null){
-            playerPowerUp.setPlayer(this);
-        }
     }
 
     @Override
