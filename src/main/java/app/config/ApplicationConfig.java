@@ -36,11 +36,11 @@ public class ApplicationConfig implements EndpointGroup {
     private final Clock clock;
 
 
-    public ApplicationConfig(EntityManagerFactory emf){
+    public ApplicationConfig(EntityManagerFactory emf) {
         this(emf, Clock.systemUTC(), new LichessClient());
     }
 
-    public ApplicationConfig(EntityManagerFactory emf, Clock clock, LichessClient lichessClient){ //constructor only to be called directly when testing
+    public ApplicationConfig(EntityManagerFactory emf, Clock clock, LichessClient lichessClient) { //constructor only to be called directly when testing
         //time
         this.clock = clock;
 
@@ -86,7 +86,7 @@ public class ApplicationConfig implements EndpointGroup {
         gameSocketController.addEndpoints();
     }
 
-    private void configuration(JavalinConfig config){
+    private void configuration(JavalinConfig config) {
         config.jsonMapper(new JavalinJackson().updateMapper(mapper -> {
             mapper.registerModule(new JavaTimeModule());
             mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS); //stops dates from being turned into arrays
@@ -96,20 +96,19 @@ public class ApplicationConfig implements EndpointGroup {
         exceptionHandler.configureExceptionHandling(config);
     }
 
-
-    public Javalin createApp(int port){
+    public Javalin createApp(int port) {
         Javalin app = Javalin.create(this::configuration);
         app.start(port);
         return app;
     }
 
-    public void startPuzzleScheduler(){
+    public void startPuzzleScheduler() {
         this.puzzleScheduler = new DailyPuzzleScheduler(dailyPuzzleService, clock);
         puzzleScheduler.start();
     }
 
-    public void stopPuzzleScheduler(){
-        if (puzzleScheduler != null){
+    public void stopPuzzleScheduler() {
+        if (puzzleScheduler != null) {
             puzzleScheduler.stop();
         }
     }

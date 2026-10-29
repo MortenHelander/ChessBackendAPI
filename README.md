@@ -2,8 +2,8 @@
 
 ## Vision
 
-This project is a backend REST API for playing chess online, built around a chess engine written from scratch.
-Two registered players can play a full game of classic chess against each other with live updates over WebSocket, track their win/loss statistics, and solve the Lichess daily puzzle move by move.
+This project is a backend REST API made for playing chess online, built around a chess engine made as a summer project to challenge myself.
+Two registered players can play a working full game of classic chess, with live updates using WebSocket, functionality to track win/loss statistics exists, and it's possible to solve a daily puzzle which is fetched from Lichess API.
 
 ---
 
@@ -281,154 +281,6 @@ Below is a list of all endpoints, further documentation and error codes of each 
 | POST | `/puzzles/daily/moves` | user | Play a move in today's puzzle |
 
 
-## Example Endpoints
-
-### Register
-
-```
-POST /api/v1/auth/register
-```
-
-Request body:
-
-```json
-{
-  "username": "sheriffen",
-  "firstName": "Morten",
-  "lastName": "Helander",
-  "email": "morten@example.com",
-  "password": "password123",
-  "passwordCheck": "password123"
-}
-```
-
-Response:
-
-```
-201 Created
-```
-
-### Log in
-
-```
-POST /api/v1/auth/login
-```
-
-Request body:
-
-```json
-{ "username": "sheriffen", "password": "password123" }
-```
-
-Response:
-
-```json
-{ "id": 1, "username": "sheriffen", "token": "eyJhbGciOi...", "roles": ["USER"] }
-```
-
-### Start a game
-
-```
-POST /api/v1/games
-```
-
-Request body:
-
-```json
-{ "whiteUserId": 1, "blackUserId": 2, "gameMode": "CLASSIC" }
-```
-
-Response: `201 Created` with the game, including its id, status, whose turn it is and the players.
-
-### Make a move
-
-```
-POST /api/v1/games/{id}/moves
-```
-
-Request body (`promotionLetter` is only needed when a pawn promotes: `q`, `r`, `b` or `n`):
-
-```json
-{ "from": "e2", "to": "e4", "promotionLetter": null }
-```
-
-Response:
-
-```json
-{
-  "id": 1,
-  "moveNumber": 1,
-  "uci": "e2e4",
-  "playedAt": "2026-10-26T14:30:00.123456",
-  "from": "E2",
-  "to": "E4",
-  "givesCheck": false
-}
-```
-
-Errors: `400` illegal move, not your turn or game finished · `403` not a player in this game · `409` another move was saved at the same time.
-
-After a successful move, every WebSocket connection to the game receives the move.
-
-### Resign
-
-```
-POST /api/v1/games/{id}/resign
-```
-
-Response: `200 OK` with the game, where `gameStatus` is `RESIGNED` and `winnerColor` is the opponent. Both players' statistics are updated.
-
-### Get today's puzzle
-
-```
-GET /api/v1/puzzles/daily
-```
-
-Response (the solution is never sent):
-
-```json
-{
-  "date": "2026-10-22",
-  "fen": "2r1b3/1p2kpQ1/p3p3/4r3/3R4/P2B4/1P3PPP/2R3K1 b - - 0 1",
-  "rating": 1964,
-  "lastMove": "a1c1",
-  "isWhitesTurn": false,
-  "movesToSolve": 5
-}
-```
-
-Errors: `502` if Lichess cannot be reached or sends invalid data.
-
-### Play a puzzle move
-
-```
-POST /api/v1/puzzles/daily/moves
-```
-
-Request body:
-
-```json
-{ "from": "c8", "to": "c1" }
-```
-
-Response:
-
-```json
-{ "isCorrect": true, "opponentMove": "d3f1", "status": "IN_PROGRESS", "attemptsLeft": 10, "movesLeft": 4 }
-```
-
-A correct move is answered with the opponent's reply. A legal but wrong move costs one try; after 10 wrong moves the attempt is `FAILED`. Any checkmate is accepted as a solution. Illegal moves return `400` and do not cost a try.
-
-### WebSocket
-
-```
-ws://<host>/api/v1/games/{id}/ws?token=<jwt>
-```
-
-Messages from the server have the form `{"type": "...", "payload": ...}`. Current types: `PLAYER_JOINED`, `Move_MADE` and `GAME_RESIGNED`.
-
----
-
 # User Stories
 
 The full list, with acceptance criteria, priorities and status, is in [USER_STORIES.md](docs/USER_STORIES.md).
@@ -471,11 +323,9 @@ The most important ones:
 
 # Development Notes
 
-**Rethinking the project.** The project started as a simple untested chess engine I build during the summer. To meet the course requirements (a REST API with concurrency and data integration) it was rebuilt around the engine as a layered Javalin API, with the engine kept free of framework code.
+**Rethinking the project.** The project started as a simple untested chess engine I build during the summer. To meet the course requirements (a REST API with concurrency and data integration) it was rebuilt around the existing chess engine, which previously used ThymeLeaf, now using Javalin and Hibernate as a framework.
 
 **Parsing FEN.** FEN describes a position but not its history, so information the engine depends on – whether a pawn, king or rook has moved – had to be derived from the position and the castling and en passant fields. The parser validates every part and returns 400 with a clear message for invalid input. A round of unit tests covers the start position, real puzzle positions, en passant and invalid input.
-
-**Concurrency in practice.** The daily puzzle feature showed three different concurrency problems: many requests fetching the same puzzle (solved with the primary key and duplicate-key handling), a double-clicked first move (unique constraint), and two moves on the same attempt (optimistic locking). Each one is covered by a test that sends parallel requests.
 
 **Exceptions wrap exceptions.** Hibernate often wraps the real cause (for example a unique constraint violation or an optimistic lock failure) inside other exceptions. Small helper methods walk the cause chain, so a duplicate key becomes 409 and a version conflict becomes 409 instead of a generic 500.
 

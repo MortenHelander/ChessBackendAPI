@@ -65,11 +65,11 @@ public class AuthController implements EndpointGroup {
         UserVerifiedPasswordDTO verified = userService.verifyUser(request);
         String token = tokenService.createToken(verified);
         UserLoginResponseDTO response = UserMapper.fromVerifiedDtoToResponseDto(verified, token);
-        ctx.status(200);
+        ctx.status(HttpStatus.OK);
         ctx.json(response);
     }
 
     public void healthCheck(@NotNull Context ctx) {
-        ctx.status(200).json("{\"msg\": \"API is up and running\"}");
+        ctx.status(HttpStatus.OK).json("{\"msg\": \"API is up and running\"}");
     }
 }
