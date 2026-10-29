@@ -34,9 +34,10 @@ public class User {
     @Builder.Default
     private Set<Player> players = new HashSet<>();
     @ManyToMany
+    @Builder.Default
     private Set<AccessRole> roles = new HashSet<>();
-    @OneToMany
-    @ToString.Exclude
+    @OneToMany(mappedBy = "user")
+    @Builder.Default
     private Set<DailyPuzzleAttempt> puzzleAttempts = new HashSet<>();
 
     public User(String username, String email, String firstName, String lastName, String password) {

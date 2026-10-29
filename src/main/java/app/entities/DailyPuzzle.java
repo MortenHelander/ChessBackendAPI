@@ -4,9 +4,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 import org.hibernate.proxy.HibernateProxy;
-
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
@@ -33,8 +31,7 @@ public class DailyPuzzle {
     private List<String> solution;
     private String fen;
     private String lastMove;
-    @OneToMany
-    @ToString.Exclude
+    @OneToMany(mappedBy = "dailyPuzzle")
     private Set<DailyPuzzleAttempt> puzzleAttempts = new HashSet<>();
 
     public DailyPuzzle(LocalDate id, String lichessPuzzleId, int rating, List<String> solution, String fen, String lastMove) {
@@ -45,14 +42,6 @@ public class DailyPuzzle {
         this.fen = fen;
         this.lastMove = lastMove;
     }
-
-    public void addPuzzleAttempt(DailyPuzzleAttempt puzzleAttempt){
-        this.puzzleAttempts.add(puzzleAttempt);
-        if (puzzleAttempt != null){
-            puzzleAttempt.setDailyPuzzle(this);
-        }
-    }
-
 
     @Override
     public final boolean equals(Object o) {

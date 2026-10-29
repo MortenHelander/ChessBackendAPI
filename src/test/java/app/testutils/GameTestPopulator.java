@@ -3,12 +3,9 @@ package app.testutils;
 import app.entities.*;
 import app.entities.enums.Color;
 import app.entities.enums.GameMode;
-import app.entities.enums.PowerUpStatus;
-import app.entities.enums.PowerUpType;
 import app.gameengine.Position;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.PersistenceException;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
